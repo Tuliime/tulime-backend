@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/Tuliime/tulime-backend/internal/handlers/agroproducts"
 	"github.com/Tuliime/tulime-backend/internal/packages"
-	"github.com/Tuliime/tulime-backend/internal/routes/agroproducts"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
