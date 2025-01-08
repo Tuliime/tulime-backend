@@ -34,6 +34,7 @@ func Db() *gorm.DB {
 			log.Println("Loaded .env var file")
 		}
 		log.Println("DB DSN: ", os.Getenv("TULIME_DEV_DSN"))
+		log.Println("DB DSN: ", os.Getenv("TULIME_PROD_DSN"))
 
 		switch env {
 		case "development":
