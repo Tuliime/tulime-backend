@@ -12,12 +12,12 @@ func (ap *Agroproduct) BeforeCreate(tx *gorm.DB) error {
 }
 
 func (ap *Agroproduct) Create(agroproduct Agroproduct) (Agroproduct, error) {
+	// TODO: to validate the category here
 	result := db.Create(&agroproduct)
 
 	if result.Error != nil {
 		return agroproduct, result.Error
 	}
-	// return agroproduct.ID, nil
 	return agroproduct, nil
 }
 
