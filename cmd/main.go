@@ -40,6 +40,7 @@ func main() {
 	})
 	agroProducts.Get("/", agroproducts.GetAllProducts)
 	agroProducts.Post("/", agroproducts.PostAgroProduct)
+	agroProducts.Post("/:id/price", agroproducts.PostAgroProductPrice)
 
 	app.Use("*", func(c *fiber.Ctx) error {
 		message := fmt.Sprintf("api route '%s' doesn't exist!", c.Path())

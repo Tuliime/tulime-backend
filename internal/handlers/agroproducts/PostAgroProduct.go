@@ -12,6 +12,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+// TODO: Validate file presences
 var PostAgroProduct = func(c *fiber.Ctx) error {
 	agroProduct := models.Agroproduct{}
 
