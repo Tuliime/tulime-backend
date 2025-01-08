@@ -3,12 +3,14 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/Tuliime/tulime-backend/internal/handlers/agroproducts"
 	"github.com/Tuliime/tulime-backend/internal/packages"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/joho/godotenv"
 )
 
 func main() {
@@ -23,10 +25,21 @@ func main() {
 
 	app.Use(logger.New())
 
+	// Load dev .env file
+	env := os.Getenv("GO_ENV")
+	if env == "development" {
+		err := godotenv.Load()
+		if err != nil {
+			log.Fatalf("Error loading .env file")
+		}
+		log.Println("Loaded .env var file")
+	}
+
 	agroProducts := app.Group("/api/v0.01/agroproducts", func(c *fiber.Ctx) error {
 		return c.Next()
 	})
 	agroProducts.Get("/", agroproducts.GetAllProducts)
+	agroProducts.Post("/", agroproducts.PostAgroProduct)
 
 	app.Use("*", func(c *fiber.Ctx) error {
 		message := fmt.Sprintf("api route '%s' doesn't exist!", c.Path())
