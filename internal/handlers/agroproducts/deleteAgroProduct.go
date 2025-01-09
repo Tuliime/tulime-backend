@@ -24,9 +24,21 @@ var DeleteAgroProduct = func(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
 
+	var savedFilePath string
+
+	// Extract savedFilePath from the url if saved imagePath is null
+	if packages.HasImagePath(savedAgroProduct) {
+		savedFilePath = savedAgroProduct.ImagePath
+	} else {
+		savedFilePath, err = packages.ExtractFilePath(savedAgroProduct.ImageUrl)
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
+	}
+
 	firebaseStorage := packages.FirebaseStorage{}
 
-	if err := firebaseStorage.Delete(savedAgroProduct.ImageUrl); err != nil {
+	if err := firebaseStorage.Delete(savedFilePath); err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
 
