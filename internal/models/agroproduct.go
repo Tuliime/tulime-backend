@@ -36,9 +36,16 @@ func (ap *Agroproduct) FindByName(name string) (Agroproduct, error) {
 }
 
 // TODO: add pagination for all select queries that return many results
-func (ap *Agroproduct) FindByCategory(name string) ([]Agroproduct, error) {
+func (ap *Agroproduct) FindByCategory(category string) ([]Agroproduct, error) {
 	var agroproducts []Agroproduct
-	db.Find(&agroproducts, "name = ?", name)
+	db.Find(&agroproducts, "category = ?", category)
+
+	for i, agroproduct := range agroproducts {
+		var agroProductPrice []AgroproductPrice
+		db.Order("\"createdAt\" desc").Limit(1).Find(&agroProductPrice, "\"agroproductID\" = ?", agroproduct.ID)
+		agroproduct.Price = agroProductPrice
+		agroproducts[i] = agroproduct
+	}
 
 	return agroproducts, nil
 }
@@ -47,6 +54,13 @@ func (ap *Agroproduct) FindByCategory(name string) ([]Agroproduct, error) {
 func (ap *Agroproduct) FindAll() ([]Agroproduct, error) {
 	var agroproducts []Agroproduct
 	db.Find(&agroproducts)
+
+	for i, agroproduct := range agroproducts {
+		var agroProductPrice []AgroproductPrice
+		db.Order("\"createdAt\" desc").Limit(1).Find(&agroProductPrice, "\"agroproductID\" = ?", agroproduct.ID)
+		agroproduct.Price = agroProductPrice
+		agroproducts[i] = agroproduct
+	}
 
 	return agroproducts, nil
 }
