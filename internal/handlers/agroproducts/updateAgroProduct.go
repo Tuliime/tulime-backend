@@ -29,9 +29,9 @@ var UpdateAgroProduct = func(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusBadRequest, "Validation Error")
 	}
 
-	agroProductId := c.Params("id")
+	agroProductID := c.Params("id")
 
-	savedAgroProduct, err := agroProduct.FindOne(agroProductId)
+	savedAgroProduct, err := agroProduct.FindOne(agroProductID)
 	if err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
@@ -39,7 +39,7 @@ var UpdateAgroProduct = func(c *fiber.Ctx) error {
 	savedAgroProduct.Name = agroProduct.Name
 	savedAgroProduct.Category = agroProduct.Category
 
-	err = savedAgroProduct.Update()
+	updatedAgroProduct, err := savedAgroProduct.Update()
 	if err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
@@ -47,7 +47,7 @@ var UpdateAgroProduct = func(c *fiber.Ctx) error {
 	response := fiber.Map{
 		"status":  "success",
 		"message": "Updated successfully!",
-		"data":    savedAgroProduct,
+		"data":    updatedAgroProduct,
 	}
 
 	return c.Status(fiber.StatusOK).JSON(response)
