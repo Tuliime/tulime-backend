@@ -9,15 +9,15 @@ import (
 )
 
 type PostAgroProductPriceInput struct {
-	AgroproductID string `validate:"string"`
-	Amount        string `validate:"number"`
-	Currency      string `validate:"string"`
+	AgroproductID string  `validate:"string"`
+	Amount        float64 `validate:"number"`
+	Currency      string  `validate:"string"`
 }
 
 var PostAgroProductPrice = func(c *fiber.Ctx) error {
 	agroProductPrice := models.AgroproductPrice{}
 
-	if err := c.BodyParser(agroProductPrice); err != nil {
+	if err := c.BodyParser(&agroProductPrice); err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
 
