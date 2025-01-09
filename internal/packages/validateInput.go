@@ -19,6 +19,8 @@ import (
 // 	IsActive bool   `validate:"bool"`
 // }
 
+// TODO: to add another to ensure that all fields provided in input are present
+
 // ValidateInput fn compares the request body against
 // against the provided input struct and returns errors
 // as an array of strings
