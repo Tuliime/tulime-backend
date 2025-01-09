@@ -155,6 +155,7 @@ func (fs *FirebaseStorage) Update(file multipart.File, fileHeader *multipart.Fil
 	return url, nil
 }
 
+// TODO: to debug deletion functionality
 func (fs *FirebaseStorage) Delete(filePath string) error {
 
 	if filePath == "" {

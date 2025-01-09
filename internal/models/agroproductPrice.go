@@ -56,3 +56,11 @@ func (app *AgroproductPrice) Delete(id string) error {
 
 	return nil
 }
+
+func (app *AgroproductPrice) DeleteByAgroProduct(agroProductID string) error {
+	if err := db.Unscoped().Where("\"agroproductID\" = ?", agroProductID).Delete(&AgroproductPrice{}).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
