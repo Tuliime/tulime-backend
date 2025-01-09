@@ -22,7 +22,7 @@ import (
 // 	return c.Status(fiber.StatusOK).JSON(response)
 // }
 
-var GetAllProducts = func(c *fiber.Ctx) error {
+var GetAllAgroProducts = func(c *fiber.Ctx) error {
 	agroProduct := models.Agroproduct{}
 
 	agroProducts, err := agroProduct.FindAll()
