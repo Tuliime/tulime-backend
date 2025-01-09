@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"reflect"
 	"regexp"
-	"strconv"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
@@ -72,14 +71,14 @@ func applyValidationRule(rule, fieldName string, value reflect.Value) error {
 		if value.Kind() != reflect.String {
 			return fmt.Errorf("field %s must be a string", fieldName)
 		}
+	case "number":
+		if value.Kind() != reflect.Float64 && value.Kind() != reflect.Int {
+			return fmt.Errorf("field %s must be a valid number", fieldName)
+		}
 	case "email":
 		emailRegex := `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
 		if !regexp.MustCompile(emailRegex).MatchString(value.String()) {
 			return fmt.Errorf("invalid email in field %s", fieldName)
-		}
-	case "number":
-		if value.Kind() != reflect.String || !isNumeric(value.String()) {
-			return fmt.Errorf("field %s must be a valid number", fieldName)
 		}
 	case "telephoneNumber":
 		phoneRegex := `^\+?[1-9]\d{1,14}$`
@@ -95,11 +94,6 @@ func applyValidationRule(rule, fieldName string, value reflect.Value) error {
 	}
 
 	return nil
-}
-
-func isNumeric(s string) bool {
-	_, err := strconv.ParseFloat(s, 64)
-	return err == nil
 }
 
 // Implementation
