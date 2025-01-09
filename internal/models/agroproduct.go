@@ -53,10 +53,15 @@ func (ap *Agroproduct) FindAll() ([]Agroproduct, error) {
 
 // Update updates one Agroproduct in the database, using the information
 // stored in the receiver u
-func (ap *Agroproduct) Update() error {
+func (ap *Agroproduct) Update() (Agroproduct, error) {
 	db.Save(&ap)
 
-	return nil
+	agroProduct, err := ap.FindOne(ap.ID)
+	if err != nil {
+		return agroProduct, err
+	}
+
+	return agroProduct, nil
 }
 
 func (ap *Agroproduct) Delete(id string) error {

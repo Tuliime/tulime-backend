@@ -45,6 +45,7 @@ func main() {
 	agroProducts.Get("/:id", agroproducts.GetAgroProduct)
 	agroProducts.Patch("/:id", agroproducts.UpdateAgroProduct)
 	agroProducts.Delete("/:id", agroproducts.DeleteAgroProduct)
+	agroProducts.Patch("/:id/image", agroproducts.UpdateAgroProductImage)
 	// AgroproductPrices
 	agroProducts.Get("/prices", agroproducts.GetAllAgroProductPrices)
 	agroProducts.Post("/:id/price", agroproducts.PostAgroProductPrice)

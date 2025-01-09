@@ -14,6 +14,7 @@ type Agroproduct struct {
 	Name      string             `gorm:"column:name;unique;not null;index" json:"name"`
 	Category  string             `gorm:"column:category;not null;index" json:"category"`
 	ImageUrl  string             `gorm:"column:imageUrl;not null" json:"imageUrl"`
+	ImagePath string             `gorm:"column:imagePath;default:null" json:"imagePath"`
 	Price     []AgroproductPrice `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"Price"`
 	CreatedAt time.Time          `gorm:"column:createdAt;index" json:"createdAt"`
 	UpdatedAt time.Time          `gorm:"column:updatedAt;index" json:"updatedAt"`
