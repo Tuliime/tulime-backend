@@ -60,6 +60,12 @@ func (ap *Agroproduct) Update() error {
 }
 
 func (ap *Agroproduct) Delete(id string) error {
+	agroProductPrice := AgroproductPrice{AgroproductID: id}
+
+	if err := agroProductPrice.DeleteByAgroProduct(id); err != nil {
+		return err
+	}
+
 	if err := db.Unscoped().Where("id = ?", id).Delete(&Agroproduct{}).Error; err != nil {
 		return err
 	}
