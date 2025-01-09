@@ -38,9 +38,16 @@ func main() {
 	agroProducts := app.Group("/api/v0.01/agroproducts", func(c *fiber.Ctx) error {
 		return c.Next()
 	})
+
+	// Agroproduct
 	agroProducts.Get("/", agroproducts.GetAllProducts)
 	agroProducts.Post("/", agroproducts.PostAgroProduct)
+	// AgroproductPrices
+	agroProducts.Get("/prices", agroproducts.GetAllAgroProductPrices)
 	agroProducts.Post("/:id/price", agroproducts.PostAgroProductPrice)
+	agroProducts.Get("/:id/price", agroproducts.GetPricesByAgroProduct)
+	agroProducts.Patch("/:id/price/:priceId", agroproducts.UpdateAgroProductPrice)
+	agroProducts.Delete("/:id/price/:priceId", agroproducts.DeleteAgroProductPrice)
 
 	app.Use("*", func(c *fiber.Ctx) error {
 		message := fmt.Sprintf("api route '%s' doesn't exist!", c.Path())
