@@ -25,14 +25,14 @@ import (
 var GetAllProducts = func(c *fiber.Ctx) error {
 	agroProduct := models.Agroproduct{}
 
-	agroProductPrices, err := agroProduct.FindAll()
+	agroProducts, err := agroProduct.FindAll()
 	if err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
 
 	response := fiber.Map{
 		"status": "success",
-		"data":   agroProductPrices,
+		"data":   agroProducts,
 	}
 
 	return c.Status(fiber.StatusOK).JSON(response)

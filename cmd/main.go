@@ -42,6 +42,7 @@ func main() {
 	// Agroproduct
 	agroProducts.Get("/", agroproducts.GetAllProducts)
 	agroProducts.Post("/", agroproducts.PostAgroProduct)
+	agroProducts.Get("/:id", agroproducts.GetAgroProduct)
 	agroProducts.Patch("/:id", agroproducts.UpdateAgroProduct)
 	// AgroproductPrices
 	agroProducts.Get("/prices", agroproducts.GetAllAgroProductPrices)
