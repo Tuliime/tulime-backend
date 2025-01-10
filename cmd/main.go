@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/Tuliime/tulime-backend/internal/handlers/agroproducts"
+	"github.com/Tuliime/tulime-backend/internal/handlers/news"
 	"github.com/Tuliime/tulime-backend/internal/packages"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -52,6 +53,17 @@ func main() {
 	agroProducts.Get("/:id/price", agroproducts.GetPricesByAgroProduct)
 	agroProducts.Patch("/:id/price/:priceId", agroproducts.UpdateAgroProductPrice)
 	agroProducts.Delete("/:id/price/:priceId", agroproducts.DeleteAgroProductPrice)
+
+	newsGroup := app.Group("/api/v0.01/news", func(c *fiber.Ctx) error {
+		return c.Next()
+	})
+	// News
+	newsGroup.Get("/", news.GetAllNews)
+	newsGroup.Get("/:id", news.GetNews)
+	newsGroup.Post("/", news.PostNews)
+	newsGroup.Patch("/:id", news.UpdateNews)
+	newsGroup.Patch("/:id/image", news.UpdateNewsImage)
+	newsGroup.Delete("/:id", news.DeleteNews)
 
 	app.Use("*", func(c *fiber.Ctx) error {
 		message := fmt.Sprintf("api route '%s' doesn't exist!", c.Path())
