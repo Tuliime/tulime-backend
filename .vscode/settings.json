@@ -3,6 +3,7 @@
     "Agro",
     "Agroproduct",
     "agroproducts",
+    "farminputs",
     "godotenv",
     "gofiber",
     "gorm",
