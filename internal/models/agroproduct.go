@@ -51,9 +51,9 @@ func (ap *Agroproduct) FindByCategory(category string) ([]Agroproduct, error) {
 }
 
 // TODO: add pagination for all select queries that return many results
-func (ap *Agroproduct) FindAll() ([]Agroproduct, error) {
+func (ap *Agroproduct) FindAll(limit float64) ([]Agroproduct, error) {
 	var agroproducts []Agroproduct
-	db.Find(&agroproducts)
+	db.Limit(int(limit)).Find(&agroproducts)
 
 	for i, agroproduct := range agroproducts {
 		var agroProductPrice []AgroproductPrice
@@ -95,8 +95,8 @@ func (ap *Agroproduct) Delete(id string) error {
 func (ap *Agroproduct) ValidCategory(category string) bool {
 	categories := []string{"crop", "livestock", "poultry", "fish"}
 
-	for _, r := range categories {
-		if r == category {
+	for _, c := range categories {
+		if c == category {
 			return true
 		}
 	}
