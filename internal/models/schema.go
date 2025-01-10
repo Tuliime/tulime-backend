@@ -28,3 +28,16 @@ type AgroproductPrice struct {
 	CreatedAt     time.Time `gorm:"column:createdAt;index" json:"createdAt"`
 	UpdatedAt     time.Time `gorm:"column:updatedAt;index" json:"updatedAt"`
 }
+
+type News struct {
+	ID          string    `gorm:"column:id;type:uuid;primaryKey" json:"id"`
+	Title       string    `gorm:"column:title;unique;not null;index" json:"title"`
+	Description string    `gorm:"column:description;not null" json:"description"`
+	Category    string    `gorm:"column:category;not null;index" json:"category"`
+	Source      string    `gorm:"column:source;not null;index" json:"source"`
+	ImageUrl    string    `gorm:"column:imageUrl;not null" json:"imageUrl"`
+	ImagePath   string    `gorm:"column:imagePath;not null" json:"imagePath"`
+	PostedAt    time.Time `gorm:"column:postedAt;default:CURRENT_TIMESTAMP;index" json:"postedAt"`
+	CreatedAt   time.Time `gorm:"column:createdAt;index" json:"createdAt"`
+	UpdatedAt   time.Time `gorm:"column:updatedAt;index" json:"updatedAt"`
+}
