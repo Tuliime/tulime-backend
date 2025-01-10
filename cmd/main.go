@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/Tuliime/tulime-backend/internal/handlers/agroproducts"
+	"github.com/Tuliime/tulime-backend/internal/handlers/farminputs"
 	"github.com/Tuliime/tulime-backend/internal/handlers/news"
 	"github.com/Tuliime/tulime-backend/internal/packages"
 	"github.com/gofiber/fiber/v2"
@@ -36,11 +37,10 @@ func main() {
 		log.Println("Loaded .env var file")
 	}
 
+	// Agroproduct
 	agroProducts := app.Group("/api/v0.01/agroproducts", func(c *fiber.Ctx) error {
 		return c.Next()
 	})
-
-	// Agroproduct
 	agroProducts.Get("/", agroproducts.GetAllAgroProducts)
 	agroProducts.Post("/", agroproducts.PostAgroProduct)
 	agroProducts.Get("/:id", agroproducts.GetAgroProduct)
@@ -54,16 +54,27 @@ func main() {
 	agroProducts.Patch("/:id/price/:priceId", agroproducts.UpdateAgroProductPrice)
 	agroProducts.Delete("/:id/price/:priceId", agroproducts.DeleteAgroProductPrice)
 
+	// News
 	newsGroup := app.Group("/api/v0.01/news", func(c *fiber.Ctx) error {
 		return c.Next()
 	})
-	// News
 	newsGroup.Get("/", news.GetAllNews)
 	newsGroup.Get("/:id", news.GetNews)
 	newsGroup.Post("/", news.PostNews)
 	newsGroup.Patch("/:id", news.UpdateNews)
 	newsGroup.Patch("/:id/image", news.UpdateNewsImage)
 	newsGroup.Delete("/:id", news.DeleteNews)
+
+	// Farm inputs
+	farmInputGroup := app.Group("/api/v0.01/farminputs", func(c *fiber.Ctx) error {
+		return c.Next()
+	})
+	farmInputGroup.Get("/", farminputs.GetAllFarmInputs)
+	farmInputGroup.Get("/:id", farminputs.GetFarmInput)
+	farmInputGroup.Post("/", farminputs.PostFarmInputs)
+	farmInputGroup.Patch("/:id", farminputs.UpdateFarmInput)
+	farmInputGroup.Patch("/:id/image", farminputs.UpdateFarmInputImage)
+	farmInputGroup.Delete("/:id", farminputs.DeleteFarmInput)
 
 	app.Use("*", func(c *fiber.Ctx) error {
 		message := fmt.Sprintf("api route '%s' doesn't exist!", c.Path())
