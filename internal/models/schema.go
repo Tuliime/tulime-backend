@@ -41,3 +41,14 @@ type News struct {
 	CreatedAt   time.Time `gorm:"column:createdAt;index" json:"createdAt"`
 	UpdatedAt   time.Time `gorm:"column:updatedAt;index" json:"updatedAt"`
 }
+
+type FarmInputs struct {
+	ID        string    `gorm:"column:id;type:uuid;primaryKey" json:"id"`
+	Name      string    `gorm:"column:name;unique;not null;index" json:"name"`
+	Purpose   string    `gorm:"column:purpose;not null" json:"purpose"`
+	Category  string    `gorm:"column:category;not null;index" json:"category"`
+	ImageUrl  string    `gorm:"column:imageUrl;not null" json:"imageUrl"`
+	ImagePath string    `gorm:"column:imagePath;not null" json:"imagePath"`
+	CreatedAt time.Time `gorm:"column:createdAt;index" json:"createdAt"`
+	UpdatedAt time.Time `gorm:"column:updatedAt;index" json:"updatedAt"`
+}
