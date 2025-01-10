@@ -2,6 +2,7 @@ package agroproducts
 
 import (
 	"github.com/Tuliime/tulime-backend/internal/models"
+	"github.com/Tuliime/tulime-backend/internal/packages"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -24,15 +25,26 @@ import (
 
 var GetAllAgroProducts = func(c *fiber.Ctx) error {
 	agroProduct := models.Agroproduct{}
+	limitParam := c.Query("limit")
 
-	agroProducts, err := agroProduct.FindAll()
+	limit, err := packages.ValidateQueryLimit(limitParam)
 	if err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
 
+	agroProducts, err := agroProduct.FindAll(limit)
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+	}
+
+	pagination := map[string]interface{}{
+		"limit": limit,
+	}
+
 	response := fiber.Map{
-		"status": "success",
-		"data":   agroProducts,
+		"status":     "success",
+		"data":       agroProducts,
+		"pagination": pagination,
 	}
 
 	return c.Status(fiber.StatusOK).JSON(response)
