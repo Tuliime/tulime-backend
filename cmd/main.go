@@ -38,21 +38,21 @@ func main() {
 	}
 
 	// Agroproduct
-	agroProducts := app.Group("/api/v0.01/agroproducts", func(c *fiber.Ctx) error {
+	agroproductsGroup := app.Group("/api/v0.01/agroproducts", func(c *fiber.Ctx) error {
 		return c.Next()
 	})
-	agroProducts.Get("/", agroproducts.GetAllAgroProducts)
-	agroProducts.Post("/", agroproducts.PostAgroProduct)
-	agroProducts.Get("/:id", agroproducts.GetAgroProduct)
-	agroProducts.Patch("/:id", agroproducts.UpdateAgroProduct)
-	agroProducts.Delete("/:id", agroproducts.DeleteAgroProduct)
-	agroProducts.Patch("/:id/image", agroproducts.UpdateAgroProductImage)
+	agroproductsGroup.Get("/", agroproducts.GetAllAgroProducts)
+	agroproductsGroup.Post("/", agroproducts.PostAgroProduct)
+	agroproductsGroup.Get("/:id", agroproducts.GetAgroProduct)
+	agroproductsGroup.Patch("/:id", agroproducts.UpdateAgroProduct)
+	agroproductsGroup.Delete("/:id", agroproducts.DeleteAgroProduct)
+	agroproductsGroup.Patch("/:id/image", agroproducts.UpdateAgroProductImage)
 	// AgroproductPrices
-	agroProducts.Get("/prices", agroproducts.GetAllAgroProductPrices)
-	agroProducts.Post("/:id/price", agroproducts.PostAgroProductPrice)
-	agroProducts.Get("/:id/price", agroproducts.GetPricesByAgroProduct)
-	agroProducts.Patch("/:id/price/:priceId", agroproducts.UpdateAgroProductPrice)
-	agroProducts.Delete("/:id/price/:priceId", agroproducts.DeleteAgroProductPrice)
+	agroproductsGroup.Get("/prices", agroproducts.GetAllAgroProductPrices)
+	agroproductsGroup.Post("/:id/price", agroproducts.PostAgroProductPrice)
+	agroproductsGroup.Get("/:id/price", agroproducts.GetPricesByAgroProduct)
+	agroproductsGroup.Patch("/:id/price/:priceId", agroproducts.UpdateAgroProductPrice)
+	agroproductsGroup.Delete("/:id/price/:priceId", agroproducts.DeleteAgroProductPrice)
 
 	// News
 	newsGroup := app.Group("/api/v0.01/news", func(c *fiber.Ctx) error {
