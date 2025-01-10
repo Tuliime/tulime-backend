@@ -95,8 +95,8 @@ func (ap *Agroproduct) Delete(id string) error {
 func (ap *Agroproduct) ValidCategory(category string) bool {
 	categories := []string{"crop", "livestock", "poultry", "fish"}
 
-	for _, r := range categories {
-		if r == category {
+	for _, c := range categories {
+		if c == category {
 			return true
 		}
 	}
