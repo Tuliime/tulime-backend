@@ -68,6 +68,7 @@ require (
 	cloud.google.com/go/storage v1.49.0
 	firebase.google.com/go/v4 v4.15.1
 	github.com/andybalholm/brotli v1.0.5 // indirect
+	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/joho/godotenv v1.5.1
 	github.com/klauspost/compress v1.17.0 // indirect

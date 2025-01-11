@@ -9,6 +9,17 @@ import (
 var db = Db()
 var DB = db
 
+type User struct {
+	ID        string    `gorm:"column:id;type:uuid;primaryKey" json:"id"`
+	Name      string    `gorm:"column:name;not null;index" json:"name"`
+	TelNumber int       `gorm:"column:telNumber;unique;not null;index" json:"telNumber"`
+	Password  string    `gorm:"column:password;not null" json:"password"`
+	Role      string    `gorm:"column:role;default:'user';not null" json:"role"`
+	OPT       []OTP     `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"OPT"`
+	CreatedAt time.Time `gorm:"column:createdAt" json:"createdAt"`
+	UpdatedAt time.Time `gorm:"column:updatedAt" json:"updatedAt"`
+}
+
 type Agroproduct struct {
 	ID        string             `gorm:"column:id;type:uuid;primaryKey" json:"id"`
 	Name      string             `gorm:"column:name;unique;not null;index" json:"name"`
@@ -51,4 +62,15 @@ type FarmInputs struct {
 	ImagePath string    `gorm:"column:imagePath;not null" json:"imagePath"`
 	CreatedAt time.Time `gorm:"column:createdAt;index" json:"createdAt"`
 	UpdatedAt time.Time `gorm:"column:updatedAt;index" json:"updatedAt"`
+}
+
+type OTP struct {
+	ID         string    `gorm:"column:id;type:uuid;primaryKey" json:"id"`
+	UserID     string    `gorm:"column:userId;not null;index" json:"userId"`
+	OTP        string    `gorm:"column:OTP;index" json:"OTP"`
+	IsUsed     bool      `gorm:"column:isUsed;default:false" json:"isUsed"`
+	IsVerified bool      `gorm:"column:isVerified;default:false" json:"isVerified"`
+	ExpiresAt  time.Time `gorm:"column:expiresAt;not null;index" json:"expiresAt"`
+	CreatedAt  time.Time `gorm:"column:createdAt;index" json:"createdAt"`
+	UpdatedAt  time.Time `gorm:"column:updatedAt;index" json:"updatedAt"`
 }
