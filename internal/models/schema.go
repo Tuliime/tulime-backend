@@ -15,6 +15,8 @@ type User struct {
 	TelNumber int       `gorm:"column:telNumber;unique;not null;index" json:"telNumber"`
 	Password  string    `gorm:"column:password;not null" json:"password"`
 	Role      string    `gorm:"column:role;default:'user';not null" json:"role"`
+	ImageUrl  string    `gorm:"column:imageUrl;default:null" json:"imageUrl"`
+	ImagePath string    `gorm:"column:imagePath;default:null" json:"imagePath"`
 	OPT       []OTP     `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"OPT"`
 	CreatedAt time.Time `gorm:"column:createdAt" json:"createdAt"`
 	UpdatedAt time.Time `gorm:"column:updatedAt" json:"updatedAt"`

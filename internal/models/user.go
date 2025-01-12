@@ -52,10 +52,14 @@ func (u *User) FindAll() ([]User, error) {
 
 // Update updates one user in the database, using the information
 // stored in the receiver u
-func (u *User) Update() error {
+func (u *User) Update() (User, error) {
 	db.Save(&u)
 
-	return nil
+	user, err := u.FindOne(u.ID)
+	if err != nil {
+		return user, err
+	}
+	return user, nil
 }
 
 func (u *User) Delete(id string) error {

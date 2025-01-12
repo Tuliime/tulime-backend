@@ -51,7 +51,7 @@ var ChangePassword = func(c *fiber.Ctx) error {
 
 	user.Password = hashedPassword
 
-	if err := user.Update(); err != nil {
+	if _, err := user.Update(); err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
