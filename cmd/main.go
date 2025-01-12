@@ -49,6 +49,7 @@ func main() {
 	userGroup.Patch("/auth/reset-password/:otp", auth.ResetPassword)
 	userGroup.Patch("/:id/auth/change-password", auth.ChangePassword)
 	userGroup.Patch("/:id/image", auth.UpdateUserImage)
+	userGroup.Patch("/:id", auth.UpdateUser)
 
 	// Agroproduct
 	agroproductsGroup := app.Group("/api/v0.01/agroproducts", func(c *fiber.Ctx) error {
