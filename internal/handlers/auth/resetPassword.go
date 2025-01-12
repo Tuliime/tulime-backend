@@ -17,7 +17,7 @@ var ResetPassword = func(c *fiber.Ctx) error {
 	}
 
 	newPassword := user.Password
-	OPT := c.Query("otp")
+	OPT := c.Params("otp")
 
 	if user.Password == "" {
 		return fiber.NewError(fiber.StatusBadRequest, "Please provide your new password!")

@@ -52,20 +52,27 @@ func (o *OTP) FindOne(id string) (OTP, error) {
 func (o *OTP) FindByOTP(otpString string) (OTP, error) {
 	var otp OTP
 	encodedOTP := pkg.EncodeToHexString(otpString)
-	db.Where("OTP = ?", encodedOTP).First(&otp)
+	db.Where("\"OTP\" = ?", encodedOTP).First(&otp)
 
 	return otp, nil
 }
 
-func (o *OTP) FindByUser(userId string) ([]OTP, error) {
+func (o *OTP) FindByUser(userID string) ([]OTP, error) {
 	var otp []OTP
-	db.Find(&otp, "\"userID\" = ?", userId)
+	db.Find(&otp, "\"userID\" = ?", userID)
 
 	return otp, nil
 }
 
-func (o *OTP) ExpireUserOTP(userId string) error {
-	if err := db.Where("\"userID\" = ?", userId).Model(&User{}).Update("\"expiresAt\"", time.Now()).Error; err != nil {
+func (o *OTP) ExpireUserOTP(userID string) error {
+	userOTPs, err := o.FindByUser(userID)
+	if err != nil {
+		return err
+	}
+	if len(userOTPs) == 0 {
+		return nil
+	}
+	if err := db.Where("\"userID\" = ?", userID).Where("\"expiresAt\" > ?", time.Now()).Model(&OTP{}).Update("\"expiresAt\"", time.Now()).Error; err != nil {
 		return err
 	}
 	return nil

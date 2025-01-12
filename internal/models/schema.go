@@ -66,8 +66,8 @@ type FarmInputs struct {
 
 type OTP struct {
 	ID         string    `gorm:"column:id;type:uuid;primaryKey" json:"id"`
-	UserID     string    `gorm:"column:userId;not null;index" json:"userId"`
-	OTP        string    `gorm:"column:OTP;index" json:"OTP"`
+	UserID     string    `gorm:"column:userID;not null;index" json:"userID"`
+	OTP        string    `gorm:"column:OTP;not null;index" json:"OTP"`
 	IsUsed     bool      `gorm:"column:isUsed;default:false" json:"isUsed"`
 	IsVerified bool      `gorm:"column:isVerified;default:false" json:"isVerified"`
 	ExpiresAt  time.Time `gorm:"column:expiresAt;not null;index" json:"expiresAt"`

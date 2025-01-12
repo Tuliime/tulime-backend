@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/Tuliime/tulime-backend/internal/handlers/agroproducts"
+	"github.com/Tuliime/tulime-backend/internal/handlers/auth"
 	"github.com/Tuliime/tulime-backend/internal/handlers/farminputs"
 	"github.com/Tuliime/tulime-backend/internal/handlers/news"
 	"github.com/Tuliime/tulime-backend/internal/packages"
@@ -36,6 +37,17 @@ func main() {
 		}
 		log.Println("Loaded .env var file")
 	}
+
+	// auth
+	userGroup := app.Group("/api/v0.01/user", func(c *fiber.Ctx) error {
+		return c.Next()
+	})
+	userGroup.Post("/auth/signup", auth.SignUp)
+	userGroup.Post("/auth/signin", auth.SignIn)
+	userGroup.Post("/auth/forgot-password", auth.ForgotPassword)
+	userGroup.Patch("/auth/verify-otp", auth.VerifyOTP)
+	userGroup.Patch("/auth/reset-password/:otp", auth.ResetPassword)
+	userGroup.Patch("/:id/auth/change-password", auth.ChangePassword)
 
 	// Agroproduct
 	agroproductsGroup := app.Group("/api/v0.01/agroproducts", func(c *fiber.Ctx) error {
