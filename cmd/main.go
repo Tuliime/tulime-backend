@@ -8,6 +8,7 @@ import (
 	"github.com/Tuliime/tulime-backend/internal/handlers/agroproducts"
 	"github.com/Tuliime/tulime-backend/internal/handlers/auth"
 	"github.com/Tuliime/tulime-backend/internal/handlers/farminputs"
+	"github.com/Tuliime/tulime-backend/internal/handlers/farmmanager"
 	"github.com/Tuliime/tulime-backend/internal/handlers/news"
 	"github.com/Tuliime/tulime-backend/internal/packages"
 	"github.com/gofiber/fiber/v2"
@@ -89,6 +90,17 @@ func main() {
 	farmInputGroup.Patch("/:id", farminputs.UpdateFarmInput)
 	farmInputGroup.Patch("/:id/image", farminputs.UpdateFarmInputImage)
 	farmInputGroup.Delete("/:id", farminputs.DeleteFarmInput)
+
+	// Farm manager
+	farmManagerGroup := app.Group("/api/v0.01/farmmanager", func(c *fiber.Ctx) error {
+		return c.Next()
+	})
+	farmManagerGroup.Get("/", farmmanager.GetAllFarmManagers)
+	farmManagerGroup.Get("/:id", farmmanager.GetFarmManager)
+	farmManagerGroup.Get("/user/:userId", farmmanager.GetFarmManagerByUser)
+	farmManagerGroup.Post("/user/:userId", farmmanager.PostFarmManager)
+	farmManagerGroup.Patch("/:id", farmmanager.UpdateFarmManager)
+	farmManagerGroup.Delete("/:id", farmmanager.DeleteFarmManager)
 
 	app.Use("*", func(c *fiber.Ctx) error {
 		message := fmt.Sprintf("api route '%s' doesn't exist!", c.Path())
