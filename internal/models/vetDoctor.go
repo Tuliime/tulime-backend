@@ -58,3 +58,10 @@ func (vd *VetDoctor) Update() (VetDoctor, error) {
 	}
 	return vetDoctor, nil
 }
+
+func (vd *VetDoctor) Delete(id string) error {
+	if err := db.Unscoped().Where("id = ?", id).Delete(&VetDoctor{}).Error; err != nil {
+		return err
+	}
+	return nil
+}
