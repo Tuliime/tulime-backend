@@ -10,7 +10,7 @@ import (
 
 type UpdateUserInput struct {
 	Name      string `validate:"string"`
-	TelNumber string `validate:"telephoneNumber"`
+	TelNumber int    `validate:"number"` //TODO: To validate telNumber in "ValidateInput" in  a better way
 }
 
 var UpdateUser = func(c *fiber.Ctx) error {
@@ -35,6 +35,7 @@ var UpdateUser = func(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
 
+	// TODO:To validate tel phone on every update
 	savedUser.Name = user.Name
 	savedUser.TelNumber = user.TelNumber
 
@@ -43,10 +44,20 @@ var UpdateUser = func(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
 
+	updateUserMap := fiber.Map{
+		"id":        updatedUser.ID,
+		"name":      updatedUser.Name,
+		"telNumber": updatedUser.TelNumber,
+		"role":      updatedUser.Role,
+		"imageUrl":  updatedUser.ImageUrl,
+		"createdAt": updatedUser.CreatedAt,
+		"updatedAt": updatedUser.UpdatedAt,
+	}
+
 	response := fiber.Map{
 		"status":  "success",
 		"message": "Updated successfully!",
-		"data":    updatedUser,
+		"data":    updateUserMap,
 	}
 
 	return c.Status(fiber.StatusOK).JSON(response)
