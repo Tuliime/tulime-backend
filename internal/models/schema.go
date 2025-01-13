@@ -10,16 +10,18 @@ var db = Db()
 var DB = db
 
 type User struct {
-	ID        string    `gorm:"column:id;type:uuid;primaryKey" json:"id"`
-	Name      string    `gorm:"column:name;not null;index" json:"name"`
-	TelNumber int       `gorm:"column:telNumber;unique;not null;index" json:"telNumber"`
-	Password  string    `gorm:"column:password;not null" json:"password"`
-	Role      string    `gorm:"column:role;default:'user';not null" json:"role"`
-	ImageUrl  string    `gorm:"column:imageUrl;default:null" json:"imageUrl"`
-	ImagePath string    `gorm:"column:imagePath;default:null" json:"imagePath"`
-	OPT       []OTP     `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"OPT"`
-	CreatedAt time.Time `gorm:"column:createdAt" json:"createdAt"`
-	UpdatedAt time.Time `gorm:"column:updatedAt" json:"updatedAt"`
+	ID          string      `gorm:"column:id;type:uuid;primaryKey" json:"id"`
+	Name        string      `gorm:"column:name;not null;index" json:"name"`
+	TelNumber   int         `gorm:"column:telNumber;unique;not null;index" json:"telNumber"`
+	Password    string      `gorm:"column:password;not null" json:"password"`
+	Role        string      `gorm:"column:role;default:'user';not null" json:"role"`
+	ImageUrl    string      `gorm:"column:imageUrl;default:null" json:"imageUrl"`
+	ImagePath   string      `gorm:"column:imagePath;default:null" json:"imagePath"`
+	OPT         []OTP       `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"OPT"`
+	FarmManager FarmManager `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"farmManager"`
+	VetDoctor   VetDoctor   `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"vetDoctor"`
+	CreatedAt   time.Time   `gorm:"column:createdAt" json:"createdAt"`
+	UpdatedAt   time.Time   `gorm:"column:updatedAt" json:"updatedAt"`
 }
 
 type Agroproduct struct {
@@ -75,4 +77,30 @@ type OTP struct {
 	ExpiresAt  time.Time `gorm:"column:expiresAt;not null;index" json:"expiresAt"`
 	CreatedAt  time.Time `gorm:"column:createdAt;index" json:"createdAt"`
 	UpdatedAt  time.Time `gorm:"column:updatedAt;index" json:"updatedAt"`
+}
+
+type FarmManager struct {
+	ID         string    `gorm:"column:id;type:uuid;primaryKey" json:"id"`
+	UserID     string    `gorm:"column:userID;unique;not null;index" json:"userID"`
+	Name       string    `gorm:"column:name;not null;index" json:"name"`
+	Gender     string    `gorm:"column:gender;not null" json:"gender"`
+	RegNo      string    `gorm:"column:regNo;not null" json:"regNo"`
+	Email      string    `gorm:"column:email;unique;not null" json:"email"`
+	TelNumber  int       `gorm:"column:telNumber;not null" json:"telNumber"`
+	IsVerified bool      `gorm:"column:isVerified;default:false" json:"isVerified"`
+	CreatedAt  time.Time `gorm:"column:createdAt;index" json:"createdAt"`
+	UpdatedAt  time.Time `gorm:"column:updatedAt;index" json:"updatedAt"`
+}
+
+type VetDoctor struct {
+	ID            string    `gorm:"column:id;type:uuid;primaryKey" json:"id"`
+	UserID        string    `gorm:"column:userID;unique;not null;index" json:"userID"`
+	Name          string    `gorm:"column:name;not null;index" json:"name"`
+	Gender        string    `gorm:"column:gender;not null" json:"gender"`
+	LicenseNumber string    `gorm:"column:licenseNumber;not null" json:"licenseNumber"`
+	Email         string    `gorm:"column:email;unique;not null" json:"email"`
+	TelNumber     string    `gorm:"column:telNumber;not null" json:"telNumber"`
+	IsVerified    bool      `gorm:"column:isVerified;default:false" json:"isVerified"`
+	CreatedAt     time.Time `gorm:"column:createdAt;index" json:"createdAt"`
+	UpdatedAt     time.Time `gorm:"column:updatedAt;index" json:"updatedAt"`
 }

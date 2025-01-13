@@ -4,6 +4,7 @@
     "Agroproduct",
     "agroproducts",
     "farminputs",
+    "farmmanager",
     "godotenv",
     "gofiber",
     "gorm",
