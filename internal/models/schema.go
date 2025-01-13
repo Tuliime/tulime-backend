@@ -99,7 +99,7 @@ type VetDoctor struct {
 	Gender        string    `gorm:"column:gender;not null" json:"gender"`
 	LicenseNumber string    `gorm:"column:licenseNumber;not null" json:"licenseNumber"`
 	Email         string    `gorm:"column:email;unique;not null" json:"email"`
-	TelNumber     string    `gorm:"column:telNumber;not null" json:"telNumber"`
+	TelNumber     int       `gorm:"column:telNumber;not null" json:"telNumber"`
 	IsVerified    bool      `gorm:"column:isVerified;default:false" json:"isVerified"`
 	CreatedAt     time.Time `gorm:"column:createdAt;index" json:"createdAt"`
 	UpdatedAt     time.Time `gorm:"column:updatedAt;index" json:"updatedAt"`

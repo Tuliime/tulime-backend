@@ -10,6 +10,7 @@ import (
 	"github.com/Tuliime/tulime-backend/internal/handlers/farminputs"
 	"github.com/Tuliime/tulime-backend/internal/handlers/farmmanager"
 	"github.com/Tuliime/tulime-backend/internal/handlers/news"
+	"github.com/Tuliime/tulime-backend/internal/handlers/vetdoctor"
 	"github.com/Tuliime/tulime-backend/internal/packages"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -101,6 +102,17 @@ func main() {
 	farmManagerGroup.Post("/user/:userId", farmmanager.PostFarmManager)
 	farmManagerGroup.Patch("/:id", farmmanager.UpdateFarmManager)
 	farmManagerGroup.Delete("/:id", farmmanager.DeleteFarmManager)
+
+	// Vet Doctor
+	vetDoctorGroup := app.Group("/api/v0.01/vetdoctor", func(c *fiber.Ctx) error {
+		return c.Next()
+	})
+	vetDoctorGroup.Get("/", vetdoctor.GetAllVetDoctors)
+	vetDoctorGroup.Get("/:id", vetdoctor.GetVetDoctor)
+	vetDoctorGroup.Get("/user/:userId", vetdoctor.GetVetDoctorByUser)
+	vetDoctorGroup.Post("/user/:userId", vetdoctor.PostVetDoctorManager)
+	vetDoctorGroup.Patch("/:id", vetdoctor.UpdateVetDoctor)
+	vetDoctorGroup.Delete("/:id", vetdoctor.DeleteVetDoctor)
 
 	app.Use("*", func(c *fiber.Ctx) error {
 		message := fmt.Sprintf("api route '%s' doesn't exist!", c.Path())
