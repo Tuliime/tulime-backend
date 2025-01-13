@@ -24,8 +24,6 @@ var UpdateFarmManager = func(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
 
-	farmManager.UserID = farmManagerID
-
 	var input UpdateFarmManagerInput
 	errors := packages.ValidateInput(c, &input)
 	if len(errors) > 0 {
