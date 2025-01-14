@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/Tuliime/tulime-backend/internal/events/subscribers"
 	"github.com/Tuliime/tulime-backend/internal/handlers/agroproducts"
 	"github.com/Tuliime/tulime-backend/internal/handlers/auth"
 	"github.com/Tuliime/tulime-backend/internal/handlers/farminputs"
@@ -119,5 +120,9 @@ func main() {
 		return fiber.NewError(fiber.StatusNotFound, message)
 	})
 
+	// Initialize all event subscribers in the app
+	subscribers.InitEventSubscribers()
+
 	log.Fatal(app.Listen(":5000"))
+
 }
