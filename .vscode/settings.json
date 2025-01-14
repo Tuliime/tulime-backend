@@ -3,6 +3,7 @@
     "Agro",
     "Agroproduct",
     "agroproducts",
+    "chans",
     "farminputs",
     "farmmanager",
     "godotenv",
