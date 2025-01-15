@@ -25,7 +25,6 @@ func Db() *gorm.DB {
 		log.Println("GO_ENV:", env)
 
 		// Load dev .env file
-		// env := os.Getenv("GO_ENV")
 		if env == "development" {
 			err := godotenv.Load()
 			if err != nil {
@@ -54,7 +53,9 @@ func Db() *gorm.DB {
 		}
 		log.Println("Connected to postgres successfully")
 
-		err = gormDB.AutoMigrate(&User{}, &Agroproduct{}, &AgroproductPrice{}, &News{}, &FarmInputs{}, &OTP{}, &FarmManager{}, &VetDoctor{})
+		err = gormDB.AutoMigrate(&User{}, &Agroproduct{}, &AgroproductPrice{},
+			&News{}, &FarmInputs{}, &OTP{}, &FarmManager{}, &VetDoctor{},
+			&Chatroom{}, &ChatroomFile{}, &ChatroomMention{})
 		if err != nil {
 			log.Fatal("Failed to make auto migration", err)
 		}
