@@ -3,6 +3,8 @@ package models
 import (
 	// "context"
 	"time"
+
+	"gorm.io/gorm"
 	// "gorm.io/gorm"
 )
 
@@ -10,19 +12,23 @@ var db = Db()
 var DB = db
 
 type User struct {
-	ID          string      `gorm:"column:id;type:uuid;primaryKey" json:"id"`
-	Name        string      `gorm:"column:name;not null;index" json:"name"`
-	TelNumber   int         `gorm:"column:telNumber;unique;not null;index" json:"telNumber"`
-	Password    string      `gorm:"column:password;not null" json:"password"`
-	Role        string      `gorm:"column:role;default:'user';not null" json:"role"`
-	ImageUrl    string      `gorm:"column:imageUrl;default:null" json:"imageUrl"`
-	ImagePath   string      `gorm:"column:imagePath;default:null" json:"imagePath"`
-	OPT         []OTP       `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"OPT"`
-	FarmManager FarmManager `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"farmManager"`
-	VetDoctor   VetDoctor   `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"vetDoctor"`
-	CreatedAt   time.Time   `gorm:"column:createdAt" json:"createdAt"`
-	UpdatedAt   time.Time   `gorm:"column:updatedAt" json:"updatedAt"`
+	ID              string            `gorm:"column:id;type:uuid;primaryKey" json:"id"`
+	Name            string            `gorm:"column:name;not null;index" json:"name"`
+	TelNumber       int               `gorm:"column:telNumber;unique;not null;index" json:"telNumber"`
+	Password        string            `gorm:"column:password;not null" json:"password"`
+	Role            string            `gorm:"column:role;default:'user';not null" json:"role"`
+	ImageUrl        string            `gorm:"column:imageUrl;default:null" json:"imageUrl"`
+	ImagePath       string            `gorm:"column:imagePath;default:null" json:"imagePath"`
+	OPT             []OTP             `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"OPT"`
+	FarmManager     FarmManager       `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"farmManager"`
+	VetDoctor       VetDoctor         `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"vetDoctor"`
+	Chatroom        []Chatroom        `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"chatroom"`
+	ChatroomMention []ChatroomMention `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"chatroomMention"`
+	CreatedAt       time.Time         `gorm:"column:createdAt" json:"createdAt"`
+	UpdatedAt       time.Time         `gorm:"column:updatedAt" json:"updatedAt"`
 }
+
+// ChatroomMention
 
 type Agroproduct struct {
 	ID        string             `gorm:"column:id;type:uuid;primaryKey" json:"id"`
@@ -103,4 +109,37 @@ type VetDoctor struct {
 	IsVerified    bool      `gorm:"column:isVerified;default:false" json:"isVerified"`
 	CreatedAt     time.Time `gorm:"column:createdAt;index" json:"createdAt"`
 	UpdatedAt     time.Time `gorm:"column:updatedAt;index" json:"updatedAt"`
+}
+
+type Chatroom struct {
+	ID        string            `gorm:"column:id;type:uuid;primaryKey" json:"id"`
+	UserID    string            `gorm:"column:userID;not null;index" json:"userID"`
+	Text      string            `gorm:"column:name;default:null" json:"name"`
+	Reply     string            `gorm:"column:reply;default:null" json:"reply"`
+	File      ChatroomFile      `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"file"`
+	Mention   []ChatroomMention `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"mention"`
+	SentAt    time.Time         `gorm:"column:sentAt;not null;index" json:"sentAt"`
+	ArrivedAt time.Time         `gorm:"column:arrivedAt;not null;index" json:"arrivedAt"`
+	CreatedAt time.Time         `gorm:"column:createdAt;index" json:"createdAt"`
+	UpdatedAt time.Time         `gorm:"column:updatedAt;index" json:"updatedAt"`
+	DeletedAt gorm.DeletedAt    `gorm:"column:deletedAt;index" json:"deletedAt"`
+}
+
+type ChatroomFile struct {
+	ID         string         `gorm:"column:id;type:uuid;primaryKey" json:"id"`
+	ChatroomID string         `gorm:"column:chatroomID;not null;index" json:"chatroomID"`
+	URL        string         `gorm:"column:url;not null" json:"url"`
+	Path       string         `gorm:"column:path;not null" json:"path"`
+	CreatedAt  time.Time      `gorm:"column:createdAt;index" json:"createdAt"`
+	UpdatedAt  time.Time      `gorm:"column:updatedAt;index" json:"updatedAt"`
+	DeletedAt  gorm.DeletedAt `gorm:"column:deletedAt;index" json:"deletedAt"`
+}
+
+type ChatroomMention struct {
+	ID         string         `gorm:"column:id;type:uuid;primaryKey" json:"id"`
+	ChatroomID string         `gorm:"column:chatroomID;not null;index" json:"chatroomID"`
+	UserID     string         `gorm:"column:userID;not null;index" json:"userID"`
+	CreatedAt  time.Time      `gorm:"column:createdAt;index" json:"createdAt"`
+	UpdatedAt  time.Time      `gorm:"column:updatedAt;index" json:"updatedAt"`
+	DeletedAt  gorm.DeletedAt `gorm:"column:deletedAt;index" json:"deletedAt"`
 }

@@ -6,6 +6,7 @@
     "chans",
     "farminputs",
     "farmmanager",
+    "fasthttp",
     "godotenv",
     "gofiber",
     "gorm",
