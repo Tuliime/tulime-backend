@@ -13,6 +13,7 @@ import (
 	"github.com/Tuliime/tulime-backend/internal/handlers/farminputs"
 	"github.com/Tuliime/tulime-backend/internal/handlers/farmmanager"
 	"github.com/Tuliime/tulime-backend/internal/handlers/news"
+	"github.com/Tuliime/tulime-backend/internal/handlers/status"
 	"github.com/Tuliime/tulime-backend/internal/handlers/vetdoctor"
 	"github.com/Tuliime/tulime-backend/internal/packages"
 	"github.com/gofiber/fiber/v2"
@@ -132,6 +133,9 @@ func main() {
 	chatBotGroup.Get("/user/:userId", chatbot.GetChatByUser)
 	chatBotGroup.Post("/user/:userId", chatbot.PostChat)
 	chatBotGroup.Delete("/:id", chatbot.DeleteChat)
+
+	// Status
+	app.Get("/status", status.GetActive)
 
 	app.Use("*", func(c *fiber.Ctx) error {
 		message := fmt.Sprintf("api route '%s' doesn't exist!", c.Path())
