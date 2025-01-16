@@ -27,20 +27,25 @@ func (cr *Chatroom) FindOne(id string) (Chatroom, error) {
 	return chatroom, nil
 }
 
-// TODO: add pagination for all select queries that return many results
-func (cr *Chatroom) FindAll(limit float64) ([]Chatroom, error) {
-	var chatRoom []Chatroom
-	db.Limit(int(limit)).Find(&chatRoom)
+// TODO: to include file and mention
+func (cr *Chatroom) FindAll(limit float64, cursor string) ([]Chatroom, error) {
+	var chatRooms []Chatroom
 
-	// TODO: to fetch file and mention for each chat
-	// for i, agroproduct := range chatRoom {
-	// 	var Chatroom []Chatroom
-	// 	db.Order("\"createdAt\" desc").Limit(1).Find(&agroProductPrice, "\"agroproductID\" = ?", agroproduct.ID)
-	// 	agroproduct.Price = agroProductPrice
-	// 	chatRoom[i] = agroproduct
-	// }
+	query := db.Order("\"arrivedAt\" DESC").Limit(int(limit))
 
-	return chatRoom, nil
+	if cursor != "" {
+		var lastChatroom Chatroom
+		if err := db.Select("\"arrivedAt\"").Where("id = ?", cursor).First(&lastChatroom).Error; err != nil {
+			return nil, err
+		}
+		query = query.Where("\"arrivedAt\" < ?", lastChatroom.ArrivedAt)
+	}
+
+	if err := query.Find(&chatRooms).Error; err != nil {
+		return nil, err
+	}
+
+	return chatRooms, nil
 }
 
 // Update updates one Agroproduct in the database, using the information
