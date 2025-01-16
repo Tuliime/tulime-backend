@@ -105,7 +105,6 @@ var PostChat = func(c *fiber.Ctx) error {
 		if err != nil {
 			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 		}
-		// chatRoomMentions[i] = newChatroomMention
 		chatRoomMentions = append(chatRoomMentions, newChatroomMention)
 	}
 

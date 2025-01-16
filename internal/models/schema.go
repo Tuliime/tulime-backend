@@ -115,7 +115,7 @@ type Chatroom struct {
 	ID        string            `gorm:"column:id;type:uuid;primaryKey" json:"id"`
 	UserID    string            `gorm:"column:userID;not null;index" json:"userID"`
 	Text      string            `gorm:"column:name;default:null" json:"name"`
-	Reply     string            `gorm:"column:reply;default:null" json:"reply"`
+	Reply     string            `gorm:"column:reply;default:null;index" json:"reply"`
 	File      ChatroomFile      `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"file"`
 	Mention   []ChatroomMention `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"mention"`
 	SentAt    time.Time         `gorm:"column:sentAt;not null;index" json:"sentAt"`

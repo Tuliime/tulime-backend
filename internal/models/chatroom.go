@@ -27,6 +27,15 @@ func (cr *Chatroom) FindOne(id string) (Chatroom, error) {
 	return chatroom, nil
 }
 
+func (cr *Chatroom) FindReply(reply string) (Chatroom, error) {
+	var chatRoom Chatroom
+	if err := db.Where("reply = ?", reply).Find(&chatRoom).Error; err != nil {
+		return chatRoom, err
+	}
+
+	return chatRoom, nil
+}
+
 // TODO: To include reply list
 func (cr *Chatroom) FindAll(limit float64, cursor string) ([]Chatroom, error) {
 	var chatRooms []Chatroom
