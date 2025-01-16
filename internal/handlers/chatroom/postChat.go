@@ -25,7 +25,7 @@ var PostChat = func(c *fiber.Ctx) error {
 
 	// TODO: text to be validated alongside file
 	if chatRoom.UserID == "" || chatRoom.Text == "" || sentAt == "" {
-		return fiber.NewError(fiber.StatusBadRequest, "Missing userID/Text/SentAt!")
+		return fiber.NewError(fiber.StatusBadRequest, "Missing userID/SentAt!")
 	}
 
 	parsedSentAt, err := time.Parse(time.RFC3339, sentAt)

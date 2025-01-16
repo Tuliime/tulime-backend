@@ -120,6 +120,7 @@ func main() {
 	chatRoomGroup := app.Group("/api/v0.01/chatroom", func(c *fiber.Ctx) error {
 		return c.Next()
 	})
+	chatRoomGroup.Get("/", chatroom.GetChat)
 	chatRoomGroup.Post("/", chatroom.PostChat)
 	chatRoomGroup.Get("/live", chatroom.GetLiveChat)
 
