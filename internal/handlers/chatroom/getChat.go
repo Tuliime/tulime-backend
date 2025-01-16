@@ -10,7 +10,6 @@ var GetChat = func(c *fiber.Ctx) error {
 	chatroom := models.Chatroom{}
 	limitParam := c.Query("limit")
 	cursorParam := c.Query("cursor")
-	var cursor string
 
 	limit, err := packages.ValidateQueryLimit(limitParam)
 	if err != nil {
@@ -18,22 +17,45 @@ var GetChat = func(c *fiber.Ctx) error {
 	}
 
 	if cursorParam == "" {
-		cursor = ""
+		cursorParam = ""
 	}
 
-	chatMessages, err := chatroom.FindAll(limit, cursor)
+	chatMessages, err := chatroom.FindAll(limit, cursorParam)
 	if err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
 
-	// TODO: To add a cursor in the pagination
+	var repliedMessages []models.Chatroom
+
+	for _, chatMessage := range chatMessages {
+		if chatMessage.Reply == "" {
+			continue
+		}
+		reply, err := chatroom.FindReply(chatMessage.Reply)
+		if err != nil {
+			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		}
+		repliedMessages = append(repliedMessages, reply)
+	}
+
+	var prevCursor string
+	if len(chatMessages) > 0 {
+		prevCursor = chatMessages[0].ID
+	}
+
 	pagination := map[string]interface{}{
-		"limit": limit,
+		"limit":      limit,
+		"prevCursor": prevCursor,
+	}
+
+	chatMap := fiber.Map{
+		"chats":   chatMessages,
+		"replies": repliedMessages,
 	}
 
 	response := fiber.Map{
 		"status":     "success",
-		"data":       chatMessages,
+		"data":       chatMap,
 		"pagination": pagination,
 	}
 
