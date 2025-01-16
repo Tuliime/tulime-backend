@@ -8,6 +8,7 @@ import (
 	"github.com/Tuliime/tulime-backend/internal/events/subscribers"
 	"github.com/Tuliime/tulime-backend/internal/handlers/agroproducts"
 	"github.com/Tuliime/tulime-backend/internal/handlers/auth"
+	"github.com/Tuliime/tulime-backend/internal/handlers/chatbot"
 	"github.com/Tuliime/tulime-backend/internal/handlers/chatroom"
 	"github.com/Tuliime/tulime-backend/internal/handlers/farminputs"
 	"github.com/Tuliime/tulime-backend/internal/handlers/farmmanager"
@@ -123,6 +124,14 @@ func main() {
 	chatRoomGroup.Get("/", chatroom.GetChat)
 	chatRoomGroup.Post("/", chatroom.PostChat)
 	chatRoomGroup.Get("/live", chatroom.GetLiveChat)
+
+	// ChatBoot
+	chatBotGroup := app.Group("/api/v0.01/chatbot", func(c *fiber.Ctx) error {
+		return c.Next()
+	})
+	chatBotGroup.Get("/user/:userId", chatbot.GetChatByUser)
+	chatBotGroup.Post("/user/:userId", chatbot.PostChat)
+	chatBotGroup.Delete("/:id", chatbot.DeleteChat)
 
 	app.Use("*", func(c *fiber.Ctx) error {
 		message := fmt.Sprintf("api route '%s' doesn't exist!", c.Path())
