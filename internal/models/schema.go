@@ -24,6 +24,7 @@ type User struct {
 	VetDoctor       VetDoctor         `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"vetDoctor"`
 	Chatroom        []Chatroom        `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"chatroom"`
 	ChatroomMention []ChatroomMention `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"chatroomMention"`
+	Chatbot         []Chatbot         `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"chatbot"`
 	CreatedAt       time.Time         `gorm:"column:createdAt" json:"createdAt"`
 	UpdatedAt       time.Time         `gorm:"column:updatedAt" json:"updatedAt"`
 }
@@ -114,7 +115,7 @@ type VetDoctor struct {
 type Chatroom struct {
 	ID        string            `gorm:"column:id;type:uuid;primaryKey" json:"id"`
 	UserID    string            `gorm:"column:userID;not null;index" json:"userID"`
-	Text      string            `gorm:"column:name;default:null" json:"name"`
+	Text      string            `gorm:"column:text;default:null" json:"text"`
 	Reply     string            `gorm:"column:reply;default:null;index" json:"reply"`
 	File      ChatroomFile      `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"file"`
 	Mention   []ChatroomMention `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"mention"`
@@ -142,4 +143,13 @@ type ChatroomMention struct {
 	CreatedAt  time.Time      `gorm:"column:createdAt;index" json:"createdAt"`
 	UpdatedAt  time.Time      `gorm:"column:updatedAt;index" json:"updatedAt"`
 	DeletedAt  gorm.DeletedAt `gorm:"column:deletedAt;index" json:"deletedAt"`
+}
+
+type Chatbot struct {
+	ID         string    `gorm:"column:id;type:uuid;primaryKey" json:"id"`
+	UserID     string    `gorm:"column:userID;not null;index" json:"userID"`
+	Prompt     string    `gorm:"column:prompt;not null" json:"prompt"`
+	AIResponse string    `gorm:"column:aiResponse;not null" json:"aiResponse"`
+	CreatedAt  time.Time `gorm:"column:createdAt;index" json:"createdAt"`
+	UpdatedAt  time.Time `gorm:"column:updatedAt;index" json:"updatedAt"`
 }
