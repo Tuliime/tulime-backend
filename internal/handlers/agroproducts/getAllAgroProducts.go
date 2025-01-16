@@ -48,7 +48,7 @@ var GetAllAgroProducts = func(c *fiber.Ctx) error {
 
 	var prevCursor string
 	if len(agroProducts) > 0 {
-		prevCursor = agroProducts[0].ID
+		prevCursor = agroProducts[len(agroProducts)-1].ID
 	}
 
 	pagination := map[string]interface{}{
