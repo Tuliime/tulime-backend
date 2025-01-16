@@ -27,11 +27,11 @@ func (cr *Chatroom) FindOne(id string) (Chatroom, error) {
 	return chatroom, nil
 }
 
-// TODO: to include file and mention
+// TODO: To include reply list
 func (cr *Chatroom) FindAll(limit float64, cursor string) ([]Chatroom, error) {
 	var chatRooms []Chatroom
 
-	query := db.Order("\"arrivedAt\" DESC").Limit(int(limit))
+	query := db.Preload("File").Preload("Mention").Order("\"arrivedAt\" ASC").Limit(int(limit))
 
 	if cursor != "" {
 		var lastChatroom Chatroom
