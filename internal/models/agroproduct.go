@@ -50,10 +50,23 @@ func (ap *Agroproduct) FindByCategory(category string) ([]Agroproduct, error) {
 	return agroproducts, nil
 }
 
-// TODO: add pagination for all select queries that return many results
-func (ap *Agroproduct) FindAll(limit float64) ([]Agroproduct, error) {
+func (ap *Agroproduct) FindAll(limit float64, category string, cursor string) ([]Agroproduct, error) {
 	var agroproducts []Agroproduct
-	db.Limit(int(limit)).Find(&agroproducts)
+	query := db.Order("\"updatedAt\" DESC").Limit(int(limit))
+
+	if category != "" {
+		query.Where("category = ?", category)
+	}
+
+	if cursor != "" {
+		var lastAgroproduct Agroproduct
+		if err := db.Select("\"updatedAt\"").Where("id = ?", cursor).First(&lastAgroproduct).Error; err != nil {
+			return nil, err
+		}
+		query = query.Where("\"updatedAt\" < ?", lastAgroproduct.UpdatedAt)
+	}
+
+	query.Find(&agroproducts)
 
 	for i, agroproduct := range agroproducts {
 		var agroProductPrice []AgroproductPrice

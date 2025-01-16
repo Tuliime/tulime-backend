@@ -26,19 +26,34 @@ import (
 var GetAllAgroProducts = func(c *fiber.Ctx) error {
 	agroProduct := models.Agroproduct{}
 	limitParam := c.Query("limit")
+	categoryParam := c.Query("category")
+	cursorParam := c.Query("cursor")
 
 	limit, err := packages.ValidateQueryLimit(limitParam)
 	if err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
 
-	agroProducts, err := agroProduct.FindAll(limit)
+	if cursorParam == "" {
+		cursorParam = ""
+	}
+	if categoryParam == "" {
+		categoryParam = ""
+	}
+
+	agroProducts, err := agroProduct.FindAll(limit, categoryParam, cursorParam)
 	if err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
 
+	var prevCursor string
+	if len(agroProducts) > 0 {
+		prevCursor = agroProducts[0].ID
+	}
+
 	pagination := map[string]interface{}{
-		"limit": limit,
+		"limit":      limit,
+		"prevCursor": prevCursor,
 	}
 
 	response := fiber.Map{
