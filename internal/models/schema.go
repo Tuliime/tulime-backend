@@ -65,14 +65,18 @@ type News struct {
 }
 
 type FarmInputs struct {
-	ID        string    `gorm:"column:id;type:uuid;primaryKey" json:"id"`
-	Name      string    `gorm:"column:name;unique;not null;index" json:"name"`
-	Purpose   string    `gorm:"column:purpose;not null" json:"purpose"`
-	Category  string    `gorm:"column:category;not null;index" json:"category"`
-	ImageUrl  string    `gorm:"column:imageUrl;not null" json:"imageUrl"`
-	ImagePath string    `gorm:"column:imagePath;not null" json:"imagePath"`
-	CreatedAt time.Time `gorm:"column:createdAt;index" json:"createdAt"`
-	UpdatedAt time.Time `gorm:"column:updatedAt;index" json:"updatedAt"`
+	ID            string    `gorm:"column:id;type:uuid;primaryKey" json:"id"`
+	Name          string    `gorm:"column:name;unique;not null;index" json:"name"`
+	Purpose       string    `gorm:"column:purpose;not null" json:"purpose"`
+	Category      string    `gorm:"column:category;not null;index" json:"category"`
+	ImageUrl      string    `gorm:"column:imageUrl;not null" json:"imageUrl"`
+	ImagePath     string    `gorm:"column:imagePath;not null" json:"imagePath"`
+	Price         float64   `gorm:"column:price;not null" json:"price"`
+	PriceCurrency string    `gorm:"column:priceCurrency;not null" json:"priceCurrency"`
+	Source        string    `gorm:"column:source;not null" json:"Source"`
+	SourceUrl     string    `gorm:"column:sourceUrl;default:null" json:"sourceUrl"`
+	CreatedAt     time.Time `gorm:"column:createdAt;index" json:"createdAt"`
+	UpdatedAt     time.Time `gorm:"column:updatedAt;index" json:"updatedAt"`
 }
 
 type OTP struct {

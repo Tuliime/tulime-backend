@@ -8,21 +8,13 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-// type FarmInputs struct {
-// 	ID        string    `gorm:"column:id;type:uuid;primaryKey" json:"id"`
-// 	Name      string    `gorm:"column:name;unique;not null;index" json:"name"`
-// 	Purpose   string    `gorm:"column:purpose;not null" json:"purpose"`
-// 	Category  string    `gorm:"column:category;not null;index" json:"category"`
-// 	ImageUrl  string    `gorm:"column:imageUrl;not null" json:"imageUrl"`
-// 	ImagePath string    `gorm:"column:imagePath;not null" json:"imagePath"`
-// 	CreatedAt time.Time `gorm:"column:createdAt;index" json:"createdAt"`
-// 	UpdatedAt time.Time `gorm:"column:updatedAt;index" json:"updatedAt"`
-// }
-
 type UpdateFarmInputValidator struct {
-	Name     string `validate:"string"`
-	Category string `validate:"string"`
-	Purpose  string `validate:"string"`
+	Name          string  `validate:"string"`
+	Category      string  `validate:"string"`
+	Purpose       string  `validate:"string"`
+	Price         float64 `validate:"number"`
+	PriceCurrency string  `validate:"string"`
+	Source        string  `validate:"string"`
 }
 
 var UpdateFarmInput = func(c *fiber.Ctx) error {
@@ -51,6 +43,9 @@ var UpdateFarmInput = func(c *fiber.Ctx) error {
 	savedFarmInput.Name = farmInput.Name
 	savedFarmInput.Category = farmInput.Category
 	savedFarmInput.Purpose = farmInput.Purpose
+	savedFarmInput.Price = farmInput.Price
+	savedFarmInput.PriceCurrency = farmInput.PriceCurrency
+	savedFarmInput.Source = farmInput.Source
 
 	updatedFarmInput, err := savedFarmInput.Update()
 	if err != nil {
