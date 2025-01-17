@@ -36,8 +36,18 @@ var SignUp = func(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
-	accessToken, err := packages.SignJWTToken(userId)
+	accessToken, err := packages.SignJWTToken(userId, "accessToken")
 	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+
+	refreshToken, err := packages.SignJWTToken(userId, "refreshToken")
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+
+	session := models.Session{UserID: userId, AccessToken: accessToken, RefreshToken: refreshToken}
+	if _, err := session.Create(session); err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
@@ -48,10 +58,11 @@ var SignUp = func(c *fiber.Ctx) error {
 		"role":      user.Role,
 	}
 	response := map[string]interface{}{
-		"status":      "success",
-		"message":     "Account created successfully",
-		"accessToken": accessToken,
-		"user":        newUser,
+		"status":       "success",
+		"message":      "Account created successfully",
+		"accessToken":  accessToken,
+		"refreshToken": refreshToken,
+		"user":         newUser,
 	}
 
 	return c.Status(fiber.StatusCreated).JSON(response)

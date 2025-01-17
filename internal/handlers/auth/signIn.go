@@ -36,8 +36,18 @@ var SignIn = func(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusBadRequest, "Invalid telNumber/password!")
 	}
 
-	accessToken, err := packages.SignJWTToken(user.ID)
+	accessToken, err := packages.SignJWTToken(user.ID, "accessToken")
 	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+
+	refreshToken, err := packages.SignJWTToken(user.ID, "refreshToken")
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+
+	session := models.Session{UserID: user.ID, AccessToken: accessToken, RefreshToken: refreshToken}
+	if _, err := session.Create(session); err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
@@ -48,10 +58,11 @@ var SignIn = func(c *fiber.Ctx) error {
 		"role":      user.Role,
 	}
 	response := map[string]interface{}{
-		"status":      "success",
-		"message":     "Sign in successfully",
-		"accessToken": accessToken,
-		"user":        userMap,
+		"status":       "success",
+		"message":      "Sign in successfully",
+		"accessToken":  accessToken,
+		"refreshToken": refreshToken,
+		"user":         userMap,
 	}
 
 	return c.Status(fiber.StatusOK).JSON(response)

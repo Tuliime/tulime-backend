@@ -8,10 +8,20 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
-func SignJWTToken(userId string) (string, error) {
+func SignJWTToken(userID string, tokenType string) (string, error) {
+	var tokenExpiration int64
+
+	if tokenType == "accessToken" {
+		tokenExpiration = time.Now().Add(12 * time.Hour).Unix()
+	} else if tokenType == "refreshToken" {
+		tokenExpiration = time.Now().Add(24 * 30 * time.Hour).Unix()
+	} else {
+		return "", fmt.Errorf("invalid token type: %s", tokenType)
+	}
+
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"userId": userId,
-		"exp":    time.Now().Add(9 * time.Hour).Unix(),
+		"userId": userID,
+		"exp":    tokenExpiration,
 		"iat":    time.Now().Unix(),
 	})
 
