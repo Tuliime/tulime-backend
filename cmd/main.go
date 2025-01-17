@@ -135,7 +135,7 @@ func main() {
 	chatBotGroup.Delete("/:id", chatbot.DeleteChat)
 
 	// Status
-	app.Get("/status", status.GetActive)
+	app.Get("/status", status.GetAppStatus)
 
 	app.Use("*", func(c *fiber.Ctx) error {
 		message := fmt.Sprintf("api route '%s' doesn't exist!", c.Path())

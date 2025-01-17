@@ -4,7 +4,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-var GetActive = func(c *fiber.Ctx) error {
+var GetAppStatus = func(c *fiber.Ctx) error {
 	response := fiber.Map{
 		"status":  "success",
 		"message": "Active",
