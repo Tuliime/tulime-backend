@@ -46,7 +46,8 @@ var SignIn = func(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
-	session := models.Session{UserID: user.ID, AccessToken: accessToken, RefreshToken: refreshToken}
+	session := models.Session{UserID: user.ID, AccessToken: accessToken,
+		RefreshToken: refreshToken, GeneratedVia: "sign in"}
 	if _, err := session.Create(session); err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}

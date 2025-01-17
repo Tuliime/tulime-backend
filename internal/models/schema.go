@@ -164,6 +164,7 @@ type Session struct {
 	UserID       string    `gorm:"column:userID;not null;index" json:"userID"`
 	AccessToken  string    `gorm:"column:accessToken;not null;index" json:"accessToken"`
 	RefreshToken string    `gorm:"column:refreshToken;not null;index" json:"refreshToken"`
+	GeneratedVia string    `gorm:"column:generatedVia;not null;index" json:"generatedVia"`
 	IsRevoked    bool      `gorm:"column:isRevoked;default:false" json:"isRevoked"`
 	CreatedAt    time.Time `gorm:"column:createdAt;index" json:"createdAt"`
 	UpdatedAt    time.Time `gorm:"column:updatedAt;index" json:"updatedAt"`
