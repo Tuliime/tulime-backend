@@ -50,6 +50,7 @@ func main() {
 	})
 	userGroup.Post("/auth/signup", auth.SignUp)
 	userGroup.Post("/auth/signin", auth.SignIn)
+	userGroup.Post("/auth/rt-signin", auth.SignInWithRefreshToken)
 	userGroup.Post("/auth/forgot-password", auth.ForgotPassword)
 	userGroup.Patch("/auth/verify-otp", auth.VerifyOTP)
 	userGroup.Patch("/auth/reset-password/:otp", auth.ResetPassword)
