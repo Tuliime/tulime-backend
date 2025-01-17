@@ -35,12 +35,24 @@ func (f *FarmInputs) FindByCategory(category string) ([]FarmInputs, error) {
 	return FarmInputs, nil
 }
 
-// TODO: add pagination for all select queries that return many results
-func (f *FarmInputs) FindAll(limit float64) ([]FarmInputs, error) {
-	var FarmInputs []FarmInputs
-	db.Limit(int(limit)).Find(&FarmInputs)
+func (f *FarmInputs) FindAll(limit float64, category string, cursor string) ([]FarmInputs, error) {
+	var farmInputs []FarmInputs
+	query := db.Order("\"updatedAt\" DESC").Limit(int(limit))
 
-	return FarmInputs, nil
+	if category != "" {
+		query.Where("category = ?", category)
+	}
+
+	if cursor != "" {
+		var lastFarmInput FarmInputs
+		if err := db.Select("\"updatedAt\"").Where("id = ?", cursor).First(&lastFarmInput).Error; err != nil {
+			return nil, err
+		}
+		query = query.Where("\"updatedAt\" < ?", lastFarmInput.UpdatedAt)
+	}
+	query.Find(&farmInputs)
+
+	return farmInputs, nil
 }
 
 // Update updates one FarmInputs in the database, using the information
