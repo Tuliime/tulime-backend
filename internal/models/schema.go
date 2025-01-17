@@ -25,6 +25,7 @@ type User struct {
 	Chatroom        []Chatroom        `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"chatroom"`
 	ChatroomMention []ChatroomMention `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"chatroomMention"`
 	Chatbot         []Chatbot         `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"chatbot"`
+	Session         []Session         `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"session"`
 	CreatedAt       time.Time         `gorm:"column:createdAt" json:"createdAt"`
 	UpdatedAt       time.Time         `gorm:"column:updatedAt" json:"updatedAt"`
 }
@@ -156,4 +157,14 @@ type Chatbot struct {
 	AIResponse string    `gorm:"column:aiResponse;not null" json:"aiResponse"`
 	CreatedAt  time.Time `gorm:"column:createdAt;index" json:"createdAt"`
 	UpdatedAt  time.Time `gorm:"column:updatedAt;index" json:"updatedAt"`
+}
+
+type Session struct {
+	ID           string    `gorm:"column:id;type:uuid;primaryKey" json:"id"`
+	UserID       string    `gorm:"column:userID;not null;index" json:"userID"`
+	AccessToken  string    `gorm:"column:accessToken;not null;index" json:"accessToken"`
+	RefreshToken string    `gorm:"column:refreshToken;not null;index" json:"refreshToken"`
+	IsRevoked    bool      `gorm:"column:isRevoked;default:false" json:"isRevoked"`
+	CreatedAt    time.Time `gorm:"column:createdAt;index" json:"createdAt"`
+	UpdatedAt    time.Time `gorm:"column:updatedAt;index" json:"updatedAt"`
 }
