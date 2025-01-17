@@ -1,6 +1,8 @@
 package farminputs
 
 import (
+	"strconv"
+
 	"github.com/Tuliime/tulime-backend/internal/models"
 	"github.com/Tuliime/tulime-backend/internal/packages"
 	"github.com/gofiber/fiber/v2"
@@ -11,9 +13,17 @@ var PostFarmInputs = func(c *fiber.Ctx) error {
 	farmInputs.Name = c.FormValue("name")
 	farmInputs.Category = c.FormValue("category")
 	farmInputs.Purpose = c.FormValue("purpose")
+	farmInputs.Price, _ = strconv.ParseFloat(c.FormValue("price"), 64)
+	farmInputs.PriceCurrency = c.FormValue("priceCurrency")
+	farmInputs.Source = c.FormValue("source")
+	farmInputs.SourceUrl = c.FormValue("sourceUrl")
 
 	if farmInputs.Name == "" || farmInputs.Category == "" || farmInputs.Purpose == "" {
 		return fiber.NewError(fiber.StatusBadRequest, "Missing name/category/purpose!")
+	}
+
+	if farmInputs.Price == 0 || farmInputs.PriceCurrency == "" || farmInputs.Source == "" || farmInputs.SourceUrl == "" {
+		return fiber.NewError(fiber.StatusBadRequest, "Missing price/priceCurrency/source/sourceUrl!")
 	}
 
 	file, err := c.FormFile("file")
