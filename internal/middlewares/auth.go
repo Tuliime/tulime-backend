@@ -45,7 +45,7 @@ func Auth(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusForbidden, "Invalid token. Please log in again.")
 	}
 
-	if userIDClaim, ok := claims["userId"].(string); ok {
+	if userIDClaim, ok := claims["userID"].(string); ok {
 		userID = userIDClaim
 	}
 
