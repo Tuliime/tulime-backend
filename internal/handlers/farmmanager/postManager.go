@@ -19,7 +19,7 @@ type PostFarmManagerInput struct {
 
 var PostFarmManager = func(c *fiber.Ctx) error {
 	farmManager := models.FarmManager{}
-	userID := c.Params("userId")
+	userID := c.Params("userID")
 	fmt.Println("userID:", userID)
 
 	if err := c.BodyParser(&farmManager); err != nil {

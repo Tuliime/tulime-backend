@@ -8,9 +8,9 @@ import (
 var DeleteAgroProductPrice = func(c *fiber.Ctx) error {
 	agroProductPrice := models.AgroproductPrice{}
 
-	priceId := c.Params("priceId")
+	priceID := c.Params("priceID")
 
-	savedAgroProductPrice, err := agroProductPrice.FindOne(priceId)
+	savedAgroProductPrice, err := agroProductPrice.FindOne(priceID)
 	if err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
@@ -19,7 +19,7 @@ var DeleteAgroProductPrice = func(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusNotFound, "Price of provided id is not found!")
 	}
 
-	err = agroProductPrice.Delete(priceId)
+	err = agroProductPrice.Delete(priceID)
 	if err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}

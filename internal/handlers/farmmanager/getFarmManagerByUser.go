@@ -7,7 +7,7 @@ import (
 
 var GetFarmManagerByUser = func(c *fiber.Ctx) error {
 	farmManager := models.FarmManager{}
-	userID := c.Params("userId")
+	userID := c.Params("userID")
 
 	farmManager, err := farmManager.FindByUser(userID)
 	if err != nil {
