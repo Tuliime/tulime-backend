@@ -7,7 +7,7 @@ import (
 
 var GetVetDoctorByUser = func(c *fiber.Ctx) error {
 	vetDoctor := models.VetDoctor{}
-	userID := c.Params("userId")
+	userID := c.Params("userID")
 
 	vetDoctor, err := vetDoctor.FindByUser(userID)
 	if err != nil {

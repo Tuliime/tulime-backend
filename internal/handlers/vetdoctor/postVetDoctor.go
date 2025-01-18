@@ -18,7 +18,7 @@ type PostVetDoctorInput struct {
 
 var PostVetDoctorManager = func(c *fiber.Ctx) error {
 	vetDoctor := models.VetDoctor{}
-	userID := c.Params("userId")
+	userID := c.Params("userID")
 
 	if err := c.BodyParser(&vetDoctor); err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())

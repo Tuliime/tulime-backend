@@ -29,9 +29,9 @@ var UpdateAgroProductPrice = func(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusBadRequest, "Validation Error")
 	}
 
-	priceId := c.Params("priceId")
+	priceID := c.Params("priceID")
 
-	savedAgroProductPrice, err := agroProductPrice.FindOne(priceId)
+	savedAgroProductPrice, err := agroProductPrice.FindOne(priceID)
 	if err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}

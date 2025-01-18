@@ -10,7 +10,7 @@ var GetChatByUser = func(c *fiber.Ctx) error {
 	chatbot := models.Chatbot{}
 	limitParam := c.Query("limit")
 	cursorParam := c.Query("cursor")
-	userID := c.Params("userId")
+	userID := c.Params("userID")
 
 	limit, err := packages.ValidateQueryLimit(limitParam)
 	if err != nil {

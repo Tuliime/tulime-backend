@@ -13,7 +13,7 @@ type PostChatInput struct {
 }
 
 var PostChat = func(c *fiber.Ctx) error {
-	chatbot := models.Chatbot{UserID: c.Params("userId")}
+	chatbot := models.Chatbot{UserID: c.Params("userID")}
 
 	if err := c.BodyParser(&chatbot); err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())

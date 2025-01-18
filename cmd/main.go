@@ -73,8 +73,8 @@ func main() {
 	agroproductsGroup.Get("/prices", agroproducts.GetAllAgroProductPrices)
 	agroproductsGroup.Post("/:id/price", middlewares.Auth, agroproducts.PostAgroProductPrice)
 	agroproductsGroup.Get("/:id/price", agroproducts.GetPricesByAgroProduct)
-	agroproductsGroup.Patch("/:id/price/:priceId", middlewares.Auth, agroproducts.UpdateAgroProductPrice)
-	agroproductsGroup.Delete("/:id/price/:priceId", middlewares.Auth, agroproducts.DeleteAgroProductPrice)
+	agroproductsGroup.Patch("/:id/price/:priceID", middlewares.Auth, agroproducts.UpdateAgroProductPrice)
+	agroproductsGroup.Delete("/:id/price/:priceID", middlewares.Auth, agroproducts.DeleteAgroProductPrice)
 
 	// News
 	newsGroup := app.Group("/api/v0.01/news", func(c *fiber.Ctx) error {
@@ -104,8 +104,8 @@ func main() {
 	})
 	farmManagerGroup.Get("/", farmmanager.GetAllFarmManagers)
 	farmManagerGroup.Get("/:id", farmmanager.GetFarmManager)
-	farmManagerGroup.Get("/user/:userId", farmmanager.GetFarmManagerByUser)
-	farmManagerGroup.Post("/user/:userId", middlewares.Auth, farmmanager.PostFarmManager)
+	farmManagerGroup.Get("/user/:userID", farmmanager.GetFarmManagerByUser)
+	farmManagerGroup.Post("/user/:userID", middlewares.Auth, farmmanager.PostFarmManager)
 	farmManagerGroup.Patch("/:id", middlewares.Auth, farmmanager.UpdateFarmManager)
 	farmManagerGroup.Delete("/:id", middlewares.Auth, farmmanager.DeleteFarmManager)
 
@@ -115,8 +115,8 @@ func main() {
 	})
 	vetDoctorGroup.Get("/", vetdoctor.GetAllVetDoctors)
 	vetDoctorGroup.Get("/:id", vetdoctor.GetVetDoctor)
-	vetDoctorGroup.Get("/user/:userId", vetdoctor.GetVetDoctorByUser)
-	vetDoctorGroup.Post("/user/:userId", middlewares.Auth, vetdoctor.PostVetDoctorManager)
+	vetDoctorGroup.Get("/user/:userID", vetdoctor.GetVetDoctorByUser)
+	vetDoctorGroup.Post("/user/:userID", middlewares.Auth, vetdoctor.PostVetDoctorManager)
 	vetDoctorGroup.Patch("/:id", middlewares.Auth, vetdoctor.UpdateVetDoctor)
 	vetDoctorGroup.Delete("/:id", middlewares.Auth, vetdoctor.DeleteVetDoctor)
 
@@ -132,8 +132,8 @@ func main() {
 	chatBotGroup := app.Group("/api/v0.01/chatbot", func(c *fiber.Ctx) error {
 		return c.Next()
 	})
-	chatBotGroup.Get("/user/:userId", chatbot.GetChatByUser)
-	chatBotGroup.Post("/user/:userId", middlewares.Auth, chatbot.PostChat)
+	chatBotGroup.Get("/user/:userID", chatbot.GetChatByUser)
+	chatBotGroup.Post("/user/:userID", middlewares.Auth, chatbot.PostChat)
 	chatBotGroup.Delete("/:id", middlewares.Auth, chatbot.DeleteChat)
 
 	// Status
