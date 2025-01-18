@@ -15,6 +15,7 @@ import (
 	"github.com/Tuliime/tulime-backend/internal/handlers/news"
 	"github.com/Tuliime/tulime-backend/internal/handlers/status"
 	"github.com/Tuliime/tulime-backend/internal/handlers/vetdoctor"
+	"github.com/Tuliime/tulime-backend/internal/middlewares"
 	"github.com/Tuliime/tulime-backend/internal/packages"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -54,26 +55,26 @@ func main() {
 	userGroup.Post("/auth/forgot-password", auth.ForgotPassword)
 	userGroup.Patch("/auth/verify-otp", auth.VerifyOTP)
 	userGroup.Patch("/auth/reset-password/:otp", auth.ResetPassword)
-	userGroup.Patch("/:id/auth/change-password", auth.ChangePassword)
-	userGroup.Patch("/:id/image", auth.UpdateUserImage)
-	userGroup.Patch("/:id", auth.UpdateUser)
+	userGroup.Patch("/:id/auth/change-password", middlewares.Auth, auth.ChangePassword)
+	userGroup.Patch("/:id/image", middlewares.Auth, auth.UpdateUserImage)
+	userGroup.Patch("/:id", middlewares.Auth, auth.UpdateUser)
 
 	// Agroproduct
 	agroproductsGroup := app.Group("/api/v0.01/agroproducts", func(c *fiber.Ctx) error {
 		return c.Next()
 	})
 	agroproductsGroup.Get("/", agroproducts.GetAllAgroProducts)
-	agroproductsGroup.Post("/", agroproducts.PostAgroProduct)
+	agroproductsGroup.Post("/", middlewares.Auth, agroproducts.PostAgroProduct)
 	agroproductsGroup.Get("/:id", agroproducts.GetAgroProduct)
-	agroproductsGroup.Patch("/:id", agroproducts.UpdateAgroProduct)
-	agroproductsGroup.Delete("/:id", agroproducts.DeleteAgroProduct)
-	agroproductsGroup.Patch("/:id/image", agroproducts.UpdateAgroProductImage)
+	agroproductsGroup.Patch("/:id", middlewares.Auth, agroproducts.UpdateAgroProduct)
+	agroproductsGroup.Delete("/:id", middlewares.Auth, agroproducts.DeleteAgroProduct)
+	agroproductsGroup.Patch("/:id/image", middlewares.Auth, agroproducts.UpdateAgroProductImage)
 	// AgroproductPrices
 	agroproductsGroup.Get("/prices", agroproducts.GetAllAgroProductPrices)
-	agroproductsGroup.Post("/:id/price", agroproducts.PostAgroProductPrice)
+	agroproductsGroup.Post("/:id/price", middlewares.Auth, agroproducts.PostAgroProductPrice)
 	agroproductsGroup.Get("/:id/price", agroproducts.GetPricesByAgroProduct)
-	agroproductsGroup.Patch("/:id/price/:priceId", agroproducts.UpdateAgroProductPrice)
-	agroproductsGroup.Delete("/:id/price/:priceId", agroproducts.DeleteAgroProductPrice)
+	agroproductsGroup.Patch("/:id/price/:priceId", middlewares.Auth, agroproducts.UpdateAgroProductPrice)
+	agroproductsGroup.Delete("/:id/price/:priceId", middlewares.Auth, agroproducts.DeleteAgroProductPrice)
 
 	// News
 	newsGroup := app.Group("/api/v0.01/news", func(c *fiber.Ctx) error {
@@ -81,10 +82,10 @@ func main() {
 	})
 	newsGroup.Get("/", news.GetAllNews)
 	newsGroup.Get("/:id", news.GetNews)
-	newsGroup.Post("/", news.PostNews)
-	newsGroup.Patch("/:id", news.UpdateNews)
-	newsGroup.Patch("/:id/image", news.UpdateNewsImage)
-	newsGroup.Delete("/:id", news.DeleteNews)
+	newsGroup.Post("/", middlewares.Auth, news.PostNews)
+	newsGroup.Patch("/:id", middlewares.Auth, news.UpdateNews)
+	newsGroup.Patch("/:id/image", middlewares.Auth, news.UpdateNewsImage)
+	newsGroup.Delete("/:id", middlewares.Auth, news.DeleteNews)
 
 	// Farm inputs
 	farmInputGroup := app.Group("/api/v0.01/farminputs", func(c *fiber.Ctx) error {
@@ -92,10 +93,10 @@ func main() {
 	})
 	farmInputGroup.Get("/", farminputs.GetAllFarmInputs)
 	farmInputGroup.Get("/:id", farminputs.GetFarmInput)
-	farmInputGroup.Post("/", farminputs.PostFarmInputs)
-	farmInputGroup.Patch("/:id", farminputs.UpdateFarmInput)
-	farmInputGroup.Patch("/:id/image", farminputs.UpdateFarmInputImage)
-	farmInputGroup.Delete("/:id", farminputs.DeleteFarmInput)
+	farmInputGroup.Post("/", middlewares.Auth, farminputs.PostFarmInputs)
+	farmInputGroup.Patch("/:id", middlewares.Auth, farminputs.UpdateFarmInput)
+	farmInputGroup.Patch("/:id/image", middlewares.Auth, farminputs.UpdateFarmInputImage)
+	farmInputGroup.Delete("/:id", middlewares.Auth, farminputs.DeleteFarmInput)
 
 	// Farm manager
 	farmManagerGroup := app.Group("/api/v0.01/farmmanager", func(c *fiber.Ctx) error {
@@ -104,9 +105,9 @@ func main() {
 	farmManagerGroup.Get("/", farmmanager.GetAllFarmManagers)
 	farmManagerGroup.Get("/:id", farmmanager.GetFarmManager)
 	farmManagerGroup.Get("/user/:userId", farmmanager.GetFarmManagerByUser)
-	farmManagerGroup.Post("/user/:userId", farmmanager.PostFarmManager)
-	farmManagerGroup.Patch("/:id", farmmanager.UpdateFarmManager)
-	farmManagerGroup.Delete("/:id", farmmanager.DeleteFarmManager)
+	farmManagerGroup.Post("/user/:userId", middlewares.Auth, farmmanager.PostFarmManager)
+	farmManagerGroup.Patch("/:id", middlewares.Auth, farmmanager.UpdateFarmManager)
+	farmManagerGroup.Delete("/:id", middlewares.Auth, farmmanager.DeleteFarmManager)
 
 	// Vet Doctor
 	vetDoctorGroup := app.Group("/api/v0.01/vetdoctor", func(c *fiber.Ctx) error {
@@ -115,25 +116,25 @@ func main() {
 	vetDoctorGroup.Get("/", vetdoctor.GetAllVetDoctors)
 	vetDoctorGroup.Get("/:id", vetdoctor.GetVetDoctor)
 	vetDoctorGroup.Get("/user/:userId", vetdoctor.GetVetDoctorByUser)
-	vetDoctorGroup.Post("/user/:userId", vetdoctor.PostVetDoctorManager)
-	vetDoctorGroup.Patch("/:id", vetdoctor.UpdateVetDoctor)
-	vetDoctorGroup.Delete("/:id", vetdoctor.DeleteVetDoctor)
+	vetDoctorGroup.Post("/user/:userId", middlewares.Auth, vetdoctor.PostVetDoctorManager)
+	vetDoctorGroup.Patch("/:id", middlewares.Auth, vetdoctor.UpdateVetDoctor)
+	vetDoctorGroup.Delete("/:id", middlewares.Auth, vetdoctor.DeleteVetDoctor)
 
 	// ChatRoom
 	chatRoomGroup := app.Group("/api/v0.01/chatroom", func(c *fiber.Ctx) error {
 		return c.Next()
 	})
 	chatRoomGroup.Get("/", chatroom.GetChat)
-	chatRoomGroup.Post("/", chatroom.PostChat)
-	chatRoomGroup.Get("/live", chatroom.GetLiveChat)
+	chatRoomGroup.Post("/", middlewares.Auth, chatroom.PostChat)
+	chatRoomGroup.Get("/live", middlewares.Auth, chatroom.GetLiveChat)
 
 	// ChatBoot
 	chatBotGroup := app.Group("/api/v0.01/chatbot", func(c *fiber.Ctx) error {
 		return c.Next()
 	})
 	chatBotGroup.Get("/user/:userId", chatbot.GetChatByUser)
-	chatBotGroup.Post("/user/:userId", chatbot.PostChat)
-	chatBotGroup.Delete("/:id", chatbot.DeleteChat)
+	chatBotGroup.Post("/user/:userId", middlewares.Auth, chatbot.PostChat)
+	chatBotGroup.Delete("/:id", middlewares.Auth, chatbot.DeleteChat)
 
 	// Status
 	app.Get("/status", status.GetAppStatus)
