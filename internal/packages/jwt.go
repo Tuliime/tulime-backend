@@ -22,7 +22,7 @@ func SignJWTToken(userID string, tokenType string) (string, error) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"userId": userID,
+		"userID": userID,
 		"exp":    tokenExpiration,
 		"iat":    time.Now().Unix(),
 	})
@@ -60,7 +60,7 @@ func DecodeJWT(JWTToken string) (string, error) {
 		return "", errors.New("invalid Token")
 	}
 
-	if userIDClaim, ok := claims["userId"].(string); ok {
+	if userIDClaim, ok := claims["userID"].(string); ok {
 		userID = userIDClaim
 	}
 
