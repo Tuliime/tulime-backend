@@ -35,10 +35,22 @@ func (n *News) FindByCategory(category string) ([]News, error) {
 	return news, nil
 }
 
-// TODO: add pagination for all select queries that return many results
-func (n *News) FindAll(limit float64) ([]News, error) {
+func (n *News) FindAll(limit float64, category string, cursor string) ([]News, error) {
 	var news []News
-	db.Limit(int(limit)).Find(&news)
+	query := db.Order("\"updatedAt\" DESC").Limit(int(limit))
+
+	if category != "" {
+		query.Where("category = ?", category)
+	}
+
+	if cursor != "" {
+		var lastNews News
+		if err := db.Select("\"updatedAt\"").Where("id = ?", cursor).First(&lastNews).Error; err != nil {
+			return nil, err
+		}
+		query = query.Where("\"updatedAt\" < ?", lastNews.UpdatedAt)
+	}
+	query.Find(&news)
 
 	return news, nil
 }
