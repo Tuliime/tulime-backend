@@ -36,7 +36,6 @@ func (cr *Chatroom) FindReply(reply string) (Chatroom, error) {
 	return chatRoom, nil
 }
 
-// TODO: To include reply list
 func (cr *Chatroom) FindAll(limit float64, cursor string, includeCursor bool) ([]Chatroom, error) {
 	var chatRooms []Chatroom
 
