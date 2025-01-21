@@ -37,7 +37,7 @@ func (cr *Chatroom) FindReply(reply string) (Chatroom, error) {
 }
 
 // TODO: To include reply list
-func (cr *Chatroom) FindAll(limit float64, cursor string) ([]Chatroom, error) {
+func (cr *Chatroom) FindAll(limit float64, cursor string, includeCursor bool) ([]Chatroom, error) {
 	var chatRooms []Chatroom
 
 	query := db.Preload("File").Preload("Mention").Order("\"arrivedAt\" ASC").Limit(int(limit))
@@ -47,7 +47,11 @@ func (cr *Chatroom) FindAll(limit float64, cursor string) ([]Chatroom, error) {
 		if err := db.Select("\"arrivedAt\"").Where("id = ?", cursor).First(&lastChatroom).Error; err != nil {
 			return nil, err
 		}
-		query = query.Where("\"arrivedAt\" < ?", lastChatroom.ArrivedAt)
+		if includeCursor {
+			query = query.Where("\"arrivedAt\" <= ?", lastChatroom.ArrivedAt)
+		} else {
+			query = query.Where("\"arrivedAt\" < ?", lastChatroom.ArrivedAt)
+		}
 	}
 
 	if err := query.Find(&chatRooms).Error; err != nil {
