@@ -124,7 +124,7 @@ func main() {
 	chatRoomGroup := app.Group("/api/v0.01/chatroom", func(c *fiber.Ctx) error {
 		return c.Next()
 	})
-	chatRoomGroup.Get("/", chatroom.GetChat)
+	chatRoomGroup.Get("/", middlewares.Auth, chatroom.GetChat)
 	chatRoomGroup.Post("/", middlewares.Auth, chatroom.PostChat)
 	chatRoomGroup.Get("/live", middlewares.Auth, chatroom.GetLiveChat)
 
@@ -132,7 +132,7 @@ func main() {
 	chatBotGroup := app.Group("/api/v0.01/chatbot", func(c *fiber.Ctx) error {
 		return c.Next()
 	})
-	chatBotGroup.Get("/user/:userID", chatbot.GetChatByUser)
+	chatBotGroup.Get("/user/:userID", middlewares.Auth, chatbot.GetChatByUser)
 	chatBotGroup.Post("/user/:userID", middlewares.Auth, chatbot.PostChat)
 	chatBotGroup.Delete("/:id", middlewares.Auth, chatbot.DeleteChat)
 
