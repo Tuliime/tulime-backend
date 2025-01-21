@@ -1,6 +1,8 @@
 package chatroom
 
 import (
+	"strconv"
+
 	"github.com/Tuliime/tulime-backend/internal/models"
 	"github.com/Tuliime/tulime-backend/internal/packages"
 	"github.com/gofiber/fiber/v2"
@@ -10,6 +12,7 @@ var GetChat = func(c *fiber.Ctx) error {
 	chatroom := models.Chatroom{}
 	limitParam := c.Query("limit")
 	cursorParam := c.Query("cursor")
+	inCludeCursorParam := c.Query("includeCursor", "false")
 
 	limit, err := packages.ValidateQueryLimit(limitParam)
 	if err != nil {
@@ -20,7 +23,12 @@ var GetChat = func(c *fiber.Ctx) error {
 		cursorParam = ""
 	}
 
-	chatMessages, err := chatroom.FindAll(limit, cursorParam)
+	includeCursor, err := strconv.ParseBool(inCludeCursorParam)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+
+	chatMessages, err := chatroom.FindAll(limit, cursorParam, includeCursor)
 	if err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
