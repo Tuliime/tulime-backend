@@ -13,7 +13,7 @@ var SignUp = func(c *fiber.Ctx) error {
 	}
 
 	if user.Name == "" || user.TelNumber == 0 || user.Password == "" {
-		return fiber.NewError(fiber.StatusBadRequest, "Missing username/telNumber/password!")
+		return fiber.NewError(fiber.StatusBadRequest, "Missing username/telephone number/password!")
 	}
 
 	savedUser, err := user.FindByTelNumber(user.TelNumber)
