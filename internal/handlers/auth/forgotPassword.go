@@ -20,7 +20,7 @@ var ForgotPassword = func(c *fiber.Ctx) error {
 	}
 
 	if user.ID == "" {
-		return fiber.NewError(fiber.StatusBadRequest, "We couldn't find user with provided tel number!")
+		return fiber.NewError(fiber.StatusBadRequest, "We couldn't find user with provided telephone number!")
 	}
 
 	otp := models.OTP{UserID: user.ID}

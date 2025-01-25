@@ -15,7 +15,7 @@ var SignIn = func(c *fiber.Ctx) error {
 	password := user.Password
 
 	if user.TelNumber == 0 || user.Password == "" {
-		return fiber.NewError(fiber.StatusBadRequest, "Missing username/telNumber/password!")
+		return fiber.NewError(fiber.StatusBadRequest, "Missing username/telephone number/password!")
 	}
 
 	user, err := user.FindByTelNumber(user.TelNumber)
@@ -24,7 +24,7 @@ var SignIn = func(c *fiber.Ctx) error {
 	}
 
 	if user.ID == "" {
-		return fiber.NewError(fiber.StatusBadRequest, "Invalid telNumber/password!")
+		return fiber.NewError(fiber.StatusBadRequest, "Invalid telephone number/password!")
 	}
 
 	passwordMatches, err := user.PasswordMatches(password)
@@ -33,7 +33,7 @@ var SignIn = func(c *fiber.Ctx) error {
 	}
 
 	if !passwordMatches {
-		return fiber.NewError(fiber.StatusBadRequest, "Invalid telNumber/password!")
+		return fiber.NewError(fiber.StatusBadRequest, "Invalid telephone number/password!")
 	}
 
 	accessToken, err := packages.SignJWTToken(user.ID, "accessToken")
@@ -57,6 +57,7 @@ var SignIn = func(c *fiber.Ctx) error {
 		"name":      user.Name,
 		"telNumber": user.TelNumber,
 		"role":      user.Role,
+		"imageUrl":  user.ImageUrl,
 	}
 	response := map[string]interface{}{
 		"status":       "success",

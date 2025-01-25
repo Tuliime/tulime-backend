@@ -68,6 +68,7 @@ var ResetPassword = func(c *fiber.Ctx) error {
 		"name":      user.Name,
 		"telNumber": user.TelNumber,
 		"role":      user.Role,
+		"imageUrl":  user.ImageUrl,
 	}
 	response := map[string]interface{}{
 		"status":       "success",
