@@ -58,6 +58,8 @@ var SignUp = func(c *fiber.Ctx) error {
 		"telNumber": user.TelNumber,
 		"role":      user.Role,
 		"imageUrl":  user.ImageUrl,
+		"createdAt": user.CreatedAt,
+		"updatedAt": user.UpdatedAt,
 	}
 	response := map[string]interface{}{
 		"status":       "success",
