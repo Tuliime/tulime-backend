@@ -44,7 +44,16 @@ func (vd *VetDoctor) FindByUser(userID string) (VetDoctor, error) {
 
 func (vd *VetDoctor) FindAll(limit float64) ([]VetDoctor, error) {
 	var vetDoctors []VetDoctor
-	db.Limit(int(limit)).Find(&vetDoctors)
+
+	err := db.Preload("User", func(db *gorm.DB) *gorm.DB {
+		return db.Select("id, \"imageUrl\"")
+	}).
+		Limit(int(limit)).
+		Find(&vetDoctors).Error
+
+	if err != nil {
+		return nil, err
+	}
 
 	return vetDoctors, nil
 }
