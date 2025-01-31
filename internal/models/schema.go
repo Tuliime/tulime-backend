@@ -12,16 +12,18 @@ var db = Db()
 var DB = db
 
 type User struct {
-	ID              string            `gorm:"column:id;type:uuid;primaryKey" json:"id"`
-	Name            string            `gorm:"column:name;not null;index" json:"name"`
-	TelNumber       int               `gorm:"column:telNumber;unique;not null;index" json:"telNumber"`
-	Password        string            `gorm:"column:password;not null" json:"password"`
-	Role            string            `gorm:"column:role;default:'user';not null" json:"role"`
-	ImageUrl        string            `gorm:"column:imageUrl;default:null" json:"imageUrl"`
-	ImagePath       string            `gorm:"column:imagePath;default:null" json:"imagePath"`
-	OPT             []OTP             `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"OPT"`
-	FarmManager     FarmManager       `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"farmManager"`
-	VetDoctor       VetDoctor         `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"vetDoctor"`
+	ID             string      `gorm:"column:id;type:uuid;primaryKey" json:"id"`
+	Name           string      `gorm:"column:name;not null;index" json:"name"`
+	TelNumber      int         `gorm:"column:telNumber;unique;not null;index" json:"telNumber"`
+	Password       string      `gorm:"column:password;not null" json:"password"`
+	Role           string      `gorm:"column:role;default:'user';not null" json:"role"`
+	ImageUrl       string      `gorm:"column:imageUrl;default:null" json:"imageUrl"`
+	ImagePath      string      `gorm:"column:imagePath;default:null" json:"imagePath"`
+	ProfileBgColor string      `gorm:"column:profileBgColor;default:null" json:"profileBgColor"`
+	OPT            []OTP       `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"OPT"`
+	FarmManager    FarmManager `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"farmManager"`
+	// VetDoctor       VetDoctor         `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"vetDoctor"`
+	VetDoctor       *VetDoctor        `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"vetDoctor"`
 	Chatroom        []Chatroom        `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"chatroom"`
 	ChatroomMention []ChatroomMention `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"chatroomMention"`
 	Chatbot         []Chatbot         `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"chatbot"`
@@ -29,6 +31,8 @@ type User struct {
 	CreatedAt       time.Time         `gorm:"column:createdAt" json:"createdAt"`
 	UpdatedAt       time.Time         `gorm:"column:updatedAt" json:"updatedAt"`
 }
+
+// *VetDoctor
 
 // ChatroomMention
 
@@ -115,6 +119,7 @@ type VetDoctor struct {
 	IsVerified    bool      `gorm:"column:isVerified;default:false" json:"isVerified"`
 	CreatedAt     time.Time `gorm:"column:createdAt;index" json:"createdAt"`
 	UpdatedAt     time.Time `gorm:"column:updatedAt;index" json:"updatedAt"`
+	User          *User     `gorm:"foreignKey:UserID;references:ID" json:"user"`
 }
 
 type Chatroom struct {

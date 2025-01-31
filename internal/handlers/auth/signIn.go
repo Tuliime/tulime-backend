@@ -53,13 +53,14 @@ var SignIn = func(c *fiber.Ctx) error {
 	}
 
 	userMap := map[string]interface{}{
-		"id":        user.ID,
-		"name":      user.Name,
-		"telNumber": user.TelNumber,
-		"role":      user.Role,
-		"imageUrl":  user.ImageUrl,
-		"createdAt": user.CreatedAt,
-		"updatedAt": user.UpdatedAt,
+		"id":             user.ID,
+		"name":           user.Name,
+		"telNumber":      user.TelNumber,
+		"role":           user.Role,
+		"imageUrl":       user.ImageUrl,
+		"profileBgColor": user.ProfileBgColor,
+		"createdAt":      user.CreatedAt,
+		"updatedAt":      user.UpdatedAt,
 	}
 	response := map[string]interface{}{
 		"status":       "success",

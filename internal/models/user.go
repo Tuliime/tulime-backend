@@ -3,6 +3,7 @@ package models
 import (
 	"errors"
 
+	"github.com/Tuliime/tulime-backend/internal/packages"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
@@ -13,20 +14,41 @@ func (u *User) BeforeCreate(tx *gorm.DB) error {
 	if err != nil {
 		return err
 	}
+
+	color, err := packages.GetRandomColor()
+	if err != nil {
+		return err
+	}
+
 	u.Password = hashedPassword
+	u.ProfileBgColor = color
 
 	uuid := uuid.New().String()
 	tx.Statement.SetColumn("ID", uuid)
 	return nil
 }
 
-func (u *User) Create(user User) (string, error) {
+func (u *User) BeforeSave(tx *gorm.DB) error {
+	if u.ProfileBgColor != "" {
+		return nil
+	}
+
+	color, err := packages.GetRandomColor()
+	if err != nil {
+		return err
+	}
+	u.ProfileBgColor = color
+
+	return nil
+}
+
+func (u *User) Create(user User) (User, error) {
 	result := db.Create(&user)
 
 	if result.Error != nil {
-		return "", result.Error
+		return user, result.Error
 	}
-	return user.ID, nil
+	return user, nil
 }
 
 func (u *User) FindOne(id string) (User, error) {
@@ -54,12 +76,7 @@ func (u *User) FindAll() ([]User, error) {
 // stored in the receiver u
 func (u *User) Update() (User, error) {
 	db.Save(&u)
-
-	user, err := u.FindOne(u.ID)
-	if err != nil {
-		return user, err
-	}
-	return user, nil
+	return *u, nil
 }
 
 func (u *User) Delete(id string) error {

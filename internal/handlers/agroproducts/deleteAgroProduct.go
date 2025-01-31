@@ -27,7 +27,7 @@ var DeleteAgroProduct = func(c *fiber.Ctx) error {
 	var savedFilePath string
 
 	// Extract savedFilePath from the url if saved imagePath is null
-	if packages.HasImagePath(savedAgroProduct) {
+	if agroProduct.HasImagePath(savedAgroProduct) {
 		savedFilePath = savedAgroProduct.ImagePath
 	} else {
 		savedFilePath, err = packages.ExtractFilePath(savedAgroProduct.ImageUrl)
