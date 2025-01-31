@@ -45,13 +45,14 @@ var UpdateUser = func(c *fiber.Ctx) error {
 	}
 
 	updateUserMap := fiber.Map{
-		"id":        updatedUser.ID,
-		"name":      updatedUser.Name,
-		"telNumber": updatedUser.TelNumber,
-		"role":      updatedUser.Role,
-		"imageUrl":  updatedUser.ImageUrl,
-		"createdAt": updatedUser.CreatedAt,
-		"updatedAt": updatedUser.UpdatedAt,
+		"id":             updatedUser.ID,
+		"name":           updatedUser.Name,
+		"telNumber":      updatedUser.TelNumber,
+		"role":           updatedUser.Role,
+		"imageUrl":       updatedUser.ImageUrl,
+		"profileBgColor": updatedUser.ProfileBgColor,
+		"createdAt":      updatedUser.CreatedAt,
+		"updatedAt":      updatedUser.UpdatedAt,
 	}
 
 	response := fiber.Map{

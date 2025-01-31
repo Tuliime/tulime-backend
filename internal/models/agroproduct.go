@@ -116,3 +116,9 @@ func (ap *Agroproduct) ValidCategory(category string) bool {
 
 	return false
 }
+
+// HasImagePath is temporary function to check if an agroproduct
+// has imagePath value
+func (ap *Agroproduct) HasImagePath(agroProduct Agroproduct) bool {
+	return agroProduct.ImagePath != ""
+}
