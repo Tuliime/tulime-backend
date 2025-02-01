@@ -1,17 +1,27 @@
 package models
 
 import (
+	"errors"
+
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
 func (cb *Chatbot) BeforeCreate(tx *gorm.DB) error {
-	uuid := uuid.New().String()
-	tx.Statement.SetColumn("ID", uuid)
+	var ID string
+	if cb.ID == "" {
+		ID = uuid.New().String()
+	} else {
+		ID = cb.ID
+	}
+	tx.Statement.SetColumn("ID", ID)
 	return nil
 }
 
 func (cb *Chatbot) Create(chatbot Chatbot) (Chatbot, error) {
+	if !cb.ValidateWrittenBy(chatbot.WrittenBy) {
+		return chatbot, errors.New("invalid writtenBy value")
+	}
 	result := db.Create(&chatbot)
 
 	if result.Error != nil {
@@ -45,16 +55,13 @@ func (cb *Chatbot) FindByUser(userID string, limit float64, cursor string) ([]Ch
 }
 
 // Update updates one Chatbot in the database, using the information
-// stored in the receiver u
+// stored in the receiver cb
 func (cb *Chatbot) Update() (Chatbot, error) {
-	db.Save(&cb)
-
-	chatbot, err := cb.FindOne(cb.ID)
-	if err != nil {
-		return chatbot, err
+	if !cb.ValidateWrittenBy(cb.WrittenBy) {
+		return *cb, errors.New("invalid writtenBy value")
 	}
-
-	return chatbot, nil
+	db.Save(&cb)
+	return *cb, nil
 }
 
 func (cb *Chatbot) Delete(id string) error {
@@ -63,4 +70,14 @@ func (cb *Chatbot) Delete(id string) error {
 	}
 
 	return nil
+}
+
+func (cb *Chatbot) ValidateWrittenBy(writtenBy string) bool {
+	var allowedWrittenBy = []string{"user", "bot"}
+	for _, awb := range allowedWrittenBy {
+		if awb == writtenBy {
+			return true
+		}
+	}
+	return false
 }

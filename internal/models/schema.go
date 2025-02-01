@@ -156,12 +156,13 @@ type ChatroomMention struct {
 }
 
 type Chatbot struct {
-	ID         string    `gorm:"column:id;type:uuid;primaryKey" json:"id"`
-	UserID     string    `gorm:"column:userID;not null;index" json:"userID"`
-	Prompt     string    `gorm:"column:prompt;not null" json:"prompt"`
-	AIResponse string    `gorm:"column:aiResponse;not null" json:"aiResponse"`
-	CreatedAt  time.Time `gorm:"column:createdAt;index" json:"createdAt"`
-	UpdatedAt  time.Time `gorm:"column:updatedAt;index" json:"updatedAt"`
+	ID        string    `gorm:"column:id;type:uuid;primaryKey" json:"id"`
+	UserID    string    `gorm:"column:userID;type:uuid;not null;index" json:"userID"`
+	Message   string    `gorm:"column:message;not null" json:"message"`
+	WrittenBy string    `gorm:"column:writtenBy;not null" json:"writtenBy"` // "user" or "bot"
+	PostedAt  time.Time `gorm:"column:postedAt;index" json:"postedAt"`
+	CreatedAt time.Time `gorm:"column:createdAt;index" json:"createdAt"`
+	UpdatedAt time.Time `gorm:"column:updatedAt;index" json:"updatedAt"`
 }
 
 type Session struct {
