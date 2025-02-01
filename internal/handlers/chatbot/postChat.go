@@ -1,7 +1,9 @@
 package chatbot
 
 import (
+	"fmt"
 	"log"
+	"time"
 
 	"github.com/Tuliime/tulime-backend/internal/models"
 	"github.com/Tuliime/tulime-backend/internal/packages"
@@ -9,7 +11,10 @@ import (
 )
 
 type PostChatInput struct {
-	Prompt string `validate:"string"`
+	ID        string `validate:"string"`
+	Message   string `validate:"string"`
+	WrittenBy string `validate:"string"`
+	PostedAt  string `validate:"string"`
 }
 
 var PostChat = func(c *fiber.Ctx) error {
@@ -28,19 +33,36 @@ var PostChat = func(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusBadRequest, "Validation Error")
 	}
 
+	userPostedAt, err := time.Parse(time.RFC3339, input.PostedAt)
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, "Invalid sentAt format! Must be an ISO 8601 string.")
+	}
+	fmt.Printf("parsedPostedAt: %v\n", userPostedAt)
+
+	newUserChat, err := chatbot.Create(models.Chatbot{ID: input.ID, UserID: c.Params("userID"),
+		Message: input.Message, WrittenBy: input.WrittenBy, PostedAt: userPostedAt})
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+
 	// TODO: To make an api call to openai API here
 
-	chatbot.AIResponse = "This is the apparent ai response from openai"
+	botPostedAt := time.Now()
+	botMessage := "This is the apparent ai response from openai"
 
-	newChat, err := chatbot.Create(chatbot)
+	newBotChat, err := chatbot.Create(models.Chatbot{UserID: c.Params("userID"),
+		Message: botMessage, WrittenBy: "bot", PostedAt: botPostedAt})
 	if err != nil {
-		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
 	response := fiber.Map{
 		"status":  "success",
 		"message": "Created successfully!",
-		"data":    newChat,
+		"data": fiber.Map{
+			"user": newUserChat,
+			"bot":  newBotChat,
+		},
 	}
 
 	return c.Status(fiber.StatusCreated).JSON(response)
