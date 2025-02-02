@@ -100,6 +100,9 @@ var PostChat = func(c *fiber.Ctx) error {
 
 	// Save all mentions of the chat message
 	for _, mention := range mentions {
+		if mention == "" {
+			continue
+		}
 		chatroomMention := models.ChatroomMention{ChatroomID: newChatRoom.ID, UserID: mention}
 		newChatroomMention, err := chatroomMention.Create(chatroomMention)
 		if err != nil {
