@@ -57,8 +57,8 @@ var GetChat = func(c *fiber.Ctx) error {
 	}
 
 	chatMap := fiber.Map{
-		"chats":   chatMessages,
-		"replies": repliedMessages,
+		"messages": chatMessages,
+		"replies":  repliedMessages,
 	}
 
 	response := fiber.Map{
