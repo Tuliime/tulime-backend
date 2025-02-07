@@ -39,7 +39,7 @@ func (cr *Chatroom) FindReply(reply string) (Chatroom, error) {
 func (cr *Chatroom) FindAll(limit float64, cursor string, includeCursor bool) ([]Chatroom, error) {
 	var chatRooms []Chatroom
 
-	query := db.Preload("File").Preload("Mention").Order("\"arrivedAt\" ASC").Limit(int(limit))
+	query := db.Preload("File").Preload("Mention").Order("\"arrivedAt\" DESC").Limit(int(limit))
 
 	if cursor != "" {
 		var lastChatroom Chatroom
@@ -55,6 +55,11 @@ func (cr *Chatroom) FindAll(limit float64, cursor string, includeCursor bool) ([
 
 	if err := query.Find(&chatRooms).Error; err != nil {
 		return nil, err
+	}
+
+	// Reverse the slice to return in ascending order
+	for i, j := 0, len(chatRooms)-1; i < j; i, j = i+1, j-1 {
+		chatRooms[i], chatRooms[j] = chatRooms[j], chatRooms[i]
 	}
 
 	return chatRooms, nil
