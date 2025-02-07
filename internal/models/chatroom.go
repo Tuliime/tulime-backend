@@ -29,7 +29,7 @@ func (cr *Chatroom) FindOne(id string) (Chatroom, error) {
 
 func (cr *Chatroom) FindReply(reply string) (Chatroom, error) {
 	var chatRoom Chatroom
-	if err := db.Where("reply = ?", reply).Find(&chatRoom).Error; err != nil {
+	if err := db.Where("id = ?", reply).Find(&chatRoom).Error; err != nil {
 		return chatRoom, err
 	}
 
