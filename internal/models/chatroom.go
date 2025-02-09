@@ -1,6 +1,8 @@
 package models
 
 import (
+	"errors"
+
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
@@ -36,7 +38,30 @@ func (cr *Chatroom) FindReply(reply string) (Chatroom, error) {
 	return chatRoom, nil
 }
 
-func (cr *Chatroom) FindAll(limit float64, cursor string, includeCursor bool) ([]Chatroom, error) {
+func (cr *Chatroom) FindAll(limit float64, cursor string, includeCursor bool, direction string) ([]Chatroom, error) {
+	var chatRooms []Chatroom
+
+	if direction == "FORWARD" {
+		chatRoomsInAscOrder, err := cr.FindAllInAscendingOrder(limit, cursor, includeCursor)
+		if err != nil {
+			return chatRooms, err
+		}
+		chatRooms = chatRoomsInAscOrder
+
+	} else if direction == "BACKWARD" {
+		chatRoomsInDescOrder, err := cr.FindAllInDescendingOrder(limit, cursor, includeCursor)
+		if err != nil {
+			return chatRooms, err
+		}
+		chatRooms = chatRoomsInDescOrder
+	} else {
+		return chatRooms, errors.New("invalid direction value")
+	}
+
+	return chatRooms, nil
+}
+
+func (cr *Chatroom) FindAllInDescendingOrder(limit float64, cursor string, includeCursor bool) ([]Chatroom, error) {
 	var chatRooms []Chatroom
 
 	query := db.Preload("File").Preload("Mention").Order("\"arrivedAt\" DESC").Limit(int(limit))
@@ -60,6 +85,30 @@ func (cr *Chatroom) FindAll(limit float64, cursor string, includeCursor bool) ([
 	// Reverse the slice to return in ascending order
 	for i, j := 0, len(chatRooms)-1; i < j; i, j = i+1, j-1 {
 		chatRooms[i], chatRooms[j] = chatRooms[j], chatRooms[i]
+	}
+
+	return chatRooms, nil
+}
+
+func (cr *Chatroom) FindAllInAscendingOrder(limit float64, cursor string, includeCursor bool) ([]Chatroom, error) {
+	var chatRooms []Chatroom
+
+	query := db.Preload("File").Preload("Mention").Order("\"arrivedAt\" ASC").Limit(int(limit))
+
+	if cursor != "" {
+		var lastChatroom Chatroom
+		if err := db.Select("\"arrivedAt\"").Where("id = ?", cursor).First(&lastChatroom).Error; err != nil {
+			return nil, err
+		}
+		if includeCursor {
+			query = query.Where("\"arrivedAt\" >= ?", lastChatroom.ArrivedAt)
+		} else {
+			query = query.Where("\"arrivedAt\" > ?", lastChatroom.ArrivedAt)
+		}
+	}
+
+	if err := query.Find(&chatRooms).Error; err != nil {
+		return nil, err
 	}
 
 	return chatRooms, nil
