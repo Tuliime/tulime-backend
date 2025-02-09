@@ -23,8 +23,7 @@ var PostChat = func(c *fiber.Ctx) error {
 
 	var fileUploaded bool = true
 
-	// TODO: text to be validated alongside file
-	if chatRoom.UserID == "" || chatRoom.Text == "" || sentAt == "" {
+	if chatRoom.UserID == "" || sentAt == "" {
 		return fiber.NewError(fiber.StatusBadRequest, "Missing userID/SentAt!")
 	}
 
@@ -47,7 +46,11 @@ var PostChat = func(c *fiber.Ctx) error {
 	file, err := c.FormFile("file")
 	if err != nil {
 		if err.Error() == constants.NO_FILE_UPLOADED_ERROR {
-			fmt.Println("Error:", err.Error())
+			fmt.Println("No file uploaded")
+			// Prevent empty Text field when there is no file uploaded
+			if chatRoom.Text == "" {
+				return fiber.NewError(fiber.StatusBadRequest, "Missing Text field!")
+			}
 			fileUploaded = false
 
 		} else {
