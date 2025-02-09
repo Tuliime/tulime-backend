@@ -13,6 +13,7 @@ var GetChat = func(c *fiber.Ctx) error {
 	limitParam := c.Query("limit")
 	cursorParam := c.Query("cursor")
 	inCludeCursorParam := c.Query("includeCursor", "false")
+	direction := c.Query("direction")
 
 	limit, err := packages.ValidateQueryLimit(limitParam)
 	if err != nil {
@@ -28,7 +29,11 @@ var GetChat = func(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
-	chatMessages, err := chatroom.FindAll(limit, cursorParam, includeCursor)
+	if direction == "" {
+		direction = "BACKWARD"
+	}
+
+	chatMessages, err := chatroom.FindAll(limit, cursorParam, includeCursor, direction)
 	if err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
@@ -46,14 +51,19 @@ var GetChat = func(c *fiber.Ctx) error {
 		repliedMessages = append(repliedMessages, reply)
 	}
 
-	var prevCursor string
-	if len(chatMessages) > 0 {
+	var prevCursor, nextCursor string
+	if len(chatMessages) > 0 && direction == "BACKWARD" {
 		prevCursor = chatMessages[0].ID
+	}
+	if len(chatMessages) > 0 && direction == "FORWARD" {
+		nextCursor = chatMessages[len(chatMessages)-1].ID
 	}
 
 	pagination := map[string]interface{}{
-		"limit":      limit,
-		"prevCursor": prevCursor,
+		"limit":         limit,
+		"prevCursor":    prevCursor,
+		"nextCursor":    nextCursor,
+		"includeCursor": includeCursor,
 	}
 
 	chatMap := fiber.Map{
