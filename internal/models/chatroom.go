@@ -31,10 +31,10 @@ func (cr *Chatroom) FindOne(id string) (Chatroom, error) {
 
 func (cr *Chatroom) FindReply(reply string) (Chatroom, error) {
 	var chatRoom Chatroom
-	if err := db.Where("id = ?", reply).Find(&chatRoom).Error; err != nil {
+	err := db.Preload("File").Preload("Mention").Where("id = ?", reply).First(&chatRoom).Error
+	if err != nil {
 		return chatRoom, err
 	}
-
 	return chatRoom, nil
 }
 
