@@ -22,16 +22,15 @@ func formatSSEMessage(eventType string, data any) (string, error) {
 
 	m := map[string]any{
 		"data": data,
+		"type": eventType,
 	}
 
 	err := enc.Encode(m)
 	if err != nil {
-		return "", nil
+		return "", err
 	}
-	sb := strings.Builder{}
 
-	sb.WriteString(fmt.Sprintf("event: %s\n", eventType))
-	sb.WriteString(fmt.Sprintf("retry: %d\n", 15000))
+	sb := strings.Builder{}
 	sb.WriteString(fmt.Sprintf("data: %v\n\n", buf.String()))
 
 	return sb.String(), nil
@@ -45,87 +44,67 @@ var GetLiveChat = func(c *fiber.Ctx) error {
 
 	keepAliveTicker := time.NewTicker(30 * time.Second)
 	keepAliveMsg := "keepalive"
-	warmUpMsg := "warmup"
 
 	type ChatRoom = models.Chatroom
-	chatroomChan := make(chan events.DataEvent)
-	events.EB.Subscribe("chatroomMessage", chatroomChan)
+	chatroomMessageChan := make(chan events.DataEvent)
+	events.EB.Subscribe("chatroomMessage", chatroomMessageChan)
 
 	ctx, cancel := context.WithCancel(c.Context())
-	disconnect := ctx.Done()
 	// disconnect := c.Context().Done()
+	disconnect := ctx.Done()
 
 	go func() {
 		<-disconnect
 		keepAliveTicker.Stop()
-		events.EB.Unsubscribe("chatroomMessage", chatroomChan)
+		events.EB.Unsubscribe("chatroomMessage", chatroomMessageChan)
 		log.Println("Client disconnected")
 		cancel()
 	}()
 
 	c.Context().SetBodyStreamWriter(fasthttp.StreamWriter(func(w *bufio.Writer) {
-
-		if _, err := fmt.Fprintf(w, "%s", warmUpMsg); err != nil {
-			log.Printf("Error while writing Data: %v\n", err)
-			return
-		}
-
-		if err := w.Flush(); err != nil {
-			log.Printf("Error while flushing Data: %v\n", err)
-			keepAliveTicker.Stop()
-			return
-		}
-		for {
-			select {
-			case chatroomEvent := <-chatroomChan:
-				chatroomMessage, ok := chatroomEvent.Data.(ChatRoom)
-				if !ok {
-					log.Println("Interface does not hold type ChatRoom")
-					return
-				}
-				chatroomMsgStr, err := formatSSEMessage("current-value", chatroomMessage)
+		go func() {
+			for range keepAliveTicker.C {
+				keepAliveMsgStr, err := formatSSEMessage("keep-alive", keepAliveMsg)
 				if err != nil {
-					log.Printf("Error formatting sse message: %v\n", err)
+					log.Printf("Error formatting keep-alive message: %v\n", err)
 					return
 				}
 
-				if _, err := fmt.Fprintf(w, "%s", chatroomMsgStr); err != nil {
-					log.Printf("Error while writing Data: %v\n", err)
-					return
-				}
-
-				if err := w.Flush(); err != nil {
-					log.Printf("Error while flushing Data: %v\n", err)
-					keepAliveTicker.Stop()
-					return
-				}
-			case <-keepAliveTicker.C:
-				log.Println("keep alive message sent")
-				keepAliveMsgStr, err := formatSSEMessage("current-value", keepAliveMsg)
-				if err != nil {
-					log.Printf("Error formatting sse message: %v\n", err)
-					return
-				}
 				if _, err = fmt.Fprintf(w, "%s", keepAliveMsgStr); err != nil {
-					log.Printf("Error while writing Data: %v\n", err)
+					log.Printf("Error writing keep-alive message: %v\n", err)
 					return
 				}
 
 				if err = w.Flush(); err != nil {
-					log.Printf("Error while flushing Data: %v\n", err)
-					keepAliveTicker.Stop()
+					log.Printf("Error flushing keep-alive message: %v\n", err)
 					return
 				}
+			}
+		}()
 
-				// case <-disconnect:
-				// 	keepAliveTicker.Stop()
-				// 	events.EB.Unsubscribe("chatroomMessage", chatroomChan)
-				// 	log.Println("Client disconnected")
-				// 	cancel()
-				// 	return
+		for chatroomMessageEvent := range chatroomMessageChan {
+			chatroomMessage, ok := chatroomMessageEvent.Data.(ChatRoom)
+			if !ok {
+				log.Println("Invalid data type for ChatRoom")
+				return
+			}
+
+			chatroomMsgStr, err := formatSSEMessage("chatroom-message", chatroomMessage)
+			if err != nil {
+				log.Printf("Error formatting SSE message: %v\n", err)
+				return
+			}
+
+			if _, err := fmt.Fprintf(w, "%s", chatroomMsgStr); err != nil {
+				log.Printf("Error writing chatroom message: %v\n", err)
+				return
+			}
+
+			if err := w.Flush(); err != nil {
+				log.Printf("Error flushing chatroom message: %v\n", err)
+				return
 			}
 		}
-
 	}))
 
 	return nil
