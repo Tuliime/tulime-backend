@@ -7,6 +7,7 @@
     "farminputs",
     "farmmanager",
     "fasthttp",
+    "fctx",
     "godotenv",
     "gofiber",
     "gorm",
