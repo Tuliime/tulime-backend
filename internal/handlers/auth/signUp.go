@@ -62,6 +62,7 @@ var SignUp = func(c *fiber.Ctx) error {
 		"role":           newUser.Role,
 		"imageUrl":       newUser.ImageUrl,
 		"profileBgColor": newUser.ProfileBgColor,
+		"chatroomColor":  user.ChatroomColor,
 		"createdAt":      newUser.CreatedAt,
 		"updatedAt":      newUser.UpdatedAt,
 	}

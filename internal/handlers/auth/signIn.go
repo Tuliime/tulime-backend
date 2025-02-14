@@ -59,6 +59,7 @@ var SignIn = func(c *fiber.Ctx) error {
 		"role":           user.Role,
 		"imageUrl":       user.ImageUrl,
 		"profileBgColor": user.ProfileBgColor,
+		"chatroomColor":  user.ChatroomColor,
 		"createdAt":      user.CreatedAt,
 		"updatedAt":      user.UpdatedAt,
 	}
