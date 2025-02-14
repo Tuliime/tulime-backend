@@ -20,6 +20,7 @@ type User struct {
 	ImageUrl       string      `gorm:"column:imageUrl;default:null" json:"imageUrl"`
 	ImagePath      string      `gorm:"column:imagePath;default:null" json:"imagePath"`
 	ProfileBgColor string      `gorm:"column:profileBgColor;default:null" json:"profileBgColor"`
+	ChatroomColor  string      `gorm:"column:chatroomColor;default:null" json:"chatroomColor"`
 	OPT            []OTP       `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"OPT"`
 	FarmManager    FarmManager `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"farmManager"`
 	// VetDoctor       VetDoctor         `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"vetDoctor"`
