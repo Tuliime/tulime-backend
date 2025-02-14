@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"net"
 	"strings"
 	"time"
 
@@ -45,67 +46,82 @@ var GetLiveChat = func(c *fiber.Ctx) error {
 	keepAliveTicker := time.NewTicker(30 * time.Second)
 	keepAliveMsg := "keepalive"
 
+	ctx, cancel := context.WithCancel(context.Background())
+
 	type ChatRoom = models.Chatroom
-	chatroomMessageChan := make(chan events.DataEvent)
+	chatroomMessageChan := make(chan events.DataEvent, 100)
 	events.EB.Subscribe("chatroomMessage", chatroomMessageChan)
+	log.Printf("Client '%s' connecting...", c.Locals("userID"))
 
-	ctx, cancel := context.WithCancel(c.Context())
-	// disconnect := c.Context().Done()
-	disconnect := ctx.Done()
+	c.Context().HijackSetNoResponse(false)
+	c.Context().Hijack(func(conn net.Conn) {
+		defer conn.Close()
 
-	go func() {
-		<-disconnect
-		keepAliveTicker.Stop()
-		events.EB.Unsubscribe("chatroomMessage", chatroomMessageChan)
-		log.Println("Client disconnected")
-		cancel()
-	}()
+		buf := make([]byte, 1)
+		for {
+			if _, err := conn.Read(buf); err != nil {
+				log.Printf("Connection monitoring detected closure: %v", err)
+				cancel()
+				log.Println("Connection closed and cleanup completed")
+				return
+			}
+		}
+	})
+	log.Println("Hijacked: ", c.Context().Hijacked())
 
 	c.Context().SetBodyStreamWriter(fasthttp.StreamWriter(func(w *bufio.Writer) {
-		go func() {
-			for range keepAliveTicker.C {
-				keepAliveMsgStr, err := formatSSEMessage("keep-alive", keepAliveMsg)
-				if err != nil {
-					log.Printf("Error formatting keep-alive message: %v\n", err)
+
+		for {
+			select {
+			case <-ctx.Done():
+				log.Println("Context cancelled, stopping stream")
+				keepAliveTicker.Stop()
+				events.EB.Unsubscribe("chatroomMessage", chatroomMessageChan)
+				return
+
+			case chatroomMessageEvent := <-chatroomMessageChan:
+				chatroomMessage, ok := chatroomMessageEvent.Data.(ChatRoom)
+				if !ok {
+					log.Printf("Invalid message type received: %T", chatroomMessageEvent.Data)
 					return
 				}
 
-				if _, err = fmt.Fprintf(w, "%s", keepAliveMsgStr); err != nil {
+				chatroomMsgStr, err := formatSSEMessage("chatroom-message", chatroomMessage)
+				if err != nil {
+					log.Printf("Error formatting SSE message: %v\n", err)
+					return
+				}
+
+				if _, err := fmt.Fprintf(w, "%s", chatroomMsgStr); err != nil {
+					log.Printf("Error writing chatroom message: %v\n", err)
+					return
+				}
+
+				if err := w.Flush(); err != nil {
+					log.Printf("Error flushing chatroom message: %v\n", err)
+					return
+				}
+				log.Printf("Message sent: %v", chatroomMessage)
+
+			case <-keepAliveTicker.C:
+				keepAliveMsg, err := formatSSEMessage("keep-alive", keepAliveMsg)
+				if err != nil {
+					log.Printf("Error formatting keep-alive: %v", err)
+					continue
+				}
+
+				if _, err := fmt.Fprintf(w, "%s", keepAliveMsg); err != nil {
 					log.Printf("Error writing keep-alive message: %v\n", err)
 					return
 				}
 
-				if err = w.Flush(); err != nil {
+				if err := w.Flush(); err != nil {
 					log.Printf("Error flushing keep-alive message: %v\n", err)
 					return
 				}
-			}
-		}()
-
-		for chatroomMessageEvent := range chatroomMessageChan {
-			chatroomMessage, ok := chatroomMessageEvent.Data.(ChatRoom)
-			if !ok {
-				log.Println("Invalid data type for ChatRoom")
-				return
-			}
-
-			chatroomMsgStr, err := formatSSEMessage("chatroom-message", chatroomMessage)
-			if err != nil {
-				log.Printf("Error formatting SSE message: %v\n", err)
-				return
-			}
-
-			if _, err := fmt.Fprintf(w, "%s", chatroomMsgStr); err != nil {
-				log.Printf("Error writing chatroom message: %v\n", err)
-				return
-			}
-
-			if err := w.Flush(); err != nil {
-				log.Printf("Error flushing chatroom message: %v\n", err)
-				return
+				log.Println("Keep-alive sent")
 			}
 		}
 	}))
-
 	return nil
 }
