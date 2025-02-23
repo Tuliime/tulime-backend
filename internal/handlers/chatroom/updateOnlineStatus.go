@@ -1,6 +1,8 @@
 package chatroom
 
 import (
+	"log"
+
 	"github.com/Tuliime/tulime-backend/internal/events"
 	"github.com/Tuliime/tulime-backend/internal/models"
 	"github.com/gofiber/fiber/v2"
@@ -17,17 +19,30 @@ var UpdateOnlineStatus = func(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusBadRequest, "Please provide userID!")
 	}
 
-	updatedOnlineStatus, err := onlineStatus.Update()
+	savedOnlineStatus, err := onlineStatus.FindByUser(onlineStatus.UserID)
 	if err != nil {
-		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
-	events.EB.Publish("onlineStatus", updatedOnlineStatus)
+	if savedOnlineStatus.ID == "" {
+		onlineStatus, err = onlineStatus.Create(onlineStatus)
+		if err != nil {
+			log.Println("err.Error(): ", err.Error())
+			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		}
+	} else {
+		onlineStatus, err = savedOnlineStatus.Update()
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
+	}
+
+	events.EB.Publish("onlineStatus", onlineStatus)
 
 	response := fiber.Map{
 		"status":  "success",
 		"message": "Updated successfully!",
-		"data":    updatedOnlineStatus,
+		"data":    onlineStatus,
 	}
 
 	return c.Status(fiber.StatusOK).JSON(response)

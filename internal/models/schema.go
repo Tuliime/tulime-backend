@@ -36,7 +36,7 @@ type User struct {
 
 type OnlineStatus struct {
 	ID        string    `gorm:"column:id;type:uuid;primaryKey" json:"id"`
-	UserID    string    `gorm:"column:userID;not null;index" json:"userID"`
+	UserID    string    `gorm:"column:userID;unique;not null;index" json:"userID"`
 	CreatedAt time.Time `gorm:"column:createdAt;index" json:"createdAt"`
 	UpdatedAt time.Time `gorm:"column:updatedAt;index" json:"updatedAt"`
 }
