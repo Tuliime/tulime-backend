@@ -53,6 +53,10 @@ var GetLiveChat = func(c *fiber.Ctx) error {
 	events.EB.Subscribe("chatroomMessage", chatroomMessageChan)
 	log.Printf("Client '%s' connecting...", c.Locals("userID"))
 
+	type OnlineStatus = models.OnlineStatus
+	onlineStatusChan := make(chan events.DataEvent, 100)
+	events.EB.Subscribe("onlineStatus", onlineStatusChan)
+
 	c.Context().HijackSetNoResponse(false)
 	c.Context().Hijack(func(conn net.Conn) {
 		defer conn.Close()
@@ -102,6 +106,30 @@ var GetLiveChat = func(c *fiber.Ctx) error {
 					return
 				}
 				log.Printf("Message sent: %v", chatroomMessage)
+
+			case onlineStatusEvent := <-onlineStatusChan:
+				onlineStatus, ok := onlineStatusEvent.Data.(OnlineStatus)
+				if !ok {
+					log.Printf("Invalid message type received: %T", onlineStatusEvent.Data)
+					return
+				}
+
+				onlineStatusStr, err := formatSSEMessage("online-status", onlineStatus)
+				if err != nil {
+					log.Printf("Error formatting SSE message: %v\n", err)
+					return
+				}
+
+				if _, err := fmt.Fprintf(w, "%s", onlineStatusStr); err != nil {
+					log.Printf("Error writing online status: %v\n", err)
+					return
+				}
+
+				if err := w.Flush(); err != nil {
+					log.Printf("Error flushing online status: %v\n", err)
+					return
+				}
+				log.Printf("Online status sent: %v", onlineStatus)
 
 			case <-keepAliveTicker.C:
 				keepAliveMsg, err := formatSSEMessage("keep-alive", keepAliveMsg)

@@ -129,6 +129,7 @@ func main() {
 	chatRoomGroup.Get("/", middlewares.Auth, chatroom.GetChat)
 	chatRoomGroup.Post("/", middlewares.Auth, chatroom.PostChat)
 	chatRoomGroup.Get("/live", middlewares.Auth, chatroom.GetLiveChat)
+	chatRoomGroup.Patch("/onlinestatus", middlewares.Auth, chatroom.UpdateOnlineStatus)
 
 	// ChatBoot
 	chatBotGroup := app.Group("/api/v0.01/chatbot", func(c *fiber.Ctx) error {
