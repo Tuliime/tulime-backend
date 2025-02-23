@@ -129,6 +129,7 @@ func main() {
 	chatRoomGroup.Get("/", middlewares.Auth, chatroom.GetChat)
 	chatRoomGroup.Post("/", middlewares.Auth, chatroom.PostChat)
 	chatRoomGroup.Get("/live", middlewares.Auth, chatroom.GetLiveChat)
+	chatRoomGroup.Get("/onlinestatus", middlewares.Auth, chatroom.GetOnlineStatus)
 	chatRoomGroup.Patch("/onlinestatus", middlewares.Auth, chatroom.UpdateOnlineStatus)
 
 	// ChatBoot
