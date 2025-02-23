@@ -57,6 +57,9 @@ var GetLiveChat = func(c *fiber.Ctx) error {
 	onlineStatusChan := make(chan events.DataEvent, 100)
 	events.EB.Subscribe("onlineStatus", onlineStatusChan)
 
+	typingStatusChan := make(chan events.DataEvent, 100)
+	events.EB.Subscribe("typingStatus", typingStatusChan)
+
 	c.Context().HijackSetNoResponse(false)
 	c.Context().Hijack(func(conn net.Conn) {
 		defer conn.Close()
@@ -130,6 +133,30 @@ var GetLiveChat = func(c *fiber.Ctx) error {
 					return
 				}
 				log.Printf("Online status sent: %v", onlineStatus)
+
+			case typingStatusEvent := <-typingStatusChan:
+				typingStatus, ok := typingStatusEvent.Data.(TypingStatus)
+				if !ok {
+					log.Printf("Invalid message type received: %T", typingStatusEvent.Data)
+					return
+				}
+
+				typingStatusStr, err := formatSSEMessage("typing-status", typingStatus)
+				if err != nil {
+					log.Printf("Error formatting SSE message: %v\n", err)
+					return
+				}
+
+				if _, err := fmt.Fprintf(w, "%s", typingStatusStr); err != nil {
+					log.Printf("Error writing typing status: %v\n", err)
+					return
+				}
+
+				if err := w.Flush(); err != nil {
+					log.Printf("Error flushing typing status: %v\n", err)
+					return
+				}
+				log.Printf("typing status sent: %v", typingStatus)
 
 			case <-keepAliveTicker.C:
 				keepAliveMsg, err := formatSSEMessage("keep-alive", keepAliveMsg)
