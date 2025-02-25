@@ -117,14 +117,10 @@ func (cr *Chatroom) FindAllInAscendingOrder(limit float64, cursor string, includ
 // Update updates one Agroproduct in the database, using the information
 // stored in the receiver u
 func (cr *Chatroom) Update() (Chatroom, error) {
-	db.Save(&cr)
-
-	chatRoom, err := cr.FindOne(cr.ID)
-	if err != nil {
-		return chatRoom, err
+	if err := db.Save(&cr).Error; err != nil {
+		return *cr, err
 	}
-
-	return chatRoom, nil
+	return *cr, nil
 }
 
 func (cr *Chatroom) Delete(id string) error {
