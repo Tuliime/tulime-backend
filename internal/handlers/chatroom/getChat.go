@@ -3,6 +3,7 @@ package chatroom
 import (
 	"strconv"
 
+	"github.com/Tuliime/tulime-backend/internal/constants"
 	"github.com/Tuliime/tulime-backend/internal/models"
 	"github.com/Tuliime/tulime-backend/internal/packages"
 	"github.com/gofiber/fiber/v2"
@@ -46,6 +47,9 @@ var GetChat = func(c *fiber.Ctx) error {
 		}
 		reply, err := chatroom.FindReply(chatMessage.Reply)
 		if err != nil {
+			if err.Error() == constants.RECORD_NOT_FOUND_ERROR {
+				continue
+			}
 			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 		}
 		repliedMessages = append(repliedMessages, reply)
