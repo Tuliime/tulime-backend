@@ -147,6 +147,7 @@ func main() {
 		return c.Next()
 	})
 	deviceGroup.Post("/", middlewares.Auth, device.PostDevice)
+	deviceGroup.Get("/user/:userID", middlewares.Auth, device.GetDeviceByUser)
 
 	// Status
 	app.Get("/status", status.GetAppStatus)

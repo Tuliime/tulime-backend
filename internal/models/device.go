@@ -17,6 +17,7 @@ func (d *Device) Create(device Device) (Device, error) {
 		return device, err
 	}
 
+	// TODO: To improve algorithm for writing device data to cache
 	db.Find(&devices, "\"userID\" = ?", device.UserID)
 	if len(devices) > 0 {
 		d.writeToCache(devices)
