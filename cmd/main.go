@@ -148,6 +148,7 @@ func main() {
 	})
 	deviceGroup.Post("/", middlewares.Auth, device.PostDevice)
 	deviceGroup.Get("/user/:userID", middlewares.Auth, device.GetDeviceByUser)
+	deviceGroup.Patch("/disable/:id", middlewares.Auth, device.DisableDevice)
 
 	// Status
 	app.Get("/status", status.GetAppStatus)
