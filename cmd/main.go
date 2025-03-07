@@ -10,6 +10,7 @@ import (
 	"github.com/Tuliime/tulime-backend/internal/handlers/auth"
 	"github.com/Tuliime/tulime-backend/internal/handlers/chatbot"
 	"github.com/Tuliime/tulime-backend/internal/handlers/chatroom"
+	"github.com/Tuliime/tulime-backend/internal/handlers/device"
 	"github.com/Tuliime/tulime-backend/internal/handlers/farminputs"
 	"github.com/Tuliime/tulime-backend/internal/handlers/farmmanager"
 	"github.com/Tuliime/tulime-backend/internal/handlers/news"
@@ -140,6 +141,12 @@ func main() {
 	chatBotGroup.Get("/user/:userID", middlewares.Auth, chatbot.GetChatByUser)
 	chatBotGroup.Post("/user/:userID", middlewares.Auth, chatbot.PostChat)
 	chatBotGroup.Delete("/:id", middlewares.Auth, chatbot.DeleteChat)
+
+	// Device
+	deviceGroup := app.Group("/api/v0.01/device", func(c *fiber.Ctx) error {
+		return c.Next()
+	})
+	deviceGroup.Post("/", middlewares.Auth, device.PostDevice)
 
 	// Status
 	app.Get("/status", status.GetAppStatus)

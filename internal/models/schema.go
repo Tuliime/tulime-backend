@@ -2,6 +2,7 @@ package models
 
 import (
 	// "context"
+	"context"
 	"time"
 
 	"gorm.io/gorm"
@@ -10,6 +11,8 @@ import (
 
 var db = Db()
 var DB = db
+var redisClient = RedisClient()
+var ctx = context.Background()
 
 type User struct {
 	ID             string       `gorm:"column:id;type:uuid;primaryKey" json:"id"`
@@ -30,6 +33,8 @@ type User struct {
 	ChatroomMention []ChatroomMention `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"chatroomMention"`
 	Chatbot         []Chatbot         `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"chatbot"`
 	Session         []Session         `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"session"`
+	Device          []Device          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"device"`
+	Notification    []Notification    `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"notification"`
 	CreatedAt       time.Time         `gorm:"column:createdAt" json:"createdAt"`
 	UpdatedAt       time.Time         `gorm:"column:updatedAt" json:"updatedAt"`
 }
@@ -179,4 +184,28 @@ type Session struct {
 	IsRevoked    bool      `gorm:"column:isRevoked;default:false" json:"isRevoked"`
 	CreatedAt    time.Time `gorm:"column:createdAt;index" json:"createdAt"`
 	UpdatedAt    time.Time `gorm:"column:updatedAt;index" json:"updatedAt"`
+}
+
+type Device struct {
+	ID                   string    `gorm:"column:id;type:uuid;primaryKey" json:"id"`
+	UserID               string    `gorm:"column:userID;not null;index" json:"userID"`
+	Token                string    `gorm:"column:token;unique;index" json:"token"`
+	TokenType            string    `gorm:"column:tokenType;not null" json:"tokenType"`
+	Name                 string    `gorm:"column:name;not null" json:"name"`
+	NotificationDisabled bool      `gorm:"column:notificationDisabled;default:false" json:"notificationDisabled"`
+	CreatedAt            time.Time `gorm:"column:createdAt;index" json:"createdAt"`
+	UpdatedAt            time.Time `gorm:"column:updatedAt;index" json:"updatedAt"`
+}
+
+type Notification struct {
+	ID          string    `gorm:"column:id;type:uuid;primaryKey" json:"id"`
+	UserID      string    `gorm:"column:userID;not null;index" json:"userID"`
+	Title       string    `gorm:"column:title;not null" json:"title"`
+	Body        string    `gorm:"column:body;not null" json:"body"`
+	Data        string    `gorm:"column:data" json:"data"` // stringified json
+	Icon        string    `gorm:"column:icon" json:"icon"`
+	Attachments string    `gorm:"column:attachments" json:"attachments"` // stringified json
+	IsRead      bool      `gorm:"column:isRead;default:false" json:"isRead"`
+	CreatedAt   time.Time `gorm:"column:createdAt;index" json:"createdAt"`
+	UpdatedAt   time.Time `gorm:"column:updatedAt;index" json:"updatedAt"`
 }
