@@ -198,14 +198,22 @@ type Device struct {
 }
 
 type Notification struct {
-	ID          string    `gorm:"column:id;type:uuid;primaryKey" json:"id"`
-	UserID      string    `gorm:"column:userID;not null;index" json:"userID"`
-	Title       string    `gorm:"column:title;not null" json:"title"`
-	Body        string    `gorm:"column:body;not null" json:"body"`
-	Data        string    `gorm:"column:data" json:"data"` // stringified json
-	Icon        string    `gorm:"column:icon" json:"icon"`
-	Attachments string    `gorm:"column:attachments" json:"attachments"` // stringified json
-	IsRead      bool      `gorm:"column:isRead;default:false" json:"isRead"`
-	CreatedAt   time.Time `gorm:"column:createdAt;index" json:"createdAt"`
-	UpdatedAt   time.Time `gorm:"column:updatedAt;index" json:"updatedAt"`
+	ID             string    `gorm:"column:id;type:uuid;primaryKey" json:"id"`
+	UserID         string    `gorm:"column:userID;not null;index" json:"userID"`
+	Title          string    `gorm:"column:title;not null" json:"title"`
+	Body           string    `gorm:"column:body;not null" json:"body"`
+	Data           string    `gorm:"column:data" json:"data"` // stringified json
+	Icon           string    `gorm:"column:icon" json:"icon"`
+	Attachments    string    `gorm:"column:attachments" json:"attachments"` // stringified json
+	IsRead         bool      `gorm:"column:isRead;default:false" json:"isRead"`
+	SendStatusCode int       `gorm:"column:sendStatusCode;not null" json:"sendStatusCode"`
+	Type           string    `gorm:"column:type;not null" json:"type"`
+	CreatedAt      time.Time `gorm:"column:createdAt;index" json:"createdAt"`
+	UpdatedAt      time.Time `gorm:"column:updatedAt;index" json:"updatedAt"`
+}
+
+// Other Types
+type SendNotification = struct {
+	Notification Notification
+	DeviceToken  string
 }
