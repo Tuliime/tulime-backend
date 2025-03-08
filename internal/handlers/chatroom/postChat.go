@@ -117,6 +117,7 @@ var PostChat = func(c *fiber.Ctx) error {
 	newChatRoom.Mention = chatRoomMentions
 
 	events.EB.Publish("chatroomMessage", newChatRoom)
+	events.EB.Publish("chatNotification", newChatRoom)
 
 	response := fiber.Map{
 		"status":  "success",
