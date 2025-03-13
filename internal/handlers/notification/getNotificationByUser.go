@@ -5,6 +5,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+// TODO: to add pagination
 var GetNotificationByUser = func(c *fiber.Ctx) error {
 	notification := models.Notification{}
 	userID := c.Params("userID")
