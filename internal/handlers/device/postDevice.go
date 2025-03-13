@@ -5,6 +5,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+// TODO: allow same device token for multiple users
 var PostDevice = func(c *fiber.Ctx) error {
 	device := models.Device{}
 
