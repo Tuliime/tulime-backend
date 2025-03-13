@@ -33,6 +33,46 @@ func (n *Notification) FindByUser(userID string) ([]Notification, error) {
 	return notifications, nil
 }
 
+func (n *Notification) FindUnreadByUser(userID string) ([]Notification, error) {
+	var notifications []Notification
+	err := db.Where("\"userID\" = ? AND \"isRead\" = ?", userID, false).Find(&notifications).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return notifications, nil
+}
+
+func (n *Notification) FindUnreadByUserAndType(userID, Type string) ([]Notification, error) {
+	var notifications []Notification
+	err := db.Where("\"userID\" = ? AND type = ? AND \"isRead\" = ?", userID, Type, false).Find(&notifications).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return notifications, nil
+}
+
+func (n *Notification) FindUnreadCountByUser(userID string) (int64, error) {
+	var count int64
+	if err := db.Model(&Notification{}).Where("\"userID\" = ? AND \"isRead\" = ?",
+		userID, false).Count(&count).Error; err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}
+
+func (n *Notification) FindUnreadCountByUserAndType(userID, Type string) (int64, error) {
+	var count int64
+	if err := db.Model(&Notification{}).Where("\"userID\" = ? AND type = ? AND \"isRead\" = ?",
+		userID, Type, false).Count(&count).Error; err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}
+
 func (n *Notification) FindAll() ([]Notification, error) {
 	var notifications []Notification
 	db.Find(&notifications)
