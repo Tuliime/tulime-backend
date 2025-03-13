@@ -157,6 +157,7 @@ func main() {
 		return c.Next()
 	})
 	notificationGroup.Get("/user/:userID", middlewares.Auth, notification.GetNotificationByUser)
+	notificationGroup.Get("/live", middlewares.Auth, notification.GetLiveNotification)
 	notificationGroup.Patch("/:id", middlewares.Auth, notification.UpdateNotificationAsRead)
 
 	// Status
