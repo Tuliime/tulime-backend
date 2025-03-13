@@ -14,6 +14,7 @@ import (
 	"github.com/Tuliime/tulime-backend/internal/handlers/farminputs"
 	"github.com/Tuliime/tulime-backend/internal/handlers/farmmanager"
 	"github.com/Tuliime/tulime-backend/internal/handlers/news"
+	"github.com/Tuliime/tulime-backend/internal/handlers/notification"
 	"github.com/Tuliime/tulime-backend/internal/handlers/status"
 	"github.com/Tuliime/tulime-backend/internal/handlers/vetdoctor"
 	"github.com/Tuliime/tulime-backend/internal/middlewares"
@@ -150,6 +151,12 @@ func main() {
 	deviceGroup.Get("/user/:userID", middlewares.Auth, device.GetDeviceByUser)
 	deviceGroup.Patch("/disable/:id", middlewares.Auth, device.DisableDevice)
 	deviceGroup.Patch("/enable/:id", middlewares.Auth, device.EnableDevice)
+
+	// Notification
+	notificationGroup := app.Group("/api/v0.01/notification", func(c *fiber.Ctx) error {
+		return c.Next()
+	})
+	notificationGroup.Get("/user/:userID", middlewares.Auth, notification.GetNotificationByUser)
 
 	// Status
 	app.Get("/status", status.GetAppStatus)

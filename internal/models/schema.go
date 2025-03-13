@@ -205,9 +205,9 @@ type Notification struct {
 	Data           string    `gorm:"column:data" json:"data"` // stringified json
 	Icon           string    `gorm:"column:icon" json:"icon"`
 	Attachments    string    `gorm:"column:attachments" json:"attachments"` // stringified json
-	IsRead         bool      `gorm:"column:isRead;default:false" json:"isRead"`
+	IsRead         bool      `gorm:"column:isRead;default:false;index" json:"isRead"`
 	SendStatusCode int       `gorm:"column:sendStatusCode;not null" json:"sendStatusCode"`
-	Type           string    `gorm:"column:type;not null" json:"type"`
+	Type           string    `gorm:"column:type;not null;index" json:"type"`
 	CreatedAt      time.Time `gorm:"column:createdAt;index" json:"createdAt"`
 	UpdatedAt      time.Time `gorm:"column:updatedAt;index" json:"updatedAt"`
 }
