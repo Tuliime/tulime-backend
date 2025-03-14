@@ -189,7 +189,7 @@ type Session struct {
 type Device struct {
 	ID                   string    `gorm:"column:id;type:uuid;primaryKey" json:"id"`
 	UserID               string    `gorm:"column:userID;not null;index" json:"userID"`
-	Token                string    `gorm:"column:token;unique;index" json:"token"`
+	Token                string    `gorm:"column:token;not null;index" json:"token"`
 	TokenType            string    `gorm:"column:tokenType;not null" json:"tokenType"`
 	Name                 string    `gorm:"column:name;not null" json:"name"`
 	NotificationDisabled bool      `gorm:"column:notificationDisabled;default:false" json:"notificationDisabled"`
