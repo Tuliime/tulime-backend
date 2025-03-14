@@ -17,7 +17,7 @@ var PostDevice = func(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusBadRequest, "Missing name/userId/token/tokenType!")
 	}
 
-	savedDevice, err := device.FindByToken(device.Token)
+	savedDevice, err := device.FindByTokenAndUser(device.Token, device.UserID)
 	if err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}

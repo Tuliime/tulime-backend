@@ -33,10 +33,10 @@ func (d *Device) FindOne(id string) (Device, error) {
 	return device, nil
 }
 
-func (d *Device) FindByToken(token string) (Device, error) {
+func (d *Device) FindByTokenAndUser(token, userID string) (Device, error) {
 	var device Device
 
-	db.First(&device, "token = ?", token)
+	db.Find(&device, "token = ? AND \"userID\" = ?", token, userID)
 	return device, nil
 }
 
