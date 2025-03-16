@@ -12,17 +12,19 @@ import (
 )
 
 type ExpoNotification struct {
-	To    string `json:"to"`
-	Title string `json:"title"`
-	Body  string `json:"body"`
+	To       string `json:"to"`
+	Title    string `json:"title"`
+	Body     string `json:"body"`
+	Priority string `json:"priority"`
 }
 
 func SendExpoNotification(sendNotification models.SendNotification) error {
 	notification := models.Notification{}
 	expoNotification := ExpoNotification{
-		To:    sendNotification.DeviceToken,
-		Title: sendNotification.Notification.Title,
-		Body:  sendNotification.Notification.Body,
+		To:       sendNotification.DeviceToken,
+		Title:    sendNotification.Notification.Title,
+		Body:     sendNotification.Notification.Body,
+		Priority: "high",
 	}
 
 	jsonData, err := json.Marshal(expoNotification)
@@ -52,3 +54,23 @@ func SendExpoNotification(sendNotification models.SendNotification) error {
 	}
 	return nil
 }
+
+// ExponentPushToken[MDeazfOMaoHvBMqbrwItvf]  //Test push notification
+
+// curl -X POST https://exp.host/--/api/v2/push/send \
+//      -H "Content-Type: application/json" \
+//      -d '{
+//            "to": "ExponentPushToken[MDeazfOMaoHvBMqbrwItvf]",
+//            "title": "Test Expo Dev",
+//            "body": "Hello from Expo, and it'\''s Dankan sending it",
+//            "data": {
+//              "url": "tulimeapp://notification",
+//              "extraInfo": "Notification Screen"
+//            },
+//            "sound": "default",
+//            "priority": "high",
+//            "icon": "https://example.com/icon.png",
+//            "attachments": {
+//              "image": "https://firebasestorage.googleapis.com/v0/b/reserve-now-677ca.appspot.com/o/tulime%2Frice.png?alt=media&token=d9fb8814-0d9a-40e0-8bca-ebec0782fe4a"
+//            }
+//          }'
