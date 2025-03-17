@@ -26,19 +26,36 @@ func (n *Notification) FindOne(id string) (Notification, error) {
 	return notification, nil
 }
 
-func (n *Notification) FindByUser(userID string) ([]Notification, error) {
+func (n *Notification) FindByUser(userID string, limit float64, cursor string) ([]Notification, error) {
 	var notifications []Notification
-	db.Find(&notifications, "\"userID\" = ?", userID)
+	query := db.Order("\"createdAt\" DESC").Limit(int(limit))
+
+	if cursor != "" {
+		var lastNotification Notification
+		if err := db.Select("\"createdAt\"").Where("id = ?", cursor).First(&lastNotification).Error; err != nil {
+			return nil, err
+		}
+		query = query.Where("\"createdAt\" < ?", lastNotification.CreatedAt)
+	}
+
+	query.Find(&notifications, "\"userID\" = ?", userID)
 
 	return notifications, nil
 }
 
-func (n *Notification) FindUnreadByUser(userID string) ([]Notification, error) {
+func (n *Notification) FindUnreadByUser(userID string, limit float64, cursor string) ([]Notification, error) {
 	var notifications []Notification
-	err := db.Where("\"userID\" = ? AND \"isRead\" = ?", userID, false).Find(&notifications).Error
-	if err != nil {
-		return nil, err
+	query := db.Order("\"createdAt\" DESC").Limit(int(limit))
+
+	if cursor != "" {
+		var lastNotification Notification
+		if err := db.Select("\"createdAt\"").Where("id = ?", cursor).First(&lastNotification).Error; err != nil {
+			return nil, err
+		}
+		query = query.Where("\"createdAt\" < ?", lastNotification.CreatedAt)
 	}
+
+	query.Where("\"userID\" = ? AND \"isRead\" = ?", userID, false).Find(&notifications)
 
 	return notifications, nil
 }
