@@ -20,7 +20,7 @@ type RateLimiter struct {
 var rateLimiter = &RateLimiter{
 	requests: make(map[string]int),
 	window:   60 * time.Second, // 1 min
-	limit:    20,
+	limit:    40,
 	mutex:    sync.Mutex{},
 }
 
