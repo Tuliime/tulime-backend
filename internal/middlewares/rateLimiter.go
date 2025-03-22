@@ -11,49 +11,59 @@ import (
 )
 
 type RateLimiter struct {
-	requests map[string]int
-	limit    int
-	window   time.Duration
-	mutex    sync.Mutex
+	requests     map[string]int
+	blockedUntil map[string]time.Time
+	limit        int
+	window       time.Duration
+	mutex        sync.Mutex
 }
 
 var rateLimiter = &RateLimiter{
-	requests: make(map[string]int),
-	window:   60 * time.Second, // 1 min
-	limit:    40,
-	mutex:    sync.Mutex{},
+	requests:     make(map[string]int),
+	blockedUntil: make(map[string]time.Time),
+	window:       60 * time.Second, // 1 min
+	limit:        40,
+	mutex:        sync.Mutex{},
 }
 
 func (rl *RateLimiter) resetCount(clientIp string) {
-	time.Sleep(rl.window)
 	rl.mutex.Lock()
 	delete(rl.requests, clientIp)
+	delete(rl.blockedUntil, clientIp)
 	rl.mutex.Unlock()
 }
 
+// AllowRequest blocks requests until the window expires
 func (rl *RateLimiter) AllowRequest(clientIp string) bool {
 	rl.mutex.Lock()
 	defer rl.mutex.Unlock()
 
-	// Check the current count for the client
-	count, found := rl.requests[clientIp]
-	if !found || count < rl.limit {
-		// Reset the count for a new window or increment for the current window
-		if !found {
-			go rl.resetCount(clientIp)
+	// If the IP is already blocked, check if the block has expired
+	if unblockTime, blocked := rl.blockedUntil[clientIp]; blocked {
+		if time.Now().Before(unblockTime) {
+			return false
 		}
-		rl.requests[clientIp]++
-		return true
+
+		go rl.resetCount(clientIp)
 	}
 
-	return false
+	// Count the requests for this IP
+	count := rl.requests[clientIp]
+	if count >= rl.limit {
+		// Block the IP and set the unblock time
+		rl.blockedUntil[clientIp] = time.Now().Add(rl.window)
+		return false
+	}
+
+	rl.requests[clientIp]++
+
+	return true
 }
 
 func RateLimit(c *fiber.Ctx) error {
-	env := os.Getenv("GO_ENV")
 	var clientIP string = ""
 
-	if env == "production" {
+	if os.Getenv("GO_ENV") == "production" {
 		clientIP = c.Get("CF-Connecting-IP") // Cloudflare's real IP header
 		log.Println("IP Cloudflare header: ", clientIP)
 	}
