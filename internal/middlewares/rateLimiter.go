@@ -27,6 +27,7 @@ var rateLimiter = &RateLimiter{
 }
 
 func (rl *RateLimiter) resetCount(clientIp string) {
+	time.Sleep(rl.window)
 	rl.mutex.Lock()
 	delete(rl.requests, clientIp)
 	delete(rl.blockedUntil, clientIp)
@@ -44,10 +45,10 @@ func (rl *RateLimiter) AllowRequest(clientIp string) bool {
 			return false
 		}
 
-		go rl.resetCount(clientIp)
+		delete(rl.blockedUntil, clientIp)
+		delete(rl.requests, clientIp)
 	}
 
-	// Count the requests for this IP
 	count := rl.requests[clientIp]
 	if count >= rl.limit {
 		// Block the IP and set the unblock time
@@ -55,6 +56,10 @@ func (rl *RateLimiter) AllowRequest(clientIp string) bool {
 		return false
 	}
 
+	// Increment request count and start the reset timer if first request
+	if count == 0 {
+		go rl.resetCount(clientIp)
+	}
 	rl.requests[clientIp]++
 
 	return true
