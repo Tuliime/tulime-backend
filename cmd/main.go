@@ -13,6 +13,7 @@ import (
 	"github.com/Tuliime/tulime-backend/internal/handlers/device"
 	"github.com/Tuliime/tulime-backend/internal/handlers/farminputs"
 	"github.com/Tuliime/tulime-backend/internal/handlers/farmmanager"
+	"github.com/Tuliime/tulime-backend/internal/handlers/monitor"
 	"github.com/Tuliime/tulime-backend/internal/handlers/news"
 	"github.com/Tuliime/tulime-backend/internal/handlers/notification"
 	"github.com/Tuliime/tulime-backend/internal/handlers/status"
@@ -161,6 +162,10 @@ func main() {
 	notificationGroup.Get("/user/:userID", middlewares.Auth, notification.GetNotificationByUser)
 	notificationGroup.Get("/live", middlewares.Auth, notification.GetLiveNotification)
 	notificationGroup.Patch("/:id", middlewares.Auth, notification.UpdateNotificationAsRead)
+
+
+	// Metrics
+	app.Get("/metrics", monitor.GetMetrics)
 
 	// Status
 	app.Get("/status", status.GetAppStatus)
