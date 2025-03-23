@@ -13,6 +13,7 @@ import (
 type RateLimiter struct {
 	requests     map[string]int
 	blockedUntil map[string]time.Time
+	resetAfter   map[string]time.Time
 	limit        int
 	window       time.Duration
 	mutex        sync.Mutex
@@ -21,17 +22,9 @@ type RateLimiter struct {
 var rateLimiter = &RateLimiter{
 	requests:     make(map[string]int),
 	blockedUntil: make(map[string]time.Time),
-	window:       60 * time.Second, // 1 min
+	resetAfter:   make(map[string]time.Time),
+	window:       60 * time.Second, // 1 min window
 	limit:        40,
-	mutex:        sync.Mutex{},
-}
-
-func (rl *RateLimiter) resetCount(clientIp string) {
-	time.Sleep(rl.window)
-	rl.mutex.Lock()
-	delete(rl.requests, clientIp)
-	delete(rl.blockedUntil, clientIp)
-	rl.mutex.Unlock()
 }
 
 // AllowRequest blocks requests until the window expires
@@ -39,30 +32,58 @@ func (rl *RateLimiter) AllowRequest(clientIp string) bool {
 	rl.mutex.Lock()
 	defer rl.mutex.Unlock()
 
-	// If the IP is already blocked, check if the block has expired
 	if unblockTime, blocked := rl.blockedUntil[clientIp]; blocked {
 		if time.Now().Before(unblockTime) {
 			return false
 		}
 
 		delete(rl.blockedUntil, clientIp)
+	}
+
+	if resetTime, exists := rl.resetAfter[clientIp]; exists && time.Now().After(resetTime) {
 		delete(rl.requests, clientIp)
+		delete(rl.resetAfter, clientIp)
 	}
 
 	count := rl.requests[clientIp]
-	if count >= rl.limit {
-		// Block the IP and set the unblock time
-		rl.blockedUntil[clientIp] = time.Now().Add(rl.window)
-		return false
+	if count <= rl.limit {
+		if count == 0 {
+			rl.resetAfter[clientIp] = time.Now().Add(rl.window)
+		}
+		rl.requests[clientIp]++
+		return true
 	}
 
-	// Increment request count and start the reset timer if first request
-	if count == 0 {
-		go rl.resetCount(clientIp)
-	}
-	rl.requests[clientIp]++
+	// Block further requests
+	rl.blockedUntil[clientIp] = time.Now().Add(rl.window)
+	return false
+}
 
-	return true
+// CleanupExpiredEntries removes expired IPs periodically
+func (rl *RateLimiter) CleanupExpiredEntries() {
+	log.Println("IP cleanup initiated...")
+	ticker := time.NewTicker(time.Second)
+	defer ticker.Stop()
+
+	for range ticker.C {
+		rl.mutex.Lock()
+		now := time.Now()
+
+		for ip, resetTime := range rl.resetAfter {
+			if now.After(resetTime) {
+				delete(rl.requests, ip)
+				delete(rl.resetAfter, ip)
+			}
+		}
+
+		for ip, unblockTime := range rl.blockedUntil {
+			if now.After(unblockTime) {
+				delete(rl.blockedUntil, ip)
+			}
+		}
+
+		rl.mutex.Unlock()
+	}
 }
 
 func RateLimit(c *fiber.Ctx) error {
@@ -102,4 +123,8 @@ func RateLimit(c *fiber.Ctx) error {
 	c.Locals("clientIP", clientIP)
 
 	return c.Next()
+}
+
+func init() {
+	go rateLimiter.CleanupExpiredEntries()
 }
