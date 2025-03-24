@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 
 	"github.com/Tuliime/tulime-backend/internal/events/subscribers"
@@ -21,6 +22,7 @@ import (
 	"github.com/Tuliime/tulime-backend/internal/middlewares"
 	"github.com/Tuliime/tulime-backend/internal/packages"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/adaptor"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/joho/godotenv"
@@ -50,6 +52,8 @@ func main() {
 		}
 		log.Println("Loaded .env var file")
 	}
+
+	mux := http.NewServeMux()
 
 	// auth
 	userGroup := app.Group("/api/v0.01/user", func(c *fiber.Ctx) error {
@@ -133,10 +137,13 @@ func main() {
 	})
 	chatRoomGroup.Get("/", middlewares.Auth, chatroom.GetChat)
 	chatRoomGroup.Post("/", middlewares.Auth, chatroom.PostChat)
-	chatRoomGroup.Get("/live", middlewares.Auth, chatroom.GetLiveChat)
 	chatRoomGroup.Get("/onlinestatus", middlewares.Auth, chatroom.GetOnlineStatus)
 	chatRoomGroup.Patch("/onlinestatus", middlewares.Auth, chatroom.UpdateOnlineStatus)
 	chatRoomGroup.Patch("/typingstatus", middlewares.Auth, chatroom.UpdateTypingStatus)
+
+	// handle chatroom/live using net/http
+	getLiveChat := middlewares.NetHttpWrapper(http.HandlerFunc(chatroom.GetLiveChat))
+	mux.Handle("/api/v0.01/chatroom/live", getLiveChat)
 
 	// ChatBoot
 	chatBotGroup := app.Group("/api/v0.01/chatbot", func(c *fiber.Ctx) error {
@@ -163,6 +170,9 @@ func main() {
 	notificationGroup.Get("/live", middlewares.Auth, notification.GetLiveNotification)
 	notificationGroup.Patch("/:id", middlewares.Auth, notification.UpdateNotificationAsRead)
 
+	// TODO: To use net/http for live notifications
+	// liveHandler := loggingMiddleware(http.HandlerFunc(getLiveRequests))
+	// mux.Handle("/live", liveHandler)
 
 	// Metrics
 	app.Get("/metrics", monitor.GetMetrics)
@@ -178,6 +188,15 @@ func main() {
 	// Initialize all event subscribers in the app
 	subscribers.InitEventSubscribers()
 
-	log.Fatal(app.Listen(":5000"))
+	// Attach fiberApp as a handler to net/http mux
+	mux.Handle("/", adaptor.FiberApp(app))
+
+	server := &http.Server{
+		Addr:    ":5000",
+		Handler: mux,
+	}
+	log.Println("Starting http server up on 5000")
+	log.Fatal(server.ListenAndServe())
+	// log.Fatal(app.Listen(":5000"))
 
 }
