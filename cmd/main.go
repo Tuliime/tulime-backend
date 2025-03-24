@@ -140,7 +140,6 @@ func main() {
 	chatRoomGroup.Get("/onlinestatus", middlewares.Auth, chatroom.GetOnlineStatus)
 	chatRoomGroup.Patch("/onlinestatus", middlewares.Auth, chatroom.UpdateOnlineStatus)
 	chatRoomGroup.Patch("/typingstatus", middlewares.Auth, chatroom.UpdateTypingStatus)
-
 	// handle chatroom/live using net/http
 	getLiveChat := middlewares.NetHttpWrapper(http.HandlerFunc(chatroom.GetLiveChat))
 	mux.Handle("/api/v0.01/chatroom/live", getLiveChat)
@@ -167,12 +166,10 @@ func main() {
 		return c.Next()
 	})
 	notificationGroup.Get("/user/:userID", middlewares.Auth, notification.GetNotificationByUser)
-	notificationGroup.Get("/live", middlewares.Auth, notification.GetLiveNotification)
 	notificationGroup.Patch("/:id", middlewares.Auth, notification.UpdateNotificationAsRead)
-
-	// TODO: To use net/http for live notifications
-	// liveHandler := loggingMiddleware(http.HandlerFunc(getLiveRequests))
-	// mux.Handle("/live", liveHandler)
+	// handle notification/live using net/http
+	getLiveNotification := middlewares.NetHttpWrapper(http.HandlerFunc(notification.GetLiveNotification))
+	mux.Handle("/api/v0.01/notification/live", getLiveNotification)
 
 	// Metrics
 	app.Get("/metrics", monitor.GetMetrics)
@@ -197,6 +194,5 @@ func main() {
 	}
 	log.Println("Starting http server up on 5000")
 	log.Fatal(server.ListenAndServe())
-	// log.Fatal(app.Listen(":5000"))
 
 }
