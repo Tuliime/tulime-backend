@@ -15,7 +15,6 @@ import (
 
 	"cloud.google.com/go/storage"
 	firebase "firebase.google.com/go/v4"
-	"github.com/joho/godotenv"
 	"google.golang.org/api/option"
 )
 
@@ -29,11 +28,6 @@ type FirebaseStorage struct {
 var firebaseManager = NewFirebaseManager("serviceAccountKey.json")
 
 func (fs *FirebaseStorage) initStorageBucket() (*storage.BucketHandle, error) {
-	err := godotenv.Load()
-	if err != nil {
-		return nil, err
-	}
-
 	currentDirPath, err := os.Getwd()
 	if err != nil {
 		return nil, err
@@ -85,6 +79,7 @@ func (fs *FirebaseStorage) Add(file multipart.File, fileHeader *multipart.FileHe
 
 	bucket, err := fs.initStorageBucket()
 	if err != nil {
+		log.Println("Error initializing the storage bucket")
 		firebaseManager.DeleteFile()
 		return "", err
 	}
@@ -92,18 +87,21 @@ func (fs *FirebaseStorage) Add(file multipart.File, fileHeader *multipart.FileHe
 	wc := bucket.Object(filePath).NewWriter(context.Background())
 	_, err = io.Copy(wc, file)
 	if err != nil {
+		log.Println("Error copying the file to IO")
 		firebaseManager.DeleteFile()
 		return "", err
 	}
 
 	err = wc.Close()
 	if err != nil {
+		log.Println("Error closing the write operation")
 		firebaseManager.DeleteFile()
 		return "", err
 	}
 
 	url, err := fs.getDownloadURL()
 	if err != nil {
+		log.Println("Error getting thr")
 		firebaseManager.DeleteFile()
 		return "", err
 	}

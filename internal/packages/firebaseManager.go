@@ -6,6 +6,8 @@ import (
 	"os"
 	"strings"
 	"time"
+
+	"github.com/joho/godotenv"
 )
 
 type FirebaseAdmin struct {
@@ -28,6 +30,10 @@ type FirebaseManager struct {
 }
 
 func NewFirebaseManager(fileName string) *FirebaseManager {
+	err := godotenv.Load()
+	if err != nil {
+		log.Println("Failed to load .env vars in firebase manager")
+	}
 	return &FirebaseManager{
 		fileName: fileName,
 		data: FirebaseAdmin{
