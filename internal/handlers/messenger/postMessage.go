@@ -104,8 +104,9 @@ var PostMessage = func(c *fiber.Ctx) error {
 				return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 			}
 			messenger.MessengerRoomID = newMessengerRoom.ID
+		} else {
+			messenger.MessengerRoomID = messengerRoom.ID
 		}
-		messenger.MessengerRoomID = messengerRoom.ID
 	}
 
 	newMessage, err := messenger.Create(messenger)
