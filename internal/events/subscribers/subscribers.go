@@ -6,6 +6,7 @@ func InitEventSubscribers() {
 	log.Println("Initiating global event subscribers...")
 
 	go ChatNotificationEventListener()
+	go MessengerNotificationEventListener()
 	go NotificationEventListener()
 }
 
