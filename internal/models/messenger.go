@@ -38,18 +38,19 @@ func (msgr *Messenger) FindReply(reply string) (Messenger, error) {
 	return message, nil
 }
 
-func (msgr *Messenger) FindAll(limit float64, cursor string, includeCursor bool, direction string) ([]Messenger, error) {
+func (msgr *Messenger) FindByRoom(roomID string, limit float64, cursor string,
+	includeCursor bool, direction string) ([]Messenger, error) {
 	var messages []Messenger
 
 	if direction == "FORWARD" {
-		messagesInAscOrder, err := msgr.FindAllInAscendingOrder(limit, cursor, includeCursor)
+		messagesInAscOrder, err := msgr.FindInAscOrderByRoom(roomID, limit, cursor, includeCursor)
 		if err != nil {
 			return messages, err
 		}
 		messages = messagesInAscOrder
 
 	} else if direction == "BACKWARD" {
-		messagesInDescOrder, err := msgr.FindAllInDescendingOrder(limit, cursor, includeCursor)
+		messagesInDescOrder, err := msgr.FindInDescOrderByRoom(roomID, limit, cursor, includeCursor)
 		if err != nil {
 			return messages, err
 		}
@@ -61,10 +62,11 @@ func (msgr *Messenger) FindAll(limit float64, cursor string, includeCursor bool,
 	return messages, nil
 }
 
-func (msgr *Messenger) FindAllInDescendingOrder(limit float64, cursor string, includeCursor bool) ([]Messenger, error) {
+func (msgr *Messenger) FindInDescOrderByRoom(roomID string, limit float64,
+	cursor string, includeCursor bool) ([]Messenger, error) {
 	var messages []Messenger
 
-	query := db.Preload("File").Preload("Mention").Order("\"arrivedAt\" DESC").Limit(int(limit))
+	query := db.Preload("File").Preload("Tag").Order("\"arrivedAt\" DESC").Limit(int(limit))
 
 	if cursor != "" {
 		var lastMessage Messenger
@@ -78,7 +80,7 @@ func (msgr *Messenger) FindAllInDescendingOrder(limit float64, cursor string, in
 		}
 	}
 
-	if err := query.Find(&messages).Error; err != nil {
+	if err := query.Where("\"messengerRoomID\" = ?", roomID).Find(&messages).Error; err != nil {
 		return nil, err
 	}
 
@@ -90,13 +92,14 @@ func (msgr *Messenger) FindAllInDescendingOrder(limit float64, cursor string, in
 	return messages, nil
 }
 
-func (msgr *Messenger) FindAllInAscendingOrder(limit float64, cursor string, includeCursor bool) ([]Messenger, error) {
+func (msgr *Messenger) FindInAscOrderByRoom(roomID string, limit float64,
+	cursor string, includeCursor bool) ([]Messenger, error) {
 	var messages []Messenger
 
-	query := db.Preload("File").Preload("Mention").Order("\"arrivedAt\" ASC").Limit(int(limit))
+	query := db.Preload("File").Preload("Tag").Order("\"arrivedAt\" ASC").Limit(int(limit))
 
 	if cursor != "" {
-		var lastMessage Chatroom
+		var lastMessage Messenger
 		if err := db.Select("\"arrivedAt\"").Where("id = ?", cursor).First(&lastMessage).Error; err != nil {
 			return nil, err
 		}
@@ -107,7 +110,7 @@ func (msgr *Messenger) FindAllInAscendingOrder(limit float64, cursor string, inc
 		}
 	}
 
-	if err := query.Find(&messages).Error; err != nil {
+	if err := query.Where("\"messengerRoomID\" = ?", roomID).Find(&messages).Error; err != nil {
 		return nil, err
 	}
 
