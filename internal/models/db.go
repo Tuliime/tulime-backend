@@ -56,7 +56,9 @@ func Db() *gorm.DB {
 		err = gormDB.AutoMigrate(&User{}, &Agroproduct{}, &AgroproductPrice{},
 			&News{}, &FarmInputs{}, &OTP{}, &FarmManager{}, &VetDoctor{},
 			&Chatroom{}, &ChatroomFile{}, &ChatroomMention{}, &Chatbot{},
-			&Session{}, OnlineStatus{}, Device{}, Notification{})
+			&Session{}, &OnlineStatus{}, &Device{}, &Notification{}, &Store{},
+			&Advert{}, &AdvertImage{}, &MessengerRoom{}, &Messenger{}, &MessengerFile{},
+			&MessengerTag{})
 		if err != nil {
 			log.Fatal("Failed to make auto migration", err)
 		}

@@ -13,6 +13,7 @@ import (
 	"github.com/Tuliime/tulime-backend/internal/sse"
 )
 
+// TODO: To move all the sse operations to one single endpoint("api/v0.01/live")
 func GetLiveChat(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/event-stream")
 	w.Header().Set("Cache-Control", "no-cache")
@@ -42,6 +43,10 @@ func GetLiveChat(w http.ResponseWriter, r *http.Request) {
 	chatroomMessageChan := make(chan events.DataEvent, 100)
 	events.EB.Subscribe("chatroomMessage", chatroomMessageChan)
 
+	type Messenger = models.Messenger
+	messengerChan := make(chan events.DataEvent, 100)
+	events.EB.Subscribe("messenger", messengerChan)
+
 	type OnlineStatus = models.OnlineStatus
 	onlineStatusChan := make(chan events.DataEvent, 100)
 	events.EB.Subscribe("onlineStatus", onlineStatusChan)
@@ -59,6 +64,16 @@ func GetLiveChat(w http.ResponseWriter, r *http.Request) {
 			}
 			if err := cm.SendEvent("chatroom-message", chatroomMessage, userID); err != nil {
 				log.Printf("Error sending chatroom-message event: %v\n", err)
+				return
+			}
+		case messengerEvent := <-messengerChan:
+			messengerMsg, ok := messengerEvent.Data.(Messenger)
+			if !ok {
+				log.Printf("Invalid messenger type received: %T", messengerEvent.Data)
+				return
+			}
+			if err := cm.SendEvent("messenger", messengerMsg, messengerMsg.RecipientID); err != nil {
+				log.Printf("Error sending messenger msg event: %v\n", err)
 				return
 			}
 		case onlineStatusEvent := <-onlineStatusChan:

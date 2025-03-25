@@ -14,6 +14,7 @@ import (
 	"github.com/Tuliime/tulime-backend/internal/handlers/device"
 	"github.com/Tuliime/tulime-backend/internal/handlers/farminputs"
 	"github.com/Tuliime/tulime-backend/internal/handlers/farmmanager"
+	"github.com/Tuliime/tulime-backend/internal/handlers/messenger"
 	"github.com/Tuliime/tulime-backend/internal/handlers/monitor"
 	"github.com/Tuliime/tulime-backend/internal/handlers/news"
 	"github.com/Tuliime/tulime-backend/internal/handlers/notification"
@@ -143,6 +144,12 @@ func main() {
 	// handle chatroom/live using net/http
 	getLiveChat := middlewares.NetHttpWrapper(http.HandlerFunc(chatroom.GetLiveChat))
 	mux.Handle("/api/v0.01/chatroom/live", getLiveChat)
+
+	// Messenger
+	messengerGroup := app.Group("/api/v0.01/messenger", func(c *fiber.Ctx) error {
+		return c.Next()
+	})
+	messengerGroup.Post("/", middlewares.Auth, messenger.PostMessage)
 
 	// ChatBoot
 	chatBotGroup := app.Group("/api/v0.01/chatbot", func(c *fiber.Ctx) error {

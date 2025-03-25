@@ -14,6 +14,7 @@ import (
 	"github.com/Tuliime/tulime-backend/internal/sse"
 )
 
+// TODO: To move all the sse operations to one single endpoint("api/v0.01/live")
 func GetLiveNotification(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/event-stream")
 	w.Header().Set("Cache-Control", "no-cache")
