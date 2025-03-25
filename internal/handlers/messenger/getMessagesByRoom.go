@@ -122,6 +122,7 @@ var GetMessagesByRoom = func(c *fiber.Ctx) error {
 		"includeCursor": includeCursor,
 		"hasNextItems":  hasNextItems,
 		"hasPrevItems":  hasPrevItems,
+		"direction":     direction,
 	}
 
 	messengerMap := fiber.Map{
