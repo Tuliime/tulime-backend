@@ -28,11 +28,6 @@ var GetMessagesByRoom = func(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
 
-	// TODO: To remove this code on validating it's functionality
-	if cursorParam == "" {
-		cursorParam = ""
-	}
-
 	includeCursor, err := strconv.ParseBool(inCludeCursorParam)
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
