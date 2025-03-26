@@ -19,6 +19,7 @@ import (
 	"github.com/Tuliime/tulime-backend/internal/handlers/news"
 	"github.com/Tuliime/tulime-backend/internal/handlers/notification"
 	"github.com/Tuliime/tulime-backend/internal/handlers/status"
+	"github.com/Tuliime/tulime-backend/internal/handlers/store"
 	"github.com/Tuliime/tulime-backend/internal/handlers/vetdoctor"
 	"github.com/Tuliime/tulime-backend/internal/middlewares"
 	"github.com/Tuliime/tulime-backend/internal/packages"
@@ -153,6 +154,12 @@ func main() {
 	messengerGroup.Get("/", middlewares.Auth, messenger.GetMessagesByRoom)
 	messengerGroup.Patch("/:messengerRoomID", middlewares.Auth, messenger.UpdateMessagesAsRead)
 	messengerGroup.Get("/rooms/user/:userID", middlewares.Auth, messenger.GetRoomsByUser)
+
+	// E-commerce store
+	storeGroup := app.Group("/api/v0.01/store", func(c *fiber.Ctx) error {
+		return c.Next()
+	})
+	storeGroup.Post("/", middlewares.Auth, store.PostStore)
 
 	// ChatBoot
 	chatBotGroup := app.Group("/api/v0.01/chatbot", func(c *fiber.Ctx) error {

@@ -230,6 +230,7 @@ type Store struct {
 	LogoPath            string    `gorm:"column:logoPath;default:null" json:"logoPath"`
 	BackgroundImageUrl  string    `gorm:"column:backgroundImageUrl;default:null" json:"backgroundImageUrl"`
 	BackgroundImagePath string    `gorm:"column:backgroundImagePath;default:null" json:"backgroundImagePath"`
+	Type                string    `gorm:"column:type;default:'INDIVIDUAL'" json:"type"`
 	CreatedAt           time.Time `gorm:"column:createdAt;index" json:"createdAt"`
 	UpdatedAt           time.Time `gorm:"column:updatedAt;index" json:"updatedAt"`
 	User                *User     `gorm:"foreignKey:UserID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
