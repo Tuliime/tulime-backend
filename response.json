@@ -1,0 +1,58 @@
+{
+  "data": {
+    "rooms": [
+      {
+        "id": "6ee3bff7-2bd1-47fa-a9be-2c9c9f7fee04",
+        "messengerRoomID": "0b1dc626-7e8d-4f6d-90ab-71ca6e9d5c58",
+        "senderID": "efe31267-f68b-48f7-922f-fbafb4dc3610",
+        "recipientID": "d9afe339-3d59-43ea-a2dc-bdd1a27790b1",
+        "text": "Hopefully you all will forgive me for spamming the chat",
+        "reply": "",
+        "file": {
+          "id": "",
+          "messengerID": "",
+          "url": "",
+          "path": "",
+          "createdAt": "0001-01-01T00:00:00Z",
+          "updatedAt": "0001-01-01T00:00:00Z"
+        },
+        "tag": [],
+        "isRead": false,
+        "sentAt": "2025-03-25T21:50:47+03:00",
+        "arrivedAt": "2025-03-26T14:53:20.00145+03:00",
+        "createdAt": "2025-03-26T14:53:20.00245+03:00",
+        "updatedAt": "2025-03-26T14:53:20.00245+03:00",
+        "Sender": {
+          "id": "efe31267-f68b-48f7-922f-fbafb4dc3610",
+          "name": "Tibz Dankan",
+          "telNumber": 256761839754,
+          "role": "user",
+          "imageUrl": "https://firebasestorage.googleapis.com/v0/b/reserve-now-677ca.appspot.com/o/tulime%2Fdev%2F9795_dankan-pic-2.png?alt=media&token=0b4aec95-f739-4e27-ac7b-11fa4ac339e8",
+          "imagePath": "tulime/dev/9795_dankan-pic-2.png",
+          "profileBgColor": "#FFA726",
+          "chatroomColor": "#1A73E8",
+          "createdAt": "2025-01-12T12:48:44.498691+03:00",
+          "updatedAt": "2025-02-15T00:56:12.657764+03:00"
+        },
+        "Recipient": {
+          "id": "d9afe339-3d59-43ea-a2dc-bdd1a27790b1",
+          "name": "Tibs2 Dankan2",
+          "telNumber": 256754108279,
+          "role": "user",
+          "imageUrl": "",
+          "imagePath": "",
+          "profileBgColor": "#1A73E8",
+          "chatroomColor": "#1E88E5",
+          "createdAt": "2025-01-12T12:52:37.514179+03:00",
+          "updatedAt": "2025-02-15T00:56:12.674391+03:00"
+        }
+      }
+    ]
+  },
+  "pagination": {
+    "hasPrevItems": false,
+    "limit": 12,
+    "prevCursor": ""
+  },
+  "status": "success"
+}
