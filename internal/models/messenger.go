@@ -117,6 +117,38 @@ func (msgr *Messenger) FindInAscOrderByRoom(roomID string, limit float64,
 	return messages, nil
 }
 
+// FindRoomsByUser fetches messages with sender and recipient
+// details in descending order
+func (msgr *Messenger) FindRoomsByUser(userID string, limit float64,
+	cursor string) ([]Messenger, error) {
+	var messengerRooms []Messenger
+
+	query := db.Table("messengers").Select("DISTINCT ON (\"messengerRoomID\") *").
+		Order("\"messengerRoomID\", \"arrivedAt\" DESC").
+		Limit(int(limit))
+
+	query = query.Preload("File").Preload("Tag").Preload("Sender").Preload("Recipient")
+
+	if cursor != "" {
+		var lastMessage Messenger
+		if err := db.Select("\"arrivedAt\"").Where("id = ?",
+			cursor).First(&lastMessage).Error; err != nil {
+			return nil, err
+		}
+		query = query.Where("\"arrivedAt\" < ?", lastMessage.ArrivedAt)
+	}
+	if err := query.Where("\"senderID\" = ? OR \"recipientID\" = ?",
+		userID, userID).Find(&messengerRooms).Error; err != nil {
+		return nil, err
+	}
+
+	// Reverse the slice to return in descending order
+	for i, j := 0, len(messengerRooms)-1; i < j; i, j = i+1, j-1 {
+		messengerRooms[i], messengerRooms[j] = messengerRooms[j], messengerRooms[i]
+	}
+	return messengerRooms, nil
+}
+
 // Update updates one Messenger in the database, using the information
 // stored in the receiver u
 func (msgr *Messenger) Update() (Messenger, error) {
