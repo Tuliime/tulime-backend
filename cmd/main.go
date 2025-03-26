@@ -151,6 +151,7 @@ func main() {
 	})
 	messengerGroup.Post("/", middlewares.Auth, messenger.PostMessage)
 	messengerGroup.Get("/", middlewares.Auth, messenger.GetMessagesByRoom)
+	messengerGroup.Patch("/:messengerRoomID", middlewares.Auth, messenger.UpdateMessagesAsRead)
 
 	// ChatBoot
 	chatBotGroup := app.Group("/api/v0.01/chatbot", func(c *fiber.Ctx) error {

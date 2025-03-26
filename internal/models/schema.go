@@ -272,21 +272,22 @@ type MessengerRoom struct {
 }
 
 type Messenger struct {
-	ID              string         `gorm:"column:id;type:uuid;primaryKey" json:"id"`
-	MessengerRoomID string         `gorm:"column:messengerRoomID;not null;index" json:"messengerRoomID"`
-	SenderID        string         `gorm:"column:senderID;not null;index" json:"senderID"`
-	RecipientID     string         `gorm:"column:recipientID;not null;index" json:"recipientID"`
-	Text            string         `gorm:"column:text;default:null" json:"text"`
-	Reply           string         `gorm:"column:reply;type:uuid;default:null;index" json:"reply"`
-	File            MessengerFile  `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"file"`
-	Tag             []MessengerTag `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"tag"`
-	IsRead          bool           `gorm:"column:isRead;default:false" json:"isRead"`
-	SentAt          time.Time      `gorm:"column:sentAt;not null;index" json:"sentAt"`
-	ArrivedAt       time.Time      `gorm:"column:arrivedAt;not null;index" json:"arrivedAt"`
-	CreatedAt       time.Time      `gorm:"column:createdAt;index" json:"createdAt"`
-	UpdatedAt       time.Time      `gorm:"column:updatedAt;index" json:"updatedAt"`
-	Sender          *User          `gorm:"foreignKey:SenderID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
-	Recipient       *User          `gorm:"foreignKey:RecipientID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	ID              string `gorm:"column:id;type:uuid;primaryKey" json:"id"`
+	MessengerRoomID string `gorm:"column:messengerRoomID;not null;index" json:"messengerRoomID"`
+	SenderID        string `gorm:"column:senderID;not null;index" json:"senderID"`
+	RecipientID     string `gorm:"column:recipientID;not null;index" json:"recipientID"`
+	Text            string `gorm:"column:text;default:null" json:"text"`
+	// Reply           string         `gorm:"column:reply;type:uuid;default:null;index" json:"reply"`
+	Reply     string         `gorm:"column:reply;default:null;index" json:"reply"`
+	File      MessengerFile  `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"file"`
+	Tag       []MessengerTag `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"tag"`
+	IsRead    bool           `gorm:"column:isRead;default:false" json:"isRead"`
+	SentAt    time.Time      `gorm:"column:sentAt;not null;index" json:"sentAt"`
+	ArrivedAt time.Time      `gorm:"column:arrivedAt;not null;index" json:"arrivedAt"`
+	CreatedAt time.Time      `gorm:"column:createdAt;index" json:"createdAt"`
+	UpdatedAt time.Time      `gorm:"column:updatedAt;index" json:"updatedAt"`
+	Sender    *User          `gorm:"foreignKey:SenderID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	Recipient *User          `gorm:"foreignKey:RecipientID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 }
 
 type MessengerFile struct {
