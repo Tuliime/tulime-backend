@@ -1,22 +1,35 @@
 package adverts
 
 import (
+	"strconv"
+
 	"github.com/Tuliime/tulime-backend/internal/models"
 	"github.com/Tuliime/tulime-backend/internal/packages"
 	"github.com/gofiber/fiber/v2"
 )
 
-var UpdateAdvertImage = func(c *fiber.Ctx) error {
-	advertImage := models.AdvertImage{}
-	advertImageID := c.Params("advertImageID")
+var PostAdvertImage = func(c *fiber.Ctx) error {
+	advertID := c.Params("id")
+	advert := models.Advert{}
+	isPrimaryImageStr := c.FormValue("isPrimary")
+	advertImage := models.AdvertImage{AdvertID: advertID}
 
-	savedAdvertImage, err := advertImage.FindOne(advertImageID)
+	savedAdvert, err := advert.FindOne(advertID)
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
-	if savedAdvertImage.ID == "" {
-		return fiber.NewError(fiber.StatusNotFound, "Advert Image of provided id is not found!")
+	if savedAdvert.ID == "" {
+		return fiber.NewError(fiber.StatusNotFound, "Advert of provided id is not found!")
+	}
+
+	if isPrimaryImageStr == "" {
+		isPrimaryImageStr = "false"
+	}
+
+	isPrimary, err := strconv.ParseBool(isPrimaryImageStr)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
 	fileHeader, err := c.FormFile("file")
@@ -41,24 +54,25 @@ var UpdateAdvertImage = func(c *fiber.Ctx) error {
 	filePath = packages.GenFilePath(fileHeader.Filename)
 	firebaseStorage := packages.FirebaseStorage{FilePath: filePath}
 
-	imageUrl, err = firebaseStorage.Update(file, fileHeader, savedAdvertImage.Path)
+	imageUrl, err = firebaseStorage.Add(file, fileHeader)
 	if err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
 
-	savedAdvertImage.URL = imageUrl
-	savedAdvertImage.Path = filePath
+	advertImage.URL = imageUrl
+	advertImage.Path = filePath
+	advertImage.IsPrimary = isPrimary
 
-	updatedAdvertImage, err := savedAdvertImage.Update()
+	newAdvertImage, err := advertImage.Update()
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
 	response := fiber.Map{
 		"status":  "success",
-		"message": "Advert Image updated successfully!",
-		"data":    updatedAdvertImage,
+		"message": "Advert Image uploaded successfully!",
+		"data":    newAdvertImage,
 	}
 
-	return c.Status(fiber.StatusOK).JSON(response)
+	return c.Status(fiber.StatusCreated).JSON(response)
 }

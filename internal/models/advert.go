@@ -13,7 +13,7 @@ func (ad *Advert) BeforeCreate(tx *gorm.DB) error {
 	return nil
 }
 
-func (s *Advert) Create(advert Advert) (Advert, error) {
+func (ad *Advert) Create(advert Advert) (Advert, error) {
 	result := db.Create(&advert)
 
 	if result.Error != nil {
