@@ -234,7 +234,7 @@ type Store struct {
 	CreatedAt           time.Time `gorm:"column:createdAt;index" json:"createdAt"`
 	UpdatedAt           time.Time `gorm:"column:updatedAt;index" json:"updatedAt"`
 	User                *User     `gorm:"foreignKey:UserID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
-	Advert              *Advert   `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	Advert              []*Advert `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 }
 
 type Advert struct {
@@ -243,6 +243,7 @@ type Advert struct {
 	UserID             string          `gorm:"column:userID;not null;index" json:"userID"`
 	ProductName        string          `gorm:"column:productName;not null;index" json:"productName"`
 	ProductDescription string          `gorm:"column:productDescription;not null;index" json:"productDescription"`
+	IsPublished        bool            `gorm:"column:isPublished;default:false;index" json:"isPublished"`
 	AdvertImage        []*AdvertImage  `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"advertImage"`
 	MessengerTag       []*MessengerTag `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 	CreatedAt          time.Time       `gorm:"column:createdAt;index" json:"createdAt"`
