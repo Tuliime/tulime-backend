@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/Tuliime/tulime-backend/internal/events/subscribers"
+	"github.com/Tuliime/tulime-backend/internal/handlers/adverts"
 	"github.com/Tuliime/tulime-backend/internal/handlers/agroproducts"
 	"github.com/Tuliime/tulime-backend/internal/handlers/auth"
 	"github.com/Tuliime/tulime-backend/internal/handlers/chatbot"
@@ -165,6 +166,13 @@ func main() {
 	storeGroup.Patch("/:id/logo", middlewares.Auth, store.UpdateStoreLogo)
 	storeGroup.Get("/", middlewares.Auth, store.GetAllStores)
 	storeGroup.Get("/user/:userID", middlewares.Auth, store.GetStoresByUser)
+
+	// E-commerce Adverts
+	advertGroup := app.Group("/api/v0.01/adverts", func(c *fiber.Ctx) error {
+		return c.Next()
+	})
+	advertGroup.Post("/", middlewares.Auth, adverts.PostAdvert)
+	advertGroup.Patch("/:id", middlewares.Auth, adverts.UpdateAdvert)
 
 	// ChatBoot
 	chatBotGroup := app.Group("/api/v0.01/chatbot", func(c *fiber.Ctx) error {
