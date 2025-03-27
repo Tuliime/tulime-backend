@@ -234,7 +234,7 @@ type Store struct {
 	CreatedAt           time.Time `gorm:"column:createdAt;index" json:"createdAt"`
 	UpdatedAt           time.Time `gorm:"column:updatedAt;index" json:"updatedAt"`
 	User                *User     `gorm:"foreignKey:UserID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
-	Advert              *Advert   `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	Advert              []*Advert `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 }
 
 type Advert struct {
