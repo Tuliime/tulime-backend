@@ -41,6 +41,8 @@ type User struct {
 	Recipient            []*Messenger      `gorm:"foreignKey:RecipientID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 	Store                []*Store          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 	Advert               []*Advert         `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	AdvertView           []*AdvertView     `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	Location             []*Location       `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 	CreatedAt            time.Time         `gorm:"column:createdAt" json:"createdAt"`
 	UpdatedAt            time.Time         `gorm:"column:updatedAt" json:"updatedAt"`
 }
@@ -244,8 +246,9 @@ type Advert struct {
 	ProductName        string          `gorm:"column:productName;not null;index" json:"productName"`
 	ProductDescription string          `gorm:"column:productDescription;not null;index" json:"productDescription"`
 	IsPublished        bool            `gorm:"column:isPublished;default:false;index" json:"isPublished"`
-	AdvertImage        []*AdvertImage  `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"advertImage"`
-	MessengerTag       []*MessengerTag `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	AdvertImage        []*AdvertImage  `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"images"`
+	MessengerTag       []*MessengerTag `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"tags"`
+	AdvertView         []*AdvertView   `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"views"`
 	CreatedAt          time.Time       `gorm:"column:createdAt;index" json:"createdAt"`
 	UpdatedAt          time.Time       `gorm:"column:updatedAt;index" json:"updatedAt"`
 	User               *User           `gorm:"foreignKey:UserID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
@@ -261,6 +264,32 @@ type AdvertImage struct {
 	CreatedAt time.Time `gorm:"column:createdAt;index" json:"createdAt"`
 	UpdatedAt time.Time `gorm:"column:updatedAt;index" json:"updatedAt"`
 	Advert    *Advert   `gorm:"foreignKey:AdvertID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+}
+
+type AdvertView struct {
+	ID         string    `gorm:"column:id;type:uuid;primaryKey" json:"id"`
+	AdvertID   string    `gorm:"column:advertID;not null;index" json:"advertID"`
+	UserID     string    `gorm:"column:userID;not null;index" json:"userID"`
+	LocationID string    `gorm:"column:location;not null" json:"locationID"`
+	Device     string    `gorm:"column:device;default:'UNKNOWN'" json:"device"`
+	CreatedAt  time.Time `gorm:"column:createdAt;index" json:"createdAt"`
+	UpdatedAt  time.Time `gorm:"column:updatedAt;index" json:"updatedAt"`
+	Advert     *Advert   `gorm:"foreignKey:AdvertID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	User       *User     `gorm:"foreignKey:UserID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	Location   *Location `gorm:"foreignKey:LocationID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+}
+
+type AdvertImpression struct {
+	ID         string    `gorm:"column:id;type:uuid;primaryKey" json:"id"`
+	AdvertID   string    `gorm:"column:advertID;not null;index" json:"advertID"`
+	UserID     string    `gorm:"column:userID;not null;index" json:"userID"`
+	LocationID string    `gorm:"column:location;not null" json:"locationID"`
+	Device     string    `gorm:"column:device;default:'UNKNOWN'" json:"device"`
+	CreatedAt  time.Time `gorm:"column:createdAt;index" json:"createdAt"`
+	UpdatedAt  time.Time `gorm:"column:updatedAt;index" json:"updatedAt"`
+	Advert     *Advert   `gorm:"foreignKey:AdvertID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	User       *User     `gorm:"foreignKey:UserID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	Location   *Location `gorm:"foreignKey:LocationID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 }
 
 type MessengerRoom struct {
@@ -307,6 +336,17 @@ type MessengerTag struct {
 	CreatedAt   time.Time `gorm:"column:createdAt;index" json:"createdAt"`
 	UpdatedAt   time.Time `gorm:"column:updatedAt;index" json:"updatedAt"`
 	Advert      *Advert   `gorm:"foreignKey:AdvertID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+}
+
+type Location struct {
+	ID               string              `gorm:"column:id;type:uuid;primaryKey" json:"id"`
+	UserID           string              `gorm:"column:userID;not null;index" json:"userID"`
+	Info             JSONB               `gorm:"column:info;type:jsonb;not null;" json:"info"`
+	CreatedAt        time.Time           `gorm:"column:createdAt;index" json:"createdAt"`
+	UpdatedAt        time.Time           `gorm:"column:updatedAt;index" json:"updatedAt"`
+	User             *User               `gorm:"foreignKey:UserID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	AdvertView       []*AdvertView       `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	AdvertImpression []*AdvertImpression `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 }
 
 // Other Types

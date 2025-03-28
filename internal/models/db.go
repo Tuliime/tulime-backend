@@ -57,12 +57,17 @@ func Db() *gorm.DB {
 			&News{}, &FarmInputs{}, &OTP{}, &FarmManager{}, &VetDoctor{},
 			&Chatroom{}, &ChatroomFile{}, &ChatroomMention{}, &Chatbot{},
 			&Session{}, &OnlineStatus{}, &Device{}, &Notification{}, &Store{},
-			&Advert{}, &AdvertImage{}, &MessengerRoom{}, &Messenger{}, &MessengerFile{},
-			&MessengerTag{})
+			&Advert{}, &AdvertImage{}, &AdvertView{}, &AdvertImpression{},
+			&MessengerRoom{}, &Messenger{}, &MessengerFile{}, &MessengerTag{},
+			&MessengerTag{}, &Location{})
 		if err != nil {
 			log.Fatal("Failed to make auto migration", err)
 		}
 		log.Println("Auto Migration successful")
+
+		if err := CreateLocationInfoGINIndex(gormDB); err != nil {
+			log.Printf("Failed to create GIN index on locations table: %v" + err.Error())
+		}
 
 	})
 
