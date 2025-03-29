@@ -66,7 +66,7 @@ var PostAdvertView = func(c *fiber.Ctx) error {
 			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 		}
 		newLocation, err := location.Create(models.Location{UserID: userID,
-			Info: models.JSONB(ipinfoJson)})
+			Info: models.JSONB(ipinfoJson)}, clientIP)
 		if err != nil {
 			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 		}
