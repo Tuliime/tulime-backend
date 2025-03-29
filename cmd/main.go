@@ -178,6 +178,7 @@ func main() {
 	advertGroup.Post("/:id/image", middlewares.Auth, adverts.PostAdvertImage)
 	advertGroup.Patch("/:id/image/:advertImageID", middlewares.Auth, adverts.UpdateAdvertImage)
 	advertGroup.Post("/views", middlewares.Auth, adverts.PostAdvertView)
+	advertGroup.Get("/:id/views/count", middlewares.Auth, adverts.GetViewCountByAdvert)
 
 	// ChatBoot
 	chatBotGroup := app.Group("/api/v0.01/chatbot", func(c *fiber.Ctx) error {
