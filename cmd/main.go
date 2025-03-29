@@ -21,6 +21,7 @@ import (
 	"github.com/Tuliime/tulime-backend/internal/handlers/notification"
 	"github.com/Tuliime/tulime-backend/internal/handlers/status"
 	"github.com/Tuliime/tulime-backend/internal/handlers/store"
+	"github.com/Tuliime/tulime-backend/internal/handlers/storefeedback"
 	"github.com/Tuliime/tulime-backend/internal/handlers/vetdoctor"
 	"github.com/Tuliime/tulime-backend/internal/middlewares"
 	"github.com/Tuliime/tulime-backend/internal/packages"
@@ -166,6 +167,10 @@ func main() {
 	storeGroup.Patch("/:id/logo", middlewares.Auth, store.UpdateStoreLogo)
 	storeGroup.Get("/", middlewares.Auth, store.GetAllStores)
 	storeGroup.Get("/user/:userID", middlewares.Auth, store.GetStoresByUser)
+	storeGroup.Post("/:id/feedback", middlewares.Auth, storefeedback.PostStoreFeedback)
+	storeGroup.Patch("/:id/feedback/:feedbackID", middlewares.Auth,
+		storefeedback.UpdateStoreFeedback)
+	storeGroup.Get("/:id/feedback", middlewares.Auth, storefeedback.GetFeedbackByStore)
 
 	// E-commerce Adverts
 	advertGroup := app.Group("/api/v0.01/adverts", func(c *fiber.Ctx) error {

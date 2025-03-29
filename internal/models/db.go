@@ -58,8 +58,8 @@ func Db() *gorm.DB {
 			&Chatroom{}, &ChatroomFile{}, &ChatroomMention{}, &Chatbot{},
 			&Session{}, &OnlineStatus{}, &Device{}, &Notification{}, &Store{},
 			&Advert{}, &AdvertImage{}, &AdvertView{}, &AdvertImpression{},
-			&MessengerRoom{}, &Messenger{}, &MessengerFile{}, &MessengerTag{},
-			&MessengerTag{}, &Location{})
+			&StoreFeedback{}, &StoreFeedbackFile{}, &MessengerRoom{}, &Messenger{},
+			&MessengerFile{}, &MessengerTag{}, &MessengerTag{}, &Location{})
 		if err != nil {
 			log.Fatal("Failed to make auto migration", err)
 		}

@@ -43,6 +43,7 @@ type User struct {
 	Advert               []*Advert         `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 	AdvertView           []*AdvertView     `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 	Location             []*Location       `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	StoreFeedback        []*StoreFeedback  `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 	CreatedAt            time.Time         `gorm:"column:createdAt" json:"createdAt"`
 	UpdatedAt            time.Time         `gorm:"column:updatedAt" json:"updatedAt"`
 }
@@ -221,22 +222,23 @@ type Notification struct {
 }
 
 type Store struct {
-	ID                  string    `gorm:"column:id;type:uuid;primaryKey" json:"id"`
-	UserID              string    `gorm:"column:userID;not null;index" json:"userID"`
-	Name                string    `gorm:"column:name;not null;index" json:"name"`
-	Description         string    `gorm:"column:description;default:null;index" json:"description"`
-	Website             string    `gorm:"column:website;default:null" json:"website"`
-	Email               string    `gorm:"column:email;unique;default:null" json:"email"`
-	Location            string    `gorm:"column:location;default:null" json:"location"` //TODO: To use json data type
-	LogoUrl             string    `gorm:"column:logoUrl;default:null" json:"logoUrl"`
-	LogoPath            string    `gorm:"column:logoPath;default:null" json:"logoPath"`
-	BackgroundImageUrl  string    `gorm:"column:backgroundImageUrl;default:null" json:"backgroundImageUrl"`
-	BackgroundImagePath string    `gorm:"column:backgroundImagePath;default:null" json:"backgroundImagePath"`
-	Type                string    `gorm:"column:type;default:'INDIVIDUAL'" json:"type"`
-	CreatedAt           time.Time `gorm:"column:createdAt;index" json:"createdAt"`
-	UpdatedAt           time.Time `gorm:"column:updatedAt;index" json:"updatedAt"`
-	User                *User     `gorm:"foreignKey:UserID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
-	Advert              []*Advert `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	ID                  string           `gorm:"column:id;type:uuid;primaryKey" json:"id"`
+	UserID              string           `gorm:"column:userID;not null;index" json:"userID"`
+	Name                string           `gorm:"column:name;not null;index" json:"name"`
+	Description         string           `gorm:"column:description;default:null;index" json:"description"`
+	Website             string           `gorm:"column:website;default:null" json:"website"`
+	Email               string           `gorm:"column:email;unique;default:null" json:"email"`
+	Location            string           `gorm:"column:location;default:null" json:"location"` //TODO: To use json data type
+	LogoUrl             string           `gorm:"column:logoUrl;default:null" json:"logoUrl"`
+	LogoPath            string           `gorm:"column:logoPath;default:null" json:"logoPath"`
+	BackgroundImageUrl  string           `gorm:"column:backgroundImageUrl;default:null" json:"backgroundImageUrl"`
+	BackgroundImagePath string           `gorm:"column:backgroundImagePath;default:null" json:"backgroundImagePath"`
+	Type                string           `gorm:"column:type;default:'INDIVIDUAL'" json:"type"`
+	CreatedAt           time.Time        `gorm:"column:createdAt;index" json:"createdAt"`
+	UpdatedAt           time.Time        `gorm:"column:updatedAt;index" json:"updatedAt"`
+	User                *User            `gorm:"foreignKey:UserID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	Advert              []*Advert        `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	StoreFeedback       []*StoreFeedback `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 }
 
 type Advert struct {
@@ -290,6 +292,29 @@ type AdvertImpression struct {
 	Advert     *Advert   `gorm:"foreignKey:AdvertID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 	User       *User     `gorm:"foreignKey:UserID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 	Location   *Location `gorm:"foreignKey:LocationID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+}
+
+type StoreFeedback struct {
+	ID          string              `gorm:"column:id;type:uuid;primaryKey" json:"id"`
+	StoreID     string              `gorm:"column:storeID;not null;index" json:"storeID"`
+	UserID      string              `gorm:"column:userID;not null;index" json:"userID"`
+	Title       string              `gorm:"column:title;not null" json:"title"`
+	Description string              `gorm:"column:description;not null" json:"description"`
+	Reply       string              `gorm:"column:reply;default:null;index" json:"reply"`
+	File        []StoreFeedbackFile `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"files"`
+	CreatedAt   time.Time           `gorm:"column:createdAt;index" json:"createdAt"`
+	UpdatedAt   time.Time           `gorm:"column:updatedAt;index" json:"updatedAt"`
+	Store       *Store              `gorm:"foreignKey:StoreID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	User        *User               `gorm:"foreignKey:UserID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+}
+
+type StoreFeedbackFile struct {
+	ID              string    `gorm:"column:id;type:uuid;primaryKey" json:"id"`
+	StoreFeedbackID string    `gorm:"column:storeFeedbackID;not null;index" json:"storeFeedbackID"`
+	URL             string    `gorm:"column:url;not null" json:"url"`
+	Path            string    `gorm:"column:path;not null" json:"path"`
+	CreatedAt       time.Time `gorm:"column:createdAt;index" json:"createdAt"`
+	UpdatedAt       time.Time `gorm:"column:updatedAt;index" json:"updatedAt"`
 }
 
 type MessengerRoom struct {
