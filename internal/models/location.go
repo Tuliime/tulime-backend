@@ -1,6 +1,8 @@
 package models
 
 import (
+	"log"
+
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
@@ -11,11 +13,14 @@ func (l *Location) BeforeCreate(tx *gorm.DB) error {
 	return nil
 }
 
-func (l *Location) Create(location Location) (Location, error) {
+func (l *Location) Create(location Location, ip string) (Location, error) {
 	result := db.Create(&location)
 
 	if result.Error != nil {
 		return location, result.Error
+	}
+	if err := l.WriteToCache(location, ip); err != nil {
+		log.Println(err)
 	}
 	return location, nil
 }
@@ -30,6 +35,11 @@ func (l *Location) FindOne(id string) (Location, error) {
 // GetLocationByIP fetches a location record where Info.query matches the given IP
 func (l *Location) FindByIP(ip string) (Location, error) {
 	var location Location
+
+	location, _ = l.ReadFromCache(ip)
+	if location.ID != "" {
+		return location, nil
+	}
 
 	// Query using PostgreSQL JSONB extraction
 	db.Where("info->>'query' = ?", ip).First(&location)
