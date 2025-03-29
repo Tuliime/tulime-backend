@@ -49,7 +49,7 @@ func (av *AdvertView) FindByAdvert(advertID string, limit float64, cursor string
 func (av *AdvertView) FindCountByAdvert(advertID string) (int64, error) {
 	var viewCount int64
 
-	err := db.Model(&AdvertView{}).Where("advertID = ?", advertID).Count(&viewCount).Error
+	err := db.Model(&AdvertView{}).Where("\"advertID\" = ?", advertID).Count(&viewCount).Error
 	if err != nil {
 		return 0, err
 	}
@@ -63,7 +63,7 @@ func (av *AdvertView) Update() (AdvertView, error) {
 	return *av, nil
 }
 
-// TODO: consider soft deleting the Location
+// TODO: consider soft deleting the AdvertImpression
 func (av *AdvertView) Delete(id string) error {
 	if err := db.Unscoped().Where("id = ?", id).Delete(&AdvertView{}).Error; err != nil {
 		return err
