@@ -8,6 +8,8 @@ import (
 var GetAdvert = func(c *fiber.Ctx) error {
 	advert := models.Advert{}
 	advertView := models.AdvertView{}
+	advertImpression := models.AdvertImpression{}
+
 	advertID := c.Params("id")
 	userID := c.Locals("userID")
 
@@ -20,9 +22,13 @@ var GetAdvert = func(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusNotFound, "Advert of provided id is not found!")
 	}
 
-	var advertViewCount int64
+	var advertViewCount, advertImpressionCount int64
 	if advert.UserID == userID {
 		advertViewCount, err = advertView.FindCountByAdvert(advertID)
+		if err != nil {
+			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		}
+		advertImpressionCount, err = advertImpression.FindCountByAdvert(advertID)
 		if err != nil {
 			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 		}
@@ -30,7 +36,10 @@ var GetAdvert = func(c *fiber.Ctx) error {
 
 	advertMap := fiber.Map{
 		"advert": advert,
-		"count":  advertViewCount,
+		"count": fiber.Map{
+			"viewCount":       advertViewCount,
+			"impressionCount": advertImpressionCount,
+		},
 	}
 
 	response := fiber.Map{
