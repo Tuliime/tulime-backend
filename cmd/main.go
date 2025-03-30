@@ -178,6 +178,8 @@ func main() {
 	})
 	advertGroup.Post("/", middlewares.Auth, adverts.PostAdvert)
 	advertGroup.Patch("/:id", middlewares.Auth, adverts.UpdateAdvert)
+	advertGroup.Patch("/:id/publish", middlewares.Auth, adverts.PublishAdvert)
+	advertGroup.Patch("/:id/unpublish", middlewares.Auth, adverts.UnpublishAdvert)
 	advertGroup.Get("/:id", middlewares.Auth, adverts.GetAdvert)
 	advertGroup.Get("/", middlewares.Auth, adverts.GetAllAdverts)
 	advertGroup.Get("/user/:userID", middlewares.Auth, adverts.GetAdvertsByUser)
