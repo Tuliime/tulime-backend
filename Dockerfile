@@ -1,12 +1,14 @@
-FROM golang:1.23.0-alpine
+FROM golang:1.23.0-bullseye
 
 WORKDIR /app
 
-RUN apk add --no-cache \
-    libvips \
+# Install libvips and gcc
+RUN apt-get update && apt-get install -y \
+    libvips-dev \
     gcc \
     g++ \
-    musl-dev
+    musl-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY . .
 
