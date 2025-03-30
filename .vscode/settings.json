@@ -3,6 +3,7 @@
     "Agro",
     "Agroproduct",
     "agroproducts",
+    "bimg",
     "chans",
     "farminputs",
     "farmmanager",
@@ -25,6 +26,7 @@
     "tuliime",
     "tulime",
     "typingstatus",
-    "valyala"
+    "valyala",
+    "WEBP"
   ]
 }
