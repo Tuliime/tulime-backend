@@ -298,6 +298,7 @@ type StoreFeedback struct {
 	ID          string              `gorm:"column:id;type:uuid;primaryKey" json:"id"`
 	StoreID     string              `gorm:"column:storeID;not null;index" json:"storeID"`
 	UserID      string              `gorm:"column:userID;not null;index" json:"userID"`
+	Experience  string              `gorm:"column:experience;not null" json:"experience"`
 	Title       string              `gorm:"column:title;not null" json:"title"`
 	Description string              `gorm:"column:description;not null" json:"description"`
 	Reply       string              `gorm:"column:reply;default:null;index" json:"reply"`

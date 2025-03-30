@@ -20,13 +20,14 @@ var PostStoreFeedback = func(c *fiber.Ctx) error {
 	feedback.UserID = userID
 	feedback.StoreID = storeID
 
+	feedback.Experience = c.FormValue("experience")
 	feedback.Title = c.FormValue("title")
 	feedback.Description = c.FormValue("description")
 
 	var fileUploaded bool = true
 
-	if feedback.Title == "" || feedback.Description == "" {
-		return fiber.NewError(fiber.StatusBadRequest, "Missing title/description !")
+	if feedback.Title == "" || feedback.Description == "" || feedback.Experience == "" {
+		return fiber.NewError(fiber.StatusBadRequest, "Missing title/description/experience!")
 	}
 
 	multipartForm, err := c.MultipartForm()
