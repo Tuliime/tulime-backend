@@ -180,7 +180,7 @@ func main() {
 	advertGroup.Patch("/:id", middlewares.Auth, adverts.UpdateAdvert)
 	advertGroup.Get("/:id", middlewares.Auth, adverts.GetAdvert)
 	advertGroup.Get("/", middlewares.Auth, adverts.GetAllAdverts)
-	advertGroup.Patch("/user/:userID", middlewares.Auth, adverts.GetAdvertsByUser)
+	advertGroup.Get("/user/:userID", middlewares.Auth, adverts.GetAdvertsByUser)
 	advertGroup.Post("/:id/image", middlewares.Auth, adverts.PostAdvertImage)
 	advertGroup.Patch("/:id/image/:advertImageID", middlewares.Auth, adverts.UpdateAdvertImage)
 	advertGroup.Post("/views", middlewares.Auth, adverts.PostAdvertView)

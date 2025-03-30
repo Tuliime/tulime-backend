@@ -1,7 +1,7 @@
 package adverts
 
 import (
-	"strconv"
+	"fmt"
 
 	"github.com/Tuliime/tulime-backend/internal/models"
 	"github.com/Tuliime/tulime-backend/internal/packages"
@@ -11,7 +11,6 @@ import (
 var PostAdvertImage = func(c *fiber.Ctx) error {
 	advertID := c.Params("id")
 	advert := models.Advert{}
-	isPrimaryImageStr := c.FormValue("isPrimary")
 	advertImage := models.AdvertImage{AdvertID: advertID}
 
 	savedAdvert, err := advert.FindOne(advertID)
@@ -23,55 +22,58 @@ var PostAdvertImage = func(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusNotFound, "Advert of provided id is not found!")
 	}
 
-	if isPrimaryImageStr == "" {
-		isPrimaryImageStr = "false"
-	}
-
-	isPrimary, err := strconv.ParseBool(isPrimaryImageStr)
+	multipartForm, err := c.MultipartForm()
 	if err != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		return c.Status(fiber.StatusBadRequest).SendString("Error parsing form")
 	}
 
-	fileHeader, err := c.FormFile("file")
-	if err != nil {
-		return fiber.NewError(fiber.StatusBadRequest, err.Error())
-	}
+	fileHeaders := multipartForm.File["files"]
 
-	var filePath string
-	var imageUrl string
+	var advertImages []models.AdvertImage
 
-	// Validate file size (10 MB limit)
+	// Validate image sizes (10 MB limit)
 	const maxFileSize = 10 << 20 // 10 MB in bytes
-	if fileHeader.Size > maxFileSize {
-		return fiber.NewError(fiber.StatusBadRequest, "File size exceeds the 10 MB limit")
-	}
-	file, err := fileHeader.Open()
-	if err != nil {
-		return fiber.NewError(fiber.StatusBadRequest, err.Error())
-	}
-	defer file.Close()
+	for _, fileHeader := range fileHeaders {
+		if fileHeader.Size > maxFileSize {
+			return fiber.NewError(fiber.StatusBadRequest,
+				fmt.Sprintf("%s exceeds the 10 MB limit", fileHeader.Filename))
+		}
 
-	filePath = packages.GenFilePath(fileHeader.Filename)
-	firebaseStorage := packages.FirebaseStorage{FilePath: filePath}
-
-	imageUrl, err = firebaseStorage.Add(file, fileHeader)
-	if err != nil {
-		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
 
-	advertImage.URL = imageUrl
-	advertImage.Path = filePath
-	advertImage.IsPrimary = isPrimary
+	// upload images
+	for _, fileHeader := range fileHeaders {
+		file, err := fileHeader.Open()
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
+		defer file.Close()
 
-	newAdvertImage, err := advertImage.Update()
-	if err != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		filePath := packages.GenFilePath(fileHeader.Filename)
+		firebaseStorage := packages.FirebaseStorage{FilePath: filePath}
+
+		imageUrl, err := firebaseStorage.Add(file, fileHeader)
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
+
+		advertImages = append(advertImages,
+			models.AdvertImage{AdvertID: savedAdvert.ID,
+				URL: imageUrl, Path: filePath})
+
+	}
+
+	if len(advertImages) > 0 {
+		advertImages, err = advertImage.CreateMany(advertImages)
+		if err != nil {
+			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		}
 	}
 
 	response := fiber.Map{
 		"status":  "success",
-		"message": "Advert Image uploaded successfully!",
-		"data":    newAdvertImage,
+		"message": "Advert Images uploaded successfully!",
+		"data":    advertImages,
 	}
 
 	return c.Status(fiber.StatusCreated).JSON(response)

@@ -22,7 +22,7 @@ func (f *StoreFeedback) Create(feedback StoreFeedback) (StoreFeedback, error) {
 
 func (f *StoreFeedback) FindOne(id string) (StoreFeedback, error) {
 	var feedback StoreFeedback
-	db.Preload("File").Preload("User").First(&feedback, "id = ?", id)
+	db.First(&feedback, "id = ?", id)
 
 	return feedback, nil
 }

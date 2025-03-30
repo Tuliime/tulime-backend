@@ -22,6 +22,15 @@ func (adi *AdvertImage) Create(image AdvertImage) (AdvertImage, error) {
 	return image, nil
 }
 
+func (adi *AdvertImage) CreateMany(images []AdvertImage) ([]AdvertImage, error) {
+	result := db.Create(&images)
+
+	if result.Error != nil {
+		return images, result.Error
+	}
+	return images, nil
+}
+
 func (adi *AdvertImage) FindOne(id string) (AdvertImage, error) {
 	var image AdvertImage
 	db.First(&image, "id = ?", id)

@@ -12,10 +12,9 @@ var UpdateAdvert = func(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
 
-	if advert.StoreID == "" || advert.UserID == "" ||
-		advert.ProductName == "" || advert.ProductDescription == "" {
+	if advert.ProductName == "" || advert.ProductDescription == "" {
 		return fiber.NewError(fiber.StatusBadRequest,
-			"Missing StoreID/UserID/ProductName/ProductDescription!")
+			"Missing ProductName/ProductDescription!")
 	}
 
 	savedAdvert, err := advert.FindOne(advertID)
@@ -41,5 +40,5 @@ var UpdateAdvert = func(c *fiber.Ctx) error {
 		"data":    updatedAdvert,
 	}
 
-	return c.Status(fiber.StatusCreated).JSON(response)
+	return c.Status(fiber.StatusOK).JSON(response)
 }
