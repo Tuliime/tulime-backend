@@ -54,5 +54,5 @@ var UpdateStore = func(c *fiber.Ctx) error {
 		"data":    updatedStore,
 	}
 
-	return c.Status(fiber.StatusCreated).JSON(response)
+	return c.Status(fiber.StatusOK).JSON(response)
 }

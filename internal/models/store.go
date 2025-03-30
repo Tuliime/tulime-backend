@@ -38,14 +38,14 @@ func (s *Store) FindByName(name string) (Store, error) {
 
 func (s *Store) FindByUSer(userID string, limit float64, cursor string) ([]Store, error) {
 	var stores []Store
-	query := db.Order("\"createAt\" DESC").Limit(int(limit))
+	query := db.Order("\"createdAt\" DESC").Limit(int(limit))
 
 	if cursor != "" {
 		var lastStore Store
-		if err := db.Select("\"createAt\"").Where("id = ?", cursor).First(&lastStore).Error; err != nil {
+		if err := db.Select("\"createdAt\"").Where("id = ?", cursor).First(&lastStore).Error; err != nil {
 			return nil, err
 		}
-		query = query.Where("\"createAt\" < ?", lastStore.CreatedAt)
+		query = query.Where("\"createdAt\" < ?", lastStore.CreatedAt)
 	}
 	if err := query.Where("\"userID\" = ?", userID).Find(&stores).Error; err != nil {
 		return nil, err
@@ -79,17 +79,17 @@ func (cr *Store) FindAll(limit float64, cursor string, includeCursor bool, direc
 
 func (s *Store) FindAllInDESCOrder(limit float64, cursor string, includeCursor bool) ([]Store, error) {
 	var stores []Store
-	query := db.Order("\"createAt\" DESC").Limit(int(limit))
+	query := db.Order("\"createdAt\" DESC").Limit(int(limit))
 
 	if cursor != "" {
 		var lastStore Store
-		if err := db.Select("\"createAt\"").Where("id = ?", cursor).First(&lastStore).Error; err != nil {
+		if err := db.Select("\"createdAt\"").Where("id = ?", cursor).First(&lastStore).Error; err != nil {
 			return nil, err
 		}
 		if includeCursor {
-			query = query.Where("\"createAt\" <= ?", lastStore.CreatedAt)
+			query = query.Where("\"createdAt\" <= ?", lastStore.CreatedAt)
 		} else {
-			query = query.Where("\"createAt\" < ?", lastStore.CreatedAt)
+			query = query.Where("\"createdAt\" < ?", lastStore.CreatedAt)
 		}
 	}
 

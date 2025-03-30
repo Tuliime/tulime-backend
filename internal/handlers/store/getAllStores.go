@@ -85,13 +85,9 @@ var GetAllStores = func(c *fiber.Ctx) error {
 		"direction":     direction,
 	}
 
-	storeMap := fiber.Map{
-		"stores": stores,
-	}
-
 	response := fiber.Map{
 		"status":     "success",
-		"data":       storeMap,
+		"data":       stores,
 		"pagination": pagination,
 	}
 
