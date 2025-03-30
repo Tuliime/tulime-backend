@@ -3,6 +3,7 @@
     "Agro",
     "Agroproduct",
     "agroproducts",
+    "bimg",
     "chans",
     "farminputs",
     "farmmanager",
@@ -13,6 +14,7 @@
     "gorm",
     "ipinfo",
     "joho",
+    "libvips",
     "Metageneration",
     "msgrf",
     "msgrr",
@@ -25,6 +27,7 @@
     "tuliime",
     "tulime",
     "typingstatus",
-    "valyala"
+    "valyala",
+    "WEBP"
   ]
 }

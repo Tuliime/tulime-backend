@@ -3,6 +3,7 @@ package chatroom
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"time"
 
 	"github.com/Tuliime/tulime-backend/internal/constants"
@@ -10,6 +11,7 @@ import (
 	"github.com/Tuliime/tulime-backend/internal/models"
 	"github.com/Tuliime/tulime-backend/internal/packages"
 	"github.com/gofiber/fiber/v2"
+	"github.com/h2non/bimg"
 )
 
 var PostChat = func(c *fiber.Ctx) error {
@@ -43,7 +45,7 @@ var PostChat = func(c *fiber.Ctx) error {
 	}
 	fmt.Printf("Mentions: %v\n", mentions)
 
-	file, err := c.FormFile("file")
+	fileHeader, err := c.FormFile("file")
 	if err != nil {
 		if err.Error() == constants.NO_FILE_UPLOADED_ERROR {
 			fmt.Println("No file uploaded")
@@ -62,23 +64,40 @@ var PostChat = func(c *fiber.Ctx) error {
 	var imageUrl string
 	var chatRoomFile models.ChatroomFile
 	var chatRoomMentions []models.ChatroomMention
+	dimensions := struct {
+		Height int `json:"height"`
+		Width  int `json:"Width"`
+	}{Height: 0, Width: 0}
 
 	if fileUploaded {
 		// Validate file size (10 MB limit)
 		const maxFileSize = 10 << 20 // 10 MB in bytes
-		if file.Size > maxFileSize {
+		if fileHeader.Size > maxFileSize {
 			return fiber.NewError(fiber.StatusBadRequest, "File size exceeds the 10 MB limit")
 		}
-		fileReader, err := file.Open()
+		file, err := fileHeader.Open()
 		if err != nil {
 			return fiber.NewError(fiber.StatusBadRequest, err.Error())
 		}
-		defer fileReader.Close()
+		defer file.Close()
 
-		filePath = packages.GenFilePath(file.Filename)
+		// Get image dimensions
+		buf, err := io.ReadAll(file)
+		if err != nil {
+			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		}
+		image := bimg.NewImage(buf)
+		size, err := image.Size()
+		if err != nil {
+			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		}
+		dimensions.Height = size.Height
+		dimensions.Width = size.Width
+
+		filePath = packages.GenFilePath(fileHeader.Filename)
 		firebaseStorage := packages.FirebaseStorage{FilePath: filePath}
 
-		imageUrl, err = firebaseStorage.Add(fileReader, file)
+		imageUrl, err = firebaseStorage.Add(file, fileHeader)
 		if err != nil {
 			return fiber.NewError(fiber.StatusBadRequest, err.Error())
 		}
@@ -93,7 +112,12 @@ var PostChat = func(c *fiber.Ctx) error {
 
 	// Save chatFile
 	if imageUrl != "" {
-		chatRoomFile = models.ChatroomFile{ChatroomID: newChatRoom.ID, URL: imageUrl, Path: filePath}
+		dimensionJson, err := json.Marshal(dimensions)
+		if err != nil {
+			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		}
+		chatRoomFile = models.ChatroomFile{ChatroomID: newChatRoom.ID,
+			URL: imageUrl, Path: filePath, Dimensions: models.JSONB(dimensionJson)}
 		newChatRoomFile, err := chatRoomFile.Create(chatRoomFile)
 		if err != nil {
 			return fiber.NewError(fiber.StatusInternalServerError, err.Error())

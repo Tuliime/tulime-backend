@@ -3,6 +3,7 @@ package messenger
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"time"
 
@@ -11,6 +12,7 @@ import (
 	"github.com/Tuliime/tulime-backend/internal/models"
 	"github.com/Tuliime/tulime-backend/internal/packages"
 	"github.com/gofiber/fiber/v2"
+	"github.com/h2non/bimg"
 )
 
 var PostMessage = func(c *fiber.Ctx) error {
@@ -47,7 +49,7 @@ var PostMessage = func(c *fiber.Ctx) error {
 	}
 	fmt.Printf("tags: %v\n", tags)
 
-	file, err := c.FormFile("file")
+	fileReader, err := c.FormFile("file")
 	if err != nil {
 		if err.Error() == constants.NO_FILE_UPLOADED_ERROR {
 			fmt.Println("No file uploaded")
@@ -66,23 +68,40 @@ var PostMessage = func(c *fiber.Ctx) error {
 	var imageUrl string
 	var messengerFile models.MessengerFile
 	var messengerTags []models.MessengerTag
+	dimensions := struct {
+		Height int `json:"height"`
+		Width  int `json:"Width"`
+	}{Height: 0, Width: 0}
 
 	if fileUploaded {
 		// Validate file size (10 MB limit)
 		const maxFileSize = 10 << 20 // 10 MB in bytes
-		if file.Size > maxFileSize {
+		if fileReader.Size > maxFileSize {
 			return fiber.NewError(fiber.StatusBadRequest, "File size exceeds the 10 MB limit")
 		}
-		fileReader, err := file.Open()
+		file, err := fileReader.Open()
 		if err != nil {
 			return fiber.NewError(fiber.StatusBadRequest, err.Error())
 		}
-		defer fileReader.Close()
+		defer file.Close()
 
-		filePath = packages.GenFilePath(file.Filename)
+		// Get image dimensions
+		buf, err := io.ReadAll(file)
+		if err != nil {
+			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		}
+		image := bimg.NewImage(buf)
+		size, err := image.Size()
+		if err != nil {
+			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		}
+		dimensions.Height = size.Height
+		dimensions.Width = size.Width
+
+		filePath = packages.GenFilePath(fileReader.Filename)
 		firebaseStorage := packages.FirebaseStorage{FilePath: filePath}
 
-		imageUrl, err = firebaseStorage.Add(fileReader, file)
+		imageUrl, err = firebaseStorage.Add(file, fileReader)
 		if err != nil {
 			return fiber.NewError(fiber.StatusBadRequest, err.Error())
 		}
@@ -116,7 +135,12 @@ var PostMessage = func(c *fiber.Ctx) error {
 
 	// Save messengerFile
 	if imageUrl != "" {
-		messengerFile = models.MessengerFile{MessengerID: newMessage.ID, URL: imageUrl, Path: filePath}
+		dimensionJson, err := json.Marshal(dimensions)
+		if err != nil {
+			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		}
+		messengerFile = models.MessengerFile{MessengerID: newMessage.ID,
+			URL: imageUrl, Path: filePath, Dimensions: models.JSONB(dimensionJson)}
 		newChatRoomFile, err := messengerFile.Create(messengerFile)
 		if err != nil {
 			return fiber.NewError(fiber.StatusInternalServerError, err.Error())

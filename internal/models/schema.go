@@ -160,6 +160,7 @@ type ChatroomFile struct {
 	ChatroomID string         `gorm:"column:chatroomID;not null;index" json:"chatroomID"`
 	URL        string         `gorm:"column:url;not null" json:"url"`
 	Path       string         `gorm:"column:path;not null" json:"path"`
+	Dimensions JSONB          `gorm:"column:dimensions;type:jsonb" json:"dimensions"`
 	CreatedAt  time.Time      `gorm:"column:createdAt;index" json:"createdAt"`
 	UpdatedAt  time.Time      `gorm:"column:updatedAt;index" json:"updatedAt"`
 	DeletedAt  gorm.DeletedAt `gorm:"column:deletedAt;index" json:"deletedAt"`
@@ -351,6 +352,7 @@ type MessengerFile struct {
 	MessengerID string    `gorm:"column:messengerID;not null;index" json:"messengerID"`
 	URL         string    `gorm:"column:url;not null" json:"url"`
 	Path        string    `gorm:"column:path;not null" json:"path"`
+	Dimensions  JSONB     `gorm:"column:dimensions;type:jsonb" json:"dimensions"`
 	CreatedAt   time.Time `gorm:"column:createdAt;index" json:"createdAt"`
 	UpdatedAt   time.Time `gorm:"column:updatedAt;index" json:"updatedAt"`
 }
