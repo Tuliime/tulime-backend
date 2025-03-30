@@ -17,7 +17,7 @@ var GetAdvertsByUser = func(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
 
-	adverts, err := advert.FindByUSer(userID, limit+1, cursorParam)
+	adverts, err := advert.FindByUser(userID, limit+1, cursorParam)
 	if err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}

@@ -24,7 +24,7 @@ func (ad *Advert) Create(advert Advert) (Advert, error) {
 
 func (ad *Advert) FindOne(id string) (Advert, error) {
 	var advert Advert
-	db.Preload("AdvertImage").Preload("Store").First(&advert, "id = ?", id)
+	db.First(&advert, "id = ?", id)
 
 	return advert, nil
 }
@@ -36,16 +36,16 @@ func (ad *Advert) FindByName(name string) (Advert, error) {
 	return advert, nil
 }
 
-func (ad *Advert) FindByUSer(userID string, limit float64, cursor string) ([]Advert, error) {
+func (ad *Advert) FindByUser(userID string, limit float64, cursor string) ([]Advert, error) {
 	var adverts []Advert
-	query := db.Order("\"createAt\" DESC").Limit(int(limit))
+	query := db.Order("\"createdAt\" DESC").Limit(int(limit))
 
 	if cursor != "" {
 		var lastAdvert Advert
-		if err := db.Select("\"createAt\"").Where("id = ?", cursor).First(&lastAdvert).Error; err != nil {
+		if err := db.Select("\"createdAt\"").Where("id = ?", cursor).First(&lastAdvert).Error; err != nil {
 			return nil, err
 		}
-		query = query.Where("\"createAt\" < ?", lastAdvert.CreatedAt)
+		query = query.Where("\"createdAt\" < ?", lastAdvert.CreatedAt)
 	}
 	if err := query.Where("\"userID\" = ?", userID).Find(&adverts).Error; err != nil {
 		return nil, err
@@ -79,17 +79,17 @@ func (ad *Advert) FindAll(limit float64, cursor string, includeCursor bool, dire
 
 func (ad *Advert) FindAllInDescOrder(limit float64, cursor string, includeCursor bool) ([]Advert, error) {
 	var adverts []Advert
-	query := db.Order("\"createAt\" DESC").Limit(int(limit))
+	query := db.Order("\"createdAt\" DESC").Limit(int(limit))
 
 	if cursor != "" {
 		var lastAdvert Advert
-		if err := db.Select("\"createAt\"").Where("id = ?", cursor).First(&lastAdvert).Error; err != nil {
+		if err := db.Select("\"createdAt\"").Where("id = ?", cursor).First(&lastAdvert).Error; err != nil {
 			return nil, err
 		}
 		if includeCursor {
-			query = query.Where("\"createAt\" <= ?", lastAdvert.CreatedAt)
+			query = query.Where("\"createdAt\" <= ?", lastAdvert.CreatedAt)
 		} else {
-			query = query.Where("\"createAt\" < ?", lastAdvert.CreatedAt)
+			query = query.Where("\"createdAt\" < ?", lastAdvert.CreatedAt)
 		}
 	}
 
