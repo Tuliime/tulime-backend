@@ -40,13 +40,9 @@ var GetStoresByUser = func(c *fiber.Ctx) error {
 		"hasPrevItems": hasPrevItems,
 	}
 
-	storeMap := fiber.Map{
-		"stores": stores,
-	}
-
 	response := fiber.Map{
 		"status":     "success",
-		"data":       storeMap,
+		"data":       stores,
 		"pagination": pagination,
 	}
 
