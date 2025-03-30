@@ -22,14 +22,14 @@ func (f *StoreFeedback) Create(feedback StoreFeedback) (StoreFeedback, error) {
 
 func (f *StoreFeedback) FindOne(id string) (StoreFeedback, error) {
 	var feedback StoreFeedback
-	db.Preload("StoreFeedbackFile").Preload("User").First(&feedback, "id = ?", id)
+	db.Preload("File").Preload("User").First(&feedback, "id = ?", id)
 
 	return feedback, nil
 }
 
 func (f *StoreFeedback) FindReply(reply string) ([]StoreFeedback, error) {
 	var feedback []StoreFeedback
-	err := db.Preload("StoreFeedbackFile").Preload("User").Where("id = ?", reply).Find(&feedback).Error
+	err := db.Preload("File").Preload("User").Where("id = ?", reply).Find(&feedback).Error
 	if err != nil {
 		return feedback, err
 	}
@@ -40,7 +40,7 @@ func (f *StoreFeedback) FindByStore(storeID string, limit float64,
 	cursor string) ([]StoreFeedback, error) {
 	var feedback []StoreFeedback
 
-	query := db.Preload("StoreFeedbackFile").Preload("User").Order("\"createdAt\" DESC").Limit(int(limit))
+	query := db.Preload("File").Preload("User").Order("\"createdAt\" DESC").Limit(int(limit))
 
 	if cursor != "" {
 		var lastFeedback StoreFeedback

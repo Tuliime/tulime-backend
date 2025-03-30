@@ -13,8 +13,8 @@ var UpdateStoreFeedback = func(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
 
-	if feedback.Title == "" || feedback.Description == "" {
-		return fiber.NewError(fiber.StatusBadRequest, "Missing title/description!")
+	if feedback.Title == "" || feedback.Description == "" || feedback.Experience == "" {
+		return fiber.NewError(fiber.StatusBadRequest, "Missing title/description/experience!")
 	}
 
 	savedFeedback, err := feedback.FindOne(feedbackID)
@@ -23,10 +23,11 @@ var UpdateStoreFeedback = func(c *fiber.Ctx) error {
 
 	}
 
+	savedFeedback.Experience = feedback.Experience
 	savedFeedback.Title = feedback.Title
 	savedFeedback.Description = feedback.Description
 
-	updatedFeedback, err := feedback.Update()
+	updatedFeedback, err := savedFeedback.Update()
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 

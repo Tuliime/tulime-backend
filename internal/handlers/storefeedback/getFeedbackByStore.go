@@ -28,9 +28,13 @@ var GetFeedbackByStore = func(c *fiber.Ctx) error {
 	var feedbackResponse []FeedbackResponse
 
 	for _, feedback := range savedFeedback {
-		replyFeedback, err := feedback.FindReply(feedback.Reply)
-		if err != nil && err.Error() != constants.RECORD_NOT_FOUND_ERROR {
-			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		var replyFeedback []models.StoreFeedback
+
+		if feedback.Reply != "" {
+			replyFeedback, err = feedback.FindReply(feedback.Reply)
+			if err != nil && err.Error() != constants.RECORD_NOT_FOUND_ERROR {
+				return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+			}
 		}
 
 		feedbackResponse = append(feedbackResponse, FeedbackResponse{
@@ -44,7 +48,7 @@ var GetFeedbackByStore = func(c *fiber.Ctx) error {
 			File:          feedback.File,
 			CreatedAt:     feedback.CreatedAt,
 			UpdatedAt:     feedback.UpdatedAt,
-			Store:         *feedback.Store,
+			Store:         feedback.Store,
 			User: User{
 				ID:             feedback.User.ID,
 				Name:           feedback.User.Name,
@@ -111,6 +115,6 @@ type FeedbackResponse struct {
 	File          []models.StoreFeedbackFile `json:"files"`
 	CreatedAt     time.Time                  `json:"createdAt"`
 	UpdatedAt     time.Time                  `json:"updatedAt"`
-	Store         models.Store               `json:"store"`
+	Store         *models.Store              `json:"store"`
 	User          User                       `json:"user"`
 }
