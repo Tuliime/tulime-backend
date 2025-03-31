@@ -1,16 +1,14 @@
 package packages
 
 import (
+	"fmt"
 	"log"
-	"math/rand"
 	"os"
-	"strconv"
 )
 
 // GenFilePath function generates file path for assets
 // to be stored in firebase storage bucket
 func GenFilePath(filename string) string {
-	randNumStr := strconv.Itoa(rand.Intn(9000) + 1000)
 	env := os.Getenv("GO_ENV")
 	var appEnv string
 
@@ -23,7 +21,7 @@ func GenFilePath(filename string) string {
 		log.Fatal("Unrecognized GO_ENV:", env)
 	}
 
-	filePath := "tulime/" + appEnv + "/" + randNumStr + "_" + filename
+	filePath := fmt.Sprintf("tulime/%s/%s", appEnv, GenerateFilename())
 
 	return filePath
 }
