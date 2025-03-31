@@ -1,6 +1,7 @@
 package packages
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -109,6 +110,46 @@ func (fs *FirebaseStorage) Add(file multipart.File, fileHeader *multipart.FileHe
 	return url, nil
 }
 
+func (fs *FirebaseStorage) AddFromBuffer(fileBuffer []byte) (string, error) {
+
+	filePath := fs.FilePath
+	if filePath == "" {
+		firebaseManager.DeleteFile()
+		return "", errors.New("no file path provided")
+	}
+
+	bucket, err := fs.initStorageBucket()
+	if err != nil {
+		log.Println("Error initializing the storage bucket")
+		firebaseManager.DeleteFile()
+		return "", err
+	}
+
+	wc := bucket.Object(filePath).NewWriter(context.Background())
+	_, err = io.Copy(wc, bytes.NewReader(fileBuffer))
+	if err != nil {
+		log.Println("Error copying the file to IO")
+		firebaseManager.DeleteFile()
+		return "", err
+	}
+
+	err = wc.Close()
+	if err != nil {
+		log.Println("Error closing the write operation")
+		firebaseManager.DeleteFile()
+		return "", err
+	}
+
+	url, err := fs.getDownloadURL()
+	if err != nil {
+		log.Println("Error getting thr")
+		firebaseManager.DeleteFile()
+		return "", err
+	}
+
+	return url, nil
+}
+
 func (fs *FirebaseStorage) Update(file multipart.File, fileHeader *multipart.FileHeader, savedFilePath string) (string, error) {
 
 	filePath := fs.FilePath
@@ -124,6 +165,50 @@ func (fs *FirebaseStorage) Update(file multipart.File, fileHeader *multipart.Fil
 
 	wc := bucket.Object(filePath).NewWriter(context.Background())
 	_, err = io.Copy(wc, file)
+	if err != nil {
+		firebaseManager.DeleteFile()
+		return "", err
+	}
+
+	err = wc.Close()
+	if err != nil {
+		firebaseManager.DeleteFile()
+		return "", err
+	}
+
+	url, err := fs.getDownloadURL()
+	if err != nil {
+		firebaseManager.DeleteFile()
+		return "", err
+	}
+
+	if url != "" {
+		if err := fs.Delete(savedFilePath); err != nil {
+			firebaseManager.DeleteFile()
+			return "", err
+		}
+
+		fmt.Println("file deleted from storage using path ==>", savedFilePath)
+	}
+
+	return url, nil
+}
+
+func (fs *FirebaseStorage) UpdateFromBuffer(fileBuffer []byte, savedFilePath string) (string, error) {
+
+	filePath := fs.FilePath
+	if filePath == "" {
+		return "", errors.New("no file path provided")
+	}
+
+	bucket, err := fs.initStorageBucket()
+	if err != nil {
+		firebaseManager.DeleteFile()
+		return "", err
+	}
+
+	wc := bucket.Object(filePath).NewWriter(context.Background())
+	_, err = io.Copy(wc, bytes.NewReader(fileBuffer))
 	if err != nil {
 		firebaseManager.DeleteFile()
 		return "", err
