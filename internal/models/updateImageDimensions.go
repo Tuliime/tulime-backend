@@ -3,7 +3,8 @@ package models
 import (
 	"encoding/json"
 	"log"
-	"time"
+
+	// "time"
 
 	"github.com/Tuliime/tulime-backend/internal/packages"
 )
@@ -54,7 +55,7 @@ func UpdateImageDimensions() {
 	log.Println("====== End update chatroomFile Dimensions ======")
 }
 
-func init() {
-	// Schedule UpdateImageDimensions to run 10 seconds after the server starts
-	time.AfterFunc(10*time.Second, UpdateImageDimensions)
-}
+// func init() {
+// 	// Schedule UpdateImageDimensions to run 10 seconds after the server starts
+// 	time.AfterFunc(10*time.Second, UpdateImageDimensions)
+// }
