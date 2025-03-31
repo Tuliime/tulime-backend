@@ -31,7 +31,7 @@ func (cr *Chatroom) FindOne(id string) (Chatroom, error) {
 
 func (cr *Chatroom) FindReply(reply string) (Chatroom, error) {
 	var chatRoom Chatroom
-	err := db.Preload("File").Preload("Mention").Where("id = ?", reply).First(&chatRoom).Error
+	err := db.Preload("File").Preload("Mention").Preload("User").Where("id = ?", reply).First(&chatRoom).Error
 	if err != nil {
 		return chatRoom, err
 	}
@@ -64,7 +64,7 @@ func (cr *Chatroom) FindAll(limit float64, cursor string, includeCursor bool, di
 func (cr *Chatroom) FindAllInDescendingOrder(limit float64, cursor string, includeCursor bool) ([]Chatroom, error) {
 	var chatRooms []Chatroom
 
-	query := db.Preload("File").Preload("Mention").Order("\"arrivedAt\" DESC").Limit(int(limit))
+	query := db.Preload("File").Preload("Mention").Preload("User").Order("\"arrivedAt\" DESC").Limit(int(limit))
 
 	if cursor != "" {
 		var lastChatroom Chatroom
@@ -93,7 +93,7 @@ func (cr *Chatroom) FindAllInDescendingOrder(limit float64, cursor string, inclu
 func (cr *Chatroom) FindAllInAscendingOrder(limit float64, cursor string, includeCursor bool) ([]Chatroom, error) {
 	var chatRooms []Chatroom
 
-	query := db.Preload("File").Preload("Mention").Order("\"arrivedAt\" ASC").Limit(int(limit))
+	query := db.Preload("File").Preload("Mention").Preload("User").Order("\"arrivedAt\" ASC").Limit(int(limit))
 
 	if cursor != "" {
 		var lastChatroom Chatroom
