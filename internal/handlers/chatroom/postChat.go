@@ -94,10 +94,19 @@ var PostChat = func(c *fiber.Ctx) error {
 		dimensions.Height = size.Height
 		dimensions.Width = size.Width
 
+		// Reset file cursor
+		file.Seek(0, io.SeekStart)
+		// Compress image file
+		imageProcessor := packages.ImageProcessor{}
+		compressedFileBuf, err := imageProcessor.CompressMultipartFile(file, 75)
+		if err != nil {
+			return fiber.NewError(fiber.StatusInternalServerError, "Failed to compress image")
+		}
+
 		filePath = packages.GenFilePath(fileHeader.Filename)
 		firebaseStorage := packages.FirebaseStorage{FilePath: filePath}
 
-		imageUrl, err = firebaseStorage.Add(file, fileHeader)
+		imageUrl, err = firebaseStorage.AddFromBuffer(compressedFileBuf)
 		if err != nil {
 			return fiber.NewError(fiber.StatusBadRequest, err.Error())
 		}

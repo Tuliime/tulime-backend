@@ -8,6 +8,7 @@ import (
 	"io"
 	"log"
 	"mime/multipart"
+	"time"
 
 	"github.com/h2non/bimg"
 )
@@ -92,12 +93,18 @@ func (ip *ImageProcessor) compressJPEG(imgData []byte, quality int) ([]byte, err
 // Compress reduces image size by adjusting
 // quality and stripping metadata
 func (ip *ImageProcessor) Compress(imgData []byte, quality int) ([]byte, error) {
-	image := bimg.NewImage(imgData)
-	return image.Process(bimg.Options{
+	startTime := time.Now()
+	compressedBuf, err := bimg.NewImage(imgData).Process(bimg.Options{
 		Quality:       quality,
 		StripMetadata: true,
 		Compression:   9,
 	})
+	if err != nil {
+		return nil, err
+	}
+	log.Println("File Compression Duration:", time.Since(startTime))
+
+	return compressedBuf, nil
 }
 
 // Convert changes image format (e.g., from PNG to JPEG)
