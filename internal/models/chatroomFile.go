@@ -27,20 +27,11 @@ func (crf *ChatroomFile) FindOne(id string) (ChatroomFile, error) {
 	return chatroomFile, nil
 }
 
-// TODO: add pagination for all select queries that return many results
 func (crf *ChatroomFile) FindAll(limit float64) ([]ChatroomFile, error) {
-	var chatroomFile []ChatroomFile
-	db.Limit(int(limit)).Find(&chatroomFile)
+	var chatroomFiles []ChatroomFile
+	db.Limit(int(limit)).Find(&chatroomFiles)
 
-	// TODO: to fetch file and mention for each chat
-	// for i, agroproduct := range chatRoom {
-	// 	var Chatroom []Chatroom
-	// 	db.Order("\"createdAt\" desc").Limit(1).Find(&agroProductPrice, "\"agroproductID\" = ?", agroproduct.ID)
-	// 	agroproduct.Price = agroProductPrice
-	// 	chatRoom[i] = agroproduct
-	// }
-
-	return chatroomFile, nil
+	return chatroomFiles, nil
 }
 
 // Update updates one Agroproduct in the database, using the information
@@ -48,12 +39,7 @@ func (crf *ChatroomFile) FindAll(limit float64) ([]ChatroomFile, error) {
 func (crf *ChatroomFile) Update() (ChatroomFile, error) {
 	db.Save(&crf)
 
-	chatRoomFile, err := crf.FindOne(crf.ID)
-	if err != nil {
-		return chatRoomFile, err
-	}
-
-	return chatRoomFile, nil
+	return *crf, nil
 }
 
 func (crf *ChatroomFile) Delete(id string) error {
