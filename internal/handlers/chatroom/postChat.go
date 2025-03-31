@@ -14,6 +14,8 @@ import (
 	"github.com/h2non/bimg"
 )
 
+// TODO: To adjust the response to match
+// new response structure for "/get" endpoint
 var PostChat = func(c *fiber.Ctx) error {
 	chatRoom := models.Chatroom{}
 
@@ -135,6 +137,7 @@ var PostChat = func(c *fiber.Ctx) error {
 	}
 
 	// Save all mentions of the chat message
+	// TODO: To use batch insertion for creating mentions
 	for _, mention := range mentions {
 		if mention == "" {
 			continue
