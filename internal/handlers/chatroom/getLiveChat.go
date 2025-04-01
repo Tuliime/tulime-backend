@@ -39,7 +39,6 @@ func GetLiveChat(w http.ResponseWriter, r *http.Request) {
 	disconnect := ctx.Done()
 	defer cancel()
 
-	type ChatRoom = models.Chatroom
 	chatroomMessageChan := make(chan events.DataEvent, 100)
 	events.EB.Subscribe("chatroomMessage", chatroomMessageChan)
 
@@ -57,7 +56,7 @@ func GetLiveChat(w http.ResponseWriter, r *http.Request) {
 	for {
 		select {
 		case chatroomMessageEvent := <-chatroomMessageChan:
-			chatroomMessage, ok := chatroomMessageEvent.Data.(ChatRoom)
+			chatroomMessage, ok := chatroomMessageEvent.Data.(Message)
 			if !ok {
 				log.Printf("Invalid message type received: %T", chatroomMessageEvent.Data)
 				return

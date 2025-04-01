@@ -14,20 +14,20 @@ import (
 	"github.com/h2non/bimg"
 )
 
-// TODO: To adjust the response to match
-// new response structure for "/get" endpoint
 var PostChat = func(c *fiber.Ctx) error {
-	chatRoom := models.Chatroom{}
+	chatroom := models.Chatroom{}
+	chatroomMention := models.ChatroomMention{}
+	user := models.User{}
 
-	chatRoom.UserID = c.FormValue("userID")
-	chatRoom.Text = c.FormValue("text")
-	chatRoom.Reply = c.FormValue("reply")
+	chatroom.UserID = c.FormValue("userID")
+	chatroom.Text = c.FormValue("text")
+	chatroom.Reply = c.FormValue("reply")
 	sentAt := c.FormValue("sentAt")
 	mention := c.FormValue("mention")
 
 	var fileUploaded bool = true
 
-	if chatRoom.UserID == "" || sentAt == "" {
+	if chatroom.UserID == "" || sentAt == "" {
 		return fiber.NewError(fiber.StatusBadRequest, "Missing userID/SentAt!")
 	}
 
@@ -35,8 +35,7 @@ var PostChat = func(c *fiber.Ctx) error {
 	if err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, "Invalid sentAt format! Must be an ISO 8601 string.")
 	}
-	fmt.Printf("parsedSentAt: %v\n", parsedSentAt)
-	chatRoom.SentAt = parsedSentAt
+	chatroom.SentAt = parsedSentAt
 
 	var mentions []string
 	if mention != "" {
@@ -45,14 +44,13 @@ var PostChat = func(c *fiber.Ctx) error {
 			return fiber.NewError(fiber.StatusBadRequest, "Invalid mention format! Must be a JSON stringified array of strings.")
 		}
 	}
-	fmt.Printf("Mentions: %v\n", mentions)
 
 	fileHeader, err := c.FormFile("file")
 	if err != nil {
 		if err.Error() == constants.NO_FILE_UPLOADED_ERROR {
 			fmt.Println("No file uploaded")
 			// Prevent empty Text field when there is no file uploaded
-			if chatRoom.Text == "" {
+			if chatroom.Text == "" {
 				return fiber.NewError(fiber.StatusBadRequest, "Missing Text field!")
 			}
 			fileUploaded = false
@@ -62,14 +60,11 @@ var PostChat = func(c *fiber.Ctx) error {
 		}
 	}
 
-	var filePath string
-	var imageUrl string
-	var chatRoomFile models.ChatroomFile
-	var chatRoomMentions []models.ChatroomMention
-	dimensions := struct {
-		Height int `json:"height"`
-		Width  int `json:"Width"`
-	}{Height: 0, Width: 0}
+	var imageUrl, filePath string
+	var chatroomFile models.ChatroomFile
+	var chatroomMentions []models.ChatroomMention
+	dimensions := models.ImageDimensions{Height: 0, Width: 0}
+	var repliedMessage, repliedMessageFile any = nil, nil
 
 	if fileUploaded {
 		// Validate file size (10 MB limit)
@@ -114,51 +109,148 @@ var PostChat = func(c *fiber.Ctx) error {
 		}
 	}
 
-	chatRoom.ArrivedAt = time.Now()
+	chatroom.ArrivedAt = time.Now()
 
-	newChatRoom, err := chatRoom.Create(chatRoom)
+	newChatroom, err := chatroom.Create(chatroom)
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
-	// Save chatFile
+	// Save chatroomFile
 	if imageUrl != "" {
 		dimensionJson, err := json.Marshal(dimensions)
 		if err != nil {
 			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 		}
-		chatRoomFile = models.ChatroomFile{ChatroomID: newChatRoom.ID,
+		chatroomFile = models.ChatroomFile{ChatroomID: newChatroom.ID,
 			URL: imageUrl, Path: filePath, Dimensions: models.JSONB(dimensionJson)}
-		newChatRoomFile, err := chatRoomFile.Create(chatRoomFile)
+		newChatRoomFile, err := chatroomFile.Create(chatroomFile)
 		if err != nil {
 			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 		}
-		newChatRoom.File = newChatRoomFile
+		newChatroom.File = newChatRoomFile
 	}
 
 	// Save all mentions of the chat message
-	// TODO: To use batch insertion for creating mentions
-	for _, mention := range mentions {
-		if mention == "" {
-			continue
+	if mention != "" {
+		for _, mention := range mentions {
+			if mention == "" {
+				continue
+			}
+			chatroomMentions = append(chatroomMentions,
+				models.ChatroomMention{ChatroomID: newChatroom.ID, UserID: mention})
 		}
-		chatroomMention := models.ChatroomMention{ChatroomID: newChatRoom.ID, UserID: mention}
-		newChatroomMention, err := chatroomMention.Create(chatroomMention)
+		newChatroomMentions, err := chatroomMention.CreateMany(chatroomMentions)
 		if err != nil {
 			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 		}
-		chatRoomMentions = append(chatRoomMentions, newChatroomMention)
+		newChatroom.Mention = newChatroomMentions
 	}
 
-	newChatRoom.Mention = chatRoomMentions
+	// Get replied message if it exists
+	if newChatroom.Reply != "" {
+		reply, err := chatroom.FindReply(newChatroom.Reply)
+		if err != nil && err.Error() != constants.RECORD_NOT_FOUND_ERROR {
+			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		}
+		if reply.File.ID != "" {
+			var dimensions models.ImageDimensions
+			if err := json.Unmarshal(reply.File.Dimensions, &dimensions); err != nil {
+				return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+			}
+			repliedMessageFile = File{
+				ID:         reply.File.ID,
+				ChatroomID: reply.File.ChatroomID,
+				URL:        reply.File.URL,
+				Path:       reply.File.Path,
+				Dimensions: dimensions,
+				CreatedAt:  reply.File.CreatedAt,
+				UpdatedAt:  reply.File.UpdatedAt,
+				DeletedAt:  reply.File.DeletedAt,
+			}
+		}
+		repliedMessage = Message{
+			ID:             reply.ID,
+			UserID:         reply.UserID,
+			Text:           reply.Text,
+			Reply:          reply.Reply,
+			RepliedMessage: nil,
+			File:           repliedMessageFile,
+			Mention:        reply.Mention,
+			SentAt:         reply.SentAt,
+			ArrivedAt:      reply.ArrivedAt,
+			CreatedAt:      reply.CreatedAt,
+			UpdatedAt:      reply.UpdatedAt,
+			DeletedAt:      reply.DeletedAt,
+			User: User{
+				ID:             reply.User.ID,
+				Name:           reply.User.Name,
+				TelNumber:      reply.User.TelNumber,
+				Role:           reply.User.Role,
+				ImageUrl:       reply.User.ImageUrl,
+				ImagePath:      reply.User.ImagePath,
+				ProfileBgColor: reply.User.ProfileBgColor,
+				ChatroomColor:  reply.User.ChatroomColor,
+				CreatedAt:      reply.User.CreatedAt,
+				UpdatedAt:      reply.User.UpdatedAt,
+			},
+		}
+	}
 
-	events.EB.Publish("chatroomMessage", newChatRoom)
-	events.EB.Publish("chatNotification", newChatRoom)
+	user, err = user.FindOne(newChatroom.UserID)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+
+	// structure the message
+	var chatMessageFile any = nil
+	if newChatroom.File.ID != "" {
+		chatMessageFile = File{
+			ID:         newChatroom.File.ID,
+			ChatroomID: newChatroom.File.ChatroomID,
+			URL:        newChatroom.File.URL,
+			Path:       newChatroom.File.Path,
+			Dimensions: dimensions,
+			CreatedAt:  newChatroom.File.CreatedAt,
+			UpdatedAt:  newChatroom.File.UpdatedAt,
+			DeletedAt:  newChatroom.File.DeletedAt,
+		}
+	}
+
+	message := Message{
+		ID:             newChatroom.ID,
+		UserID:         newChatroom.UserID,
+		Text:           newChatroom.Text,
+		Reply:          newChatroom.Reply,
+		RepliedMessage: repliedMessage,
+		File:           chatMessageFile,
+		Mention:        newChatroom.Mention,
+		SentAt:         newChatroom.SentAt,
+		ArrivedAt:      newChatroom.ArrivedAt,
+		CreatedAt:      newChatroom.CreatedAt,
+		UpdatedAt:      newChatroom.UpdatedAt,
+		DeletedAt:      newChatroom.DeletedAt,
+		User: User{
+			ID:             user.ID,
+			Name:           user.Name,
+			TelNumber:      user.TelNumber,
+			Role:           user.Role,
+			ImageUrl:       user.ImageUrl,
+			ImagePath:      user.ImagePath,
+			ProfileBgColor: user.ProfileBgColor,
+			ChatroomColor:  user.ChatroomColor,
+			CreatedAt:      user.CreatedAt,
+			UpdatedAt:      user.UpdatedAt,
+		},
+	}
+
+	events.EB.Publish("chatroomMessage", message)
+	events.EB.Publish("chatNotification", newChatroom)
 
 	response := fiber.Map{
 		"status":  "success",
 		"message": "chat posted successfully!",
-		"data":    newChatRoom,
+		"data":    message,
 	}
 
 	return c.Status(fiber.StatusCreated).JSON(response)

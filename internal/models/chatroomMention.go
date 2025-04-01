@@ -20,6 +20,15 @@ func (crm *ChatroomMention) Create(chatroomMention ChatroomMention) (ChatroomMen
 	return chatroomMention, nil
 }
 
+func (crm *ChatroomMention) CreateMany(chatroomMentions []ChatroomMention) ([]ChatroomMention, error) {
+	result := db.Create(&chatroomMentions)
+
+	if result.Error != nil {
+		return chatroomMentions, result.Error
+	}
+	return chatroomMentions, nil
+}
+
 func (crm *ChatroomMention) FindOne(id string) (ChatroomMention, error) {
 	var chatroomMention ChatroomMention
 	db.First(&chatroomMention, "id = ?", id)
