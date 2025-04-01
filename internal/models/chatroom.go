@@ -23,10 +23,12 @@ func (cr *Chatroom) Create(chatroom Chatroom) (Chatroom, error) {
 }
 
 func (cr *Chatroom) FindOne(id string) (Chatroom, error) {
-	var chatroom Chatroom
-	db.First(&chatroom, "id = ?", id)
-
-	return chatroom, nil
+	var chatRoom Chatroom
+	err := db.Preload("File").Preload("Mention").Preload("User").Where("id = ?", id).First(&chatRoom).Error
+	if err != nil {
+		return chatRoom, err
+	}
+	return chatRoom, nil
 }
 
 func (cr *Chatroom) FindReply(reply string) (Chatroom, error) {
