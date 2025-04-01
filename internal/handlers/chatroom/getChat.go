@@ -60,6 +60,7 @@ var GetChat = func(c *fiber.Ctx) error {
 				repliedMessageFile = File{
 					ID:         reply.File.ID,
 					ChatroomID: reply.File.ChatroomID,
+					URL:        reply.File.URL,
 					Path:       reply.File.Path,
 					Dimensions: dimensions,
 					CreatedAt:  reply.File.CreatedAt,
@@ -105,6 +106,7 @@ var GetChat = func(c *fiber.Ctx) error {
 			chatMessageFile = File{
 				ID:         chatMessage.File.ID,
 				ChatroomID: chatMessage.File.ChatroomID,
+				URL:        chatMessage.File.URL,
 				Path:       chatMessage.File.Path,
 				Dimensions: dimensions,
 				CreatedAt:  chatMessage.File.CreatedAt,
