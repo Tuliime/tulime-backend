@@ -20,6 +20,15 @@ func (msgrf *MessengerTag) Create(messengerTag MessengerTag) (MessengerTag, erro
 	return messengerTag, nil
 }
 
+func (msgrf *MessengerTag) CreateMany(messengerTags []MessengerTag) ([]MessengerTag, error) {
+	result := db.Create(&messengerTags)
+
+	if result.Error != nil {
+		return messengerTags, result.Error
+	}
+	return messengerTags, nil
+}
+
 func (msgrf *MessengerTag) FindOne(id string) (MessengerTag, error) {
 	var messengerTag MessengerTag
 	db.First(&messengerTag, "id = ?", id)

@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/Tuliime/tulime-backend/internal/events"
+	"github.com/Tuliime/tulime-backend/internal/handlers/messenger"
 	"github.com/Tuliime/tulime-backend/internal/middlewares"
 	"github.com/Tuliime/tulime-backend/internal/models"
 	"github.com/Tuliime/tulime-backend/internal/packages"
@@ -42,7 +43,7 @@ func GetLiveChat(w http.ResponseWriter, r *http.Request) {
 	chatroomMessageChan := make(chan events.DataEvent, 100)
 	events.EB.Subscribe("chatroomMessage", chatroomMessageChan)
 
-	type Messenger = models.Messenger
+	type Messenger = messenger.Message
 	messengerChan := make(chan events.DataEvent, 100)
 	events.EB.Subscribe("messenger", messengerChan)
 

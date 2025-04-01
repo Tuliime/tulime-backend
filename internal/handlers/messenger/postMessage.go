@@ -18,6 +18,7 @@ import (
 var PostMessage = func(c *fiber.Ctx) error {
 	messenger := models.Messenger{}
 	messengerRoom := models.MessengerRoom{}
+	messengerTag := models.MessengerTag{}
 
 	messenger.MessengerRoomID = c.FormValue("messengerRoomID")
 	messenger.SenderID = c.FormValue("senderID")
@@ -64,14 +65,10 @@ var PostMessage = func(c *fiber.Ctx) error {
 		}
 	}
 
-	var filePath string
-	var imageUrl string
-	var messengerFile models.MessengerFile
+	var filePath, imageUrl string
 	var messengerTags []models.MessengerTag
-	dimensions := struct {
-		Height int `json:"height"`
-		Width  int `json:"Width"`
-	}{Height: 0, Width: 0}
+	dimensions := models.ImageDimensions{Height: 0, Width: 0}
+	var repliedMessage, repliedMessageFile any = nil, nil
 
 	if fileUploaded {
 		// Validate file size (10 MB limit)
@@ -148,7 +145,7 @@ var PostMessage = func(c *fiber.Ctx) error {
 		if err != nil {
 			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 		}
-		messengerFile = models.MessengerFile{MessengerID: newMessage.ID,
+		messengerFile := models.MessengerFile{MessengerID: newMessage.ID,
 			URL: imageUrl, Path: filePath, Dimensions: models.JSONB(dimensionJson)}
 		newChatRoomFile, err := messengerFile.Create(messengerFile)
 		if err != nil {
@@ -158,29 +155,97 @@ var PostMessage = func(c *fiber.Ctx) error {
 	}
 
 	// Save all tags of the messenger
-	for _, tag := range tags {
-		if tag == "" {
-			continue
+	if tag != "" {
+		for _, tag := range tags {
+			messengerTags = append(messengerTags,
+				models.MessengerTag{MessengerID: newMessage.ID, AdvertID: tag})
 		}
-		messengerTag := models.MessengerTag{MessengerID: newMessage.ID, AdvertID: tag}
-		newMessengerTag, err := messengerTag.Create(messengerTag)
-		if err != nil {
-			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
-		}
-		messengerTags = append(messengerTags, newMessengerTag)
+	}
+	newMessengerTags, err := messengerTag.CreateMany(messengerTags)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
-	log.Printf("messengerTags: %v\n", messengerTags)
+	log.Printf("messengerTags: %v\n", newMessengerTags)
 
-	newMessage.Tag = messengerTags
+	newMessage.Tag = newMessengerTags
 
-	events.EB.Publish("messenger", newMessage)
+	// Get replied message if it exists
+	if newMessage.Reply != "" {
+		reply, err := messenger.FindReply(newMessage.Reply)
+		if err != nil && err.Error() != constants.RECORD_NOT_FOUND_ERROR {
+			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		}
+		if reply.File.ID != "" {
+			var dimensions models.ImageDimensions
+			if err := json.Unmarshal(reply.File.Dimensions, &dimensions); err != nil {
+				return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+			}
+			repliedMessageFile = File{
+				ID:          reply.File.ID,
+				MessengerID: reply.File.MessengerID,
+				URL:         reply.File.URL,
+				Path:        reply.File.Path,
+				Dimensions:  dimensions,
+				CreatedAt:   reply.File.CreatedAt,
+				UpdatedAt:   reply.File.UpdatedAt,
+			}
+		}
+		repliedMessage = Message{
+			ID:              reply.ID,
+			MessengerRoomID: messenger.MessengerRoomID,
+			SenderID:        reply.SenderID,
+			RecipientID:     reply.RecipientID,
+			Text:            reply.Text,
+			Reply:           reply.Reply,
+			RepliedMessage:  nil,
+			File:            repliedMessageFile,
+			Tag:             reply.Tag,
+			SentAt:          reply.SentAt,
+			ArrivedAt:       reply.ArrivedAt,
+			CreatedAt:       reply.CreatedAt,
+			UpdatedAt:       reply.UpdatedAt,
+		}
+	}
+
+	// structure the message
+	var messengerFile any = nil
+	if newMessage.File.ID != "" {
+		messengerFile = File{
+			ID:          newMessage.File.ID,
+			MessengerID: newMessage.File.MessengerID,
+			URL:         newMessage.File.URL,
+			Path:        newMessage.File.Path,
+			Dimensions:  dimensions,
+			CreatedAt:   newMessage.File.CreatedAt,
+			UpdatedAt:   newMessage.File.UpdatedAt,
+		}
+	}
+
+	message := Message{
+		ID:              newMessage.ID,
+		MessengerRoomID: newMessage.MessengerRoomID,
+		SenderID:        newMessage.SenderID,
+		RecipientID:     newMessage.RecipientID,
+		Text:            newMessage.Text,
+		Reply:           newMessage.Reply,
+		RepliedMessage:  repliedMessage,
+		File:            messengerFile,
+		Tag:             newMessage.Tag,
+		SentAt:          newMessage.SentAt,
+		ArrivedAt:       newMessage.ArrivedAt,
+		CreatedAt:       newMessage.CreatedAt,
+		UpdatedAt:       newMessage.UpdatedAt,
+	}
+
+	events.EB.Publish("messenger", message)
 	events.EB.Publish("messengerNotification", newMessage)
 
 	response := fiber.Map{
 		"status":  "success",
 		"message": "message posted successfully!",
-		"data":    newMessage,
+		// "data":    newMessage,
+		"data": message,
 	}
 
 	return c.Status(fiber.StatusCreated).JSON(response)
