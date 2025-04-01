@@ -1,6 +1,7 @@
 package messenger
 
 import (
+	"encoding/json"
 	"strconv"
 
 	"github.com/Tuliime/tulime-backend/internal/constants"
@@ -58,20 +59,80 @@ var GetMessagesByRoom = func(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
 
-	var repliedMessages []models.Messenger
+	var messages []Message
 
 	for _, messengerMsg := range messengerMsgs {
-		if messengerMsg.Reply == "" {
-			continue
-		}
-		reply, err := messenger.FindReply(messengerMsg.Reply)
-		if err != nil {
-			if err.Error() == constants.RECORD_NOT_FOUND_ERROR {
-				continue
+		var repliedMessage any = nil
+		var repliedMessageFile any = nil
+
+		if messengerMsg.Reply != "" {
+			reply, err := messenger.FindReply(messengerMsg.Reply)
+			if err != nil && err.Error() != constants.RECORD_NOT_FOUND_ERROR {
+				return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 			}
-			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+			if reply.File.ID != "" {
+				var dimensions models.ImageDimensions
+				if err := json.Unmarshal(reply.File.Dimensions, &dimensions); err != nil {
+					return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+				}
+				repliedMessageFile = File{
+					ID:          reply.File.ID,
+					MessengerID: reply.File.MessengerID,
+					URL:         reply.File.URL,
+					Path:        reply.File.Path,
+					Dimensions:  dimensions,
+					CreatedAt:   reply.File.CreatedAt,
+					UpdatedAt:   reply.File.UpdatedAt,
+				}
+			}
+			repliedMessage = Message{
+				ID:             reply.ID,
+				SenderID:       reply.SenderID,
+				RecipientID:    reply.RecipientID,
+				Text:           reply.Text,
+				Reply:          reply.Reply,
+				IsRead:         reply.IsRead,
+				RepliedMessage: nil,
+				File:           repliedMessageFile,
+				Tag:            reply.Tag,
+				SentAt:         reply.SentAt,
+				ArrivedAt:      reply.ArrivedAt,
+				CreatedAt:      reply.CreatedAt,
+				UpdatedAt:      reply.UpdatedAt,
+			}
 		}
-		repliedMessages = append(repliedMessages, reply)
+
+		var messengerMsgFile any = nil
+		if messengerMsg.File.ID != "" {
+			var dimensions models.ImageDimensions
+			if err := json.Unmarshal(messengerMsg.File.Dimensions, &dimensions); err != nil {
+				return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+			}
+			messengerMsgFile = File{
+				ID:          messengerMsg.File.ID,
+				MessengerID: messengerMsg.File.MessengerID,
+				URL:         messengerMsg.File.URL,
+				Path:        messengerMsg.File.Path,
+				Dimensions:  dimensions,
+				CreatedAt:   messengerMsg.File.CreatedAt,
+				UpdatedAt:   messengerMsg.File.UpdatedAt,
+			}
+		}
+		messages = append(messages, Message{
+			ID:             messengerMsg.ID,
+			SenderID:       messengerMsg.SenderID,
+			RecipientID:    messengerMsg.RecipientID,
+			Text:           messengerMsg.Text,
+			Reply:          messengerMsg.Reply,
+			RepliedMessage: repliedMessage,
+			File:           messengerMsgFile,
+			Tag:            messengerMsg.Tag,
+			IsRead:         messengerMsg.IsRead,
+			SentAt:         messengerMsg.SentAt,
+			ArrivedAt:      messengerMsg.ArrivedAt,
+			CreatedAt:      messengerMsg.CreatedAt,
+			UpdatedAt:      messengerMsg.UpdatedAt,
+		})
 	}
 
 	var prevCursor, nextCursor string
@@ -125,14 +186,9 @@ var GetMessagesByRoom = func(c *fiber.Ctx) error {
 		"direction":     direction,
 	}
 
-	messengerMap := fiber.Map{
-		"messages": messengerMsgs,
-		"replies":  repliedMessages,
-	}
-
 	response := fiber.Map{
 		"status":     "success",
-		"data":       messengerMap,
+		"data":       messages,
 		"pagination": pagination,
 	}
 
