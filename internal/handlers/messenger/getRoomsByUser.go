@@ -1,14 +1,13 @@
 package messenger
 
 import (
-	"time"
-
 	"github.com/Tuliime/tulime-backend/internal/models"
 	"github.com/Tuliime/tulime-backend/internal/packages"
 	"github.com/gofiber/fiber/v2"
 )
 
-// Filter data and only send what is necessary only
+// Gets last message for each room by userID
+// And so it is essentially to the user rooms
 var GetRoomsByUser = func(c *fiber.Ctx) error {
 	messenger := models.Messenger{}
 	limitParam := c.Query("limit")
@@ -43,24 +42,20 @@ var GetRoomsByUser = func(c *fiber.Ctx) error {
 		"hasPrevItems": hasPrevItems,
 	}
 
-	messengerMap := fiber.Map{
-		"messengerRooms": organizeRoomResponse(messengerRooms),
-	}
-
 	response := fiber.Map{
 		"status":     "success",
-		"data":       messengerMap,
+		"data":       organizeRoomResponse(messengerRooms),
 		"pagination": pagination,
 	}
 
 	return c.Status(fiber.StatusOK).JSON(response)
 }
 
-func organizeRoomResponse(messengerRooms []models.Messenger) []RoomResponse {
-	var response []RoomResponse
+func organizeRoomResponse(messengerRooms []models.Messenger) []Message {
+	var response []Message
 
 	for _, room := range messengerRooms {
-		response = append(response, RoomResponse{
+		response = append(response, Message{
 			ID:              room.ID,
 			MessengerRoomID: room.MessengerRoomID,
 			SenderID:        room.SenderID,
@@ -109,35 +104,4 @@ func organizeRoomResponse(messengerRooms []models.Messenger) []RoomResponse {
 	}
 
 	return response
-}
-
-type User struct {
-	ID             string    `json:"id"`
-	Name           string    `json:"name"`
-	TelNumber      int       `json:"telNumber"`
-	Role           string    `json:"role"`
-	ImageUrl       string    `json:"imageUrl"`
-	ImagePath      string    `json:"imagePath"`
-	ProfileBgColor string    `json:"profileBgColor"`
-	ChatroomColor  string    `json:"chatroomColor"`
-	CreatedAt      time.Time `json:"createdAt"`
-	UpdatedAt      time.Time `json:"updatedAt"`
-}
-
-type RoomResponse struct {
-	ID              string                `json:"id"`
-	MessengerRoomID string                `json:"messengerRoomID"`
-	SenderID        string                `json:"senderID"`
-	RecipientID     string                `json:"recipientID"`
-	Text            string                `json:"text"`
-	Reply           string                `json:"reply"`
-	File            models.MessengerFile  `json:"file"`
-	Tag             []models.MessengerTag `json:"tag"`
-	IsRead          bool                  `json:"isRead"`
-	SentAt          time.Time             `json:"sentAt"`
-	ArrivedAt       time.Time             `json:"arrivedAt"`
-	CreatedAt       time.Time             `json:"createdAt"`
-	UpdatedAt       time.Time             `json:"updatedAt"`
-	Sender          User                  `json:"Sender"`
-	Recipient       User                  `json:"Recipient"`
 }
