@@ -15,9 +15,9 @@ func (ols *OnlineStatus) BeforeCreate(tx *gorm.DB) error {
 
 func (ols *OnlineStatus) Create(onlineStatus OnlineStatus) (OnlineStatus, error) {
 	if err := db.Create(&onlineStatus).Error; err != nil {
-		return *ols, err
+		return onlineStatus, err
 	}
-	return *ols, nil
+	return onlineStatus, nil
 }
 
 func (ols *OnlineStatus) FindByUser(userID string) (OnlineStatus, error) {
@@ -25,6 +25,20 @@ func (ols *OnlineStatus) FindByUser(userID string) (OnlineStatus, error) {
 	db.Last(&onlineStatus, "\"userID\" = ?", userID)
 
 	return onlineStatus, nil
+}
+
+func (ols *OnlineStatus) FindByUserList(userIDList []string) ([]OnlineStatus, error) {
+	var statuses []OnlineStatus
+
+	if err := db.Table("online_statuses").
+		Select("DISTINCT ON (\"userID\") *").
+		Where("\"userID\" IN (?)", userIDList).
+		Order("\"userID\", \"createdAt\" DESC").
+		Find(&statuses).Error; err != nil {
+		return nil, err
+	}
+
+	return statuses, nil
 }
 
 func (ols *OnlineStatus) FindAll() ([]OnlineStatus, error) {

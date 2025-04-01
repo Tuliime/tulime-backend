@@ -3,15 +3,15 @@ package auth
 import (
 	"encoding/base64"
 	"encoding/json"
-	"fmt"
-	"log"
 
+	"github.com/Tuliime/tulime-backend/internal/models"
 	"github.com/gofiber/fiber/v2"
 )
 
 var GetUsersOnlineStatus = func(c *fiber.Ctx) error {
+
+	onlineStatus := models.OnlineStatus{}
 	userIDListEncoding := c.Query("userIDListEncoding")
-	log.Printf("userIDListEncoding %+v :", userIDListEncoding)
 
 	decodedBytes, err := base64.StdEncoding.DecodeString(userIDListEncoding)
 	if err != nil {
@@ -19,7 +19,6 @@ var GetUsersOnlineStatus = func(c *fiber.Ctx) error {
 	}
 
 	userIDListStr := string(decodedBytes)
-	fmt.Println("Decoded JSON:", userIDListStr)
 	if userIDListStr == "" {
 		return fiber.NewError(fiber.StatusInternalServerError, "Provided encoding without content!")
 	}
@@ -31,13 +30,15 @@ var GetUsersOnlineStatus = func(c *fiber.Ctx) error {
 			return fiber.NewError(fiber.StatusBadRequest, "Invalid format! encoded data must array of strings.")
 		}
 	}
-	fmt.Printf("userIDList: %v\n", userIDList)
 
-	// fetch users online status here
+	statuses, err := onlineStatus.FindByUserList(userIDList)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
 
 	response := fiber.Map{
 		"status": "success",
-		"data":   userIDList,
+		"data":   statuses,
 	}
 
 	return c.Status(fiber.StatusOK).JSON(response)
