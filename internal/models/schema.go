@@ -15,36 +15,36 @@ var redisClient = RedisClient()
 var ctx = context.Background()
 
 type User struct {
-	ID                   string            `gorm:"column:id;type:uuid;primaryKey" json:"id"`
-	Name                 string            `gorm:"column:name;not null;index" json:"name"`
-	TelNumber            int               `gorm:"column:telNumber;unique;not null;index" json:"telNumber"`
-	Password             string            `gorm:"column:password;not null" json:"password"`
-	Role                 string            `gorm:"column:role;default:'user';not null" json:"role"`
-	ImageUrl             string            `gorm:"column:imageUrl;default:null" json:"imageUrl"`
-	ImagePath            string            `gorm:"column:imagePath;default:null" json:"imagePath"`
-	ProfileBgColor       string            `gorm:"column:profileBgColor;default:null" json:"profileBgColor"`
-	ChatroomColor        string            `gorm:"column:chatroomColor;default:null" json:"chatroomColor"`
-	OPT                  []OTP             `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"OPT"`
-	OnlineStatus         OnlineStatus      `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"onlineStatus"`
-	FarmManager          FarmManager       `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"farmManager"`
-	VetDoctor            *VetDoctor        `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"vetDoctor"`
-	Chatroom             []*Chatroom       `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"chatroom"`
-	ChatroomMention      []ChatroomMention `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"chatroomMention"`
-	Chatbot              []Chatbot         `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"chatbot"`
-	Session              []Session         `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"session"`
-	Device               []Device          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"device"`
-	Notification         []Notification    `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"notification"`
-	MessengerRoomUserOne []*MessengerRoom  `gorm:"foreignKey:UserOneID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
-	MessengerRoomUserTwo []*MessengerRoom  `gorm:"foreignKey:UserTwoID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
-	Sender               []*Messenger      `gorm:"foreignKey:SenderID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
-	Recipient            []*Messenger      `gorm:"foreignKey:RecipientID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
-	Store                []*Store          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
-	Advert               []*Advert         `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
-	AdvertView           []*AdvertView     `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
-	Location             []*Location       `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
-	StoreFeedback        []*StoreFeedback  `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
-	CreatedAt            time.Time         `gorm:"column:createdAt" json:"createdAt"`
-	UpdatedAt            time.Time         `gorm:"column:updatedAt" json:"updatedAt"`
+	ID                   string             `gorm:"column:id;type:uuid;primaryKey" json:"id"`
+	Name                 string             `gorm:"column:name;not null;index" json:"name"`
+	TelNumber            int                `gorm:"column:telNumber;unique;not null;index" json:"telNumber"`
+	Password             string             `gorm:"column:password;not null" json:"password"`
+	Role                 string             `gorm:"column:role;default:'user';not null" json:"role"`
+	ImageUrl             string             `gorm:"column:imageUrl;default:null" json:"imageUrl"`
+	ImagePath            string             `gorm:"column:imagePath;default:null" json:"imagePath"`
+	ProfileBgColor       string             `gorm:"column:profileBgColor;default:null" json:"profileBgColor"`
+	ChatroomColor        string             `gorm:"column:chatroomColor;default:null" json:"chatroomColor"`
+	OPT                  []OTP              `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"OPT"`
+	OnlineStatus         OnlineStatus       `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"onlineStatus"`
+	FarmManager          FarmManager        `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"farmManager"`
+	VetDoctor            *VetDoctor         `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"vetDoctor"`
+	Chatroom             []*Chatroom        `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"chatroom"`
+	ChatroomMention      []*ChatroomMention `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL" json:"chatroomMention"`
+	Chatbot              []Chatbot          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"chatbot"`
+	Session              []Session          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"session"`
+	Device               []Device           `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"device"`
+	Notification         []Notification     `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"notification"`
+	MessengerRoomUserOne []*MessengerRoom   `gorm:"foreignKey:UserOneID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	MessengerRoomUserTwo []*MessengerRoom   `gorm:"foreignKey:UserTwoID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	Sender               []*Messenger       `gorm:"foreignKey:SenderID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	Recipient            []*Messenger       `gorm:"foreignKey:RecipientID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	Store                []*Store           `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	Advert               []*Advert          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	AdvertView           []*AdvertView      `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	Location             []*Location        `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	StoreFeedback        []*StoreFeedback   `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	CreatedAt            time.Time          `gorm:"column:createdAt" json:"createdAt"`
+	UpdatedAt            time.Time          `gorm:"column:updatedAt" json:"updatedAt"`
 }
 
 type OnlineStatus struct {
@@ -145,14 +145,14 @@ type Chatroom struct {
 	UserID    string            `gorm:"column:userID;not null;index" json:"userID"`
 	Text      string            `gorm:"column:text;default:null" json:"text"`
 	Reply     string            `gorm:"column:reply;default:null;index" json:"reply"`
-	File      ChatroomFile      `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"file"`
-	Mention   []ChatroomMention `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"mention"`
+	File      ChatroomFile      `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL" json:"file"`
+	Mention   []ChatroomMention `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL" json:"mention"`
 	SentAt    time.Time         `gorm:"column:sentAt;not null;index" json:"sentAt"`
 	ArrivedAt time.Time         `gorm:"column:arrivedAt;not null;index" json:"arrivedAt"`
 	CreatedAt time.Time         `gorm:"column:createdAt;index" json:"createdAt"`
 	UpdatedAt time.Time         `gorm:"column:updatedAt;index" json:"updatedAt"`
 	DeletedAt gorm.DeletedAt    `gorm:"column:deletedAt;index" json:"deletedAt"`
-	User      *User             `gorm:"foreignKey:UserID;references:ID" json:"user"`
+	User      *User             `gorm:"foreignKey:UserID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL" json:"user"`
 }
 
 type ChatroomFile struct {
@@ -173,6 +173,7 @@ type ChatroomMention struct {
 	CreatedAt  time.Time      `gorm:"column:createdAt;index" json:"createdAt"`
 	UpdatedAt  time.Time      `gorm:"column:updatedAt;index" json:"updatedAt"`
 	DeletedAt  gorm.DeletedAt `gorm:"column:deletedAt;index" json:"deletedAt"`
+	User       *User          `gorm:"foreignKey:UserID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`
 }
 
 type Chatbot struct {
@@ -243,19 +244,20 @@ type Store struct {
 }
 
 type Advert struct {
-	ID                 string          `gorm:"column:id;type:uuid;primaryKey" json:"id"`
-	StoreID            string          `gorm:"column:storeID;not null;index" json:"storeID"`
-	UserID             string          `gorm:"column:userID;not null;index" json:"userID"`
-	ProductName        string          `gorm:"column:productName;not null;index" json:"productName"`
-	ProductDescription string          `gorm:"column:productDescription;not null;index" json:"productDescription"`
-	IsPublished        bool            `gorm:"column:isPublished;default:false;index" json:"isPublished"`
-	AdvertImage        []*AdvertImage  `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"images"`
-	MessengerTag       []*MessengerTag `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"tags"`
-	AdvertView         []*AdvertView   `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"views"`
-	CreatedAt          time.Time       `gorm:"column:createdAt;index" json:"createdAt"`
-	UpdatedAt          time.Time       `gorm:"column:updatedAt;index" json:"updatedAt"`
-	User               *User           `gorm:"foreignKey:UserID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
-	Store              *Store          `gorm:"foreignKey:StoreID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	ID                 string              `gorm:"column:id;type:uuid;primaryKey" json:"id"`
+	StoreID            string              `gorm:"column:storeID;not null;index" json:"storeID"`
+	UserID             string              `gorm:"column:userID;not null;index" json:"userID"`
+	ProductName        string              `gorm:"column:productName;not null;index" json:"productName"`
+	ProductDescription string              `gorm:"column:productDescription;not null;index" json:"productDescription"`
+	IsPublished        bool                `gorm:"column:isPublished;default:false;index" json:"isPublished"`
+	AdvertImage        []*AdvertImage      `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"images"`
+	MessengerTag       []*MessengerTag     `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"tags"`
+	AdvertView         []*AdvertView       `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"views"`
+	AdvertImpression   []*AdvertImpression `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"impressions"`
+	CreatedAt          time.Time           `gorm:"column:createdAt;index" json:"createdAt"`
+	UpdatedAt          time.Time           `gorm:"column:updatedAt;index" json:"updatedAt"`
+	User               *User               `gorm:"foreignKey:UserID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	Store              *Store              `gorm:"foreignKey:StoreID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 }
 
 type AdvertImage struct {
