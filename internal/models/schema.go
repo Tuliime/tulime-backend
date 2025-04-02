@@ -173,7 +173,7 @@ type ChatroomMention struct {
 	CreatedAt  time.Time      `gorm:"column:createdAt;index" json:"createdAt"`
 	UpdatedAt  time.Time      `gorm:"column:updatedAt;index" json:"updatedAt"`
 	DeletedAt  gorm.DeletedAt `gorm:"column:deletedAt;index" json:"deletedAt"`
-	User       *User          `gorm:"foreignKey:UserID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`
+	User       *User          `gorm:"foreignKey:UserID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL" json:"user"`
 }
 
 type Chatbot struct {
