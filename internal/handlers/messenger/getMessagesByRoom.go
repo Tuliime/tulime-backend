@@ -86,19 +86,20 @@ var GetMessagesByRoom = func(c *fiber.Ctx) error {
 				}
 			}
 			repliedMessage = Message{
-				ID:             reply.ID,
-				SenderID:       reply.SenderID,
-				RecipientID:    reply.RecipientID,
-				Text:           reply.Text,
-				Reply:          reply.Reply,
-				IsRead:         reply.IsRead,
-				RepliedMessage: nil,
-				File:           repliedMessageFile,
-				Tag:            reply.Tag,
-				SentAt:         reply.SentAt,
-				ArrivedAt:      reply.ArrivedAt,
-				CreatedAt:      reply.CreatedAt,
-				UpdatedAt:      reply.UpdatedAt,
+				ID:              reply.ID,
+				MessengerRoomID: reply.MessengerRoomID,
+				SenderID:        reply.SenderID,
+				RecipientID:     reply.RecipientID,
+				Text:            reply.Text,
+				Reply:           reply.Reply,
+				IsRead:          reply.IsRead,
+				RepliedMessage:  nil,
+				File:            repliedMessageFile,
+				Tag:             reply.Tag,
+				SentAt:          reply.SentAt,
+				ArrivedAt:       reply.ArrivedAt,
+				CreatedAt:       reply.CreatedAt,
+				UpdatedAt:       reply.UpdatedAt,
 			}
 		}
 
@@ -119,19 +120,20 @@ var GetMessagesByRoom = func(c *fiber.Ctx) error {
 			}
 		}
 		messages = append(messages, Message{
-			ID:             messengerMsg.ID,
-			SenderID:       messengerMsg.SenderID,
-			RecipientID:    messengerMsg.RecipientID,
-			Text:           messengerMsg.Text,
-			Reply:          messengerMsg.Reply,
-			RepliedMessage: repliedMessage,
-			File:           messengerMsgFile,
-			Tag:            messengerMsg.Tag,
-			IsRead:         messengerMsg.IsRead,
-			SentAt:         messengerMsg.SentAt,
-			ArrivedAt:      messengerMsg.ArrivedAt,
-			CreatedAt:      messengerMsg.CreatedAt,
-			UpdatedAt:      messengerMsg.UpdatedAt,
+			ID:              messengerMsg.ID,
+			MessengerRoomID: messengerMsg.MessengerRoomID,
+			SenderID:        messengerMsg.SenderID,
+			RecipientID:     messengerMsg.RecipientID,
+			Text:            messengerMsg.Text,
+			Reply:           messengerMsg.Reply,
+			RepliedMessage:  repliedMessage,
+			File:            messengerMsgFile,
+			Tag:             messengerMsg.Tag,
+			IsRead:          messengerMsg.IsRead,
+			SentAt:          messengerMsg.SentAt,
+			ArrivedAt:       messengerMsg.ArrivedAt,
+			CreatedAt:       messengerMsg.CreatedAt,
+			UpdatedAt:       messengerMsg.UpdatedAt,
 		})
 	}
 
