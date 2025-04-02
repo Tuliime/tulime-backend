@@ -7,11 +7,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-type TypingStatus struct {
-	UserID          string    `json:"userID"`
-	StartedTypingAt time.Time `json:"startedTypingAt"`
-}
-
 var UpdateTypingStatus = func(c *fiber.Ctx) error {
 	typingStatus := TypingStatus{}
 	typingStatusInput := struct {

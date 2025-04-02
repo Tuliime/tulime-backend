@@ -13,6 +13,7 @@ import (
 	"github.com/Tuliime/tulime-backend/internal/handlers/chatbot"
 	"github.com/Tuliime/tulime-backend/internal/handlers/chatroom"
 	"github.com/Tuliime/tulime-backend/internal/handlers/device"
+	"github.com/Tuliime/tulime-backend/internal/handlers/eventstream"
 	"github.com/Tuliime/tulime-backend/internal/handlers/farminputs"
 	"github.com/Tuliime/tulime-backend/internal/handlers/farmmanager"
 	"github.com/Tuliime/tulime-backend/internal/handlers/messenger"
@@ -217,6 +218,10 @@ func main() {
 	// handle notification/live using net/http
 	getLiveNotification := middlewares.NetHttpWrapper(http.HandlerFunc(notification.GetLiveNotification))
 	mux.Handle("/api/v0.01/notification/live", getLiveNotification)
+
+	// EventStream using net/http
+	getEventStream := middlewares.NetHttpWrapper(http.HandlerFunc(eventstream.GetEventStream))
+	mux.Handle("/api/v0.01/event-stream", getEventStream)
 
 	// Metrics
 	app.Get("/metrics", monitor.GetMetrics)

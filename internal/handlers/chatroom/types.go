@@ -46,3 +46,8 @@ type File struct {
 	UpdatedAt  time.Time              `json:"updatedAt"`
 	DeletedAt  gorm.DeletedAt         `json:"deletedAt"`
 }
+
+type TypingStatus struct {
+	UserID          string    `json:"userID"`
+	StartedTypingAt time.Time `json:"startedTypingAt"`
+}
