@@ -173,7 +173,7 @@ type ChatroomMention struct {
 	CreatedAt  time.Time      `gorm:"column:createdAt;index" json:"createdAt"`
 	UpdatedAt  time.Time      `gorm:"column:updatedAt;index" json:"updatedAt"`
 	DeletedAt  gorm.DeletedAt `gorm:"column:deletedAt;index" json:"deletedAt"`
-	User       *User          `gorm:"foreignKey:UserID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`
+	User       *User          `gorm:"foreignKey:UserID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL" json:"user"`
 }
 
 type Chatbot struct {
@@ -238,9 +238,9 @@ type Store struct {
 	Type                string           `gorm:"column:type;default:'INDIVIDUAL'" json:"type"`
 	CreatedAt           time.Time        `gorm:"column:createdAt;index" json:"createdAt"`
 	UpdatedAt           time.Time        `gorm:"column:updatedAt;index" json:"updatedAt"`
-	User                *User            `gorm:"foreignKey:UserID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
-	Advert              []*Advert        `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
-	StoreFeedback       []*StoreFeedback `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	User                *User            `gorm:"foreignKey:UserID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"user"`
+	Advert              []*Advert        `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"advert"`
+	StoreFeedback       []*StoreFeedback `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"feedback"`
 }
 
 type Advert struct {
@@ -256,8 +256,8 @@ type Advert struct {
 	AdvertImpression   []*AdvertImpression `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"impressions"`
 	CreatedAt          time.Time           `gorm:"column:createdAt;index" json:"createdAt"`
 	UpdatedAt          time.Time           `gorm:"column:updatedAt;index" json:"updatedAt"`
-	User               *User               `gorm:"foreignKey:UserID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
-	Store              *Store              `gorm:"foreignKey:StoreID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	User               *User               `gorm:"foreignKey:UserID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"user"`
+	Store              *Store              `gorm:"foreignKey:StoreID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"store"`
 }
 
 type AdvertImage struct {
@@ -308,8 +308,8 @@ type StoreFeedback struct {
 	File        []StoreFeedbackFile `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"files"`
 	CreatedAt   time.Time           `gorm:"column:createdAt;index" json:"createdAt"`
 	UpdatedAt   time.Time           `gorm:"column:updatedAt;index" json:"updatedAt"`
-	Store       *Store              `gorm:"foreignKey:StoreID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
-	User        *User               `gorm:"foreignKey:UserID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	Store       *Store              `gorm:"foreignKey:StoreID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"user"`
+	User        *User               `gorm:"foreignKey:UserID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"store"`
 }
 
 type StoreFeedbackFile struct {
