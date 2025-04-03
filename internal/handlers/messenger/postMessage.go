@@ -160,15 +160,13 @@ var PostMessage = func(c *fiber.Ctx) error {
 			messengerTags = append(messengerTags,
 				models.MessengerTag{MessengerID: newMessage.ID, AdvertID: tag})
 		}
+		messengerTags, err = messengerTag.CreateMany(messengerTags)
+		if err != nil {
+			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		}
+		log.Printf("messengerTags: %v\n", messengerTags)
 	}
-	newMessengerTags, err := messengerTag.CreateMany(messengerTags)
-	if err != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
-	}
-
-	log.Printf("messengerTags: %v\n", newMessengerTags)
-
-	newMessage.Tag = newMessengerTags
+	newMessage.Tag = messengerTags
 
 	// Get replied message if it exists
 	if newMessage.Reply != "" {
