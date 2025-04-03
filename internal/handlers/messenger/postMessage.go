@@ -28,8 +28,6 @@ var PostMessage = func(c *fiber.Ctx) error {
 	sentAt := c.FormValue("sentAt")
 	tag := c.FormValue("tag")
 
-	fmt.Printf("tag raw: %v\n", tag)
-
 	var fileUploaded bool = true
 
 	if messenger.SenderID == "" || messenger.RecipientID == "" || sentAt == "" {
@@ -157,7 +155,6 @@ var PostMessage = func(c *fiber.Ctx) error {
 	}
 
 	// Save all tags of the messenger
-	// if tag != "" {
 	if len(tags) > 0 {
 		for _, tag := range tags {
 			messengerTags = append(messengerTags,
