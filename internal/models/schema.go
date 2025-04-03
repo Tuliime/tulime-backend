@@ -31,7 +31,7 @@ type User struct {
 	Chatroom             []*Chatroom        `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"chatroom"`
 	ChatroomMention      []*ChatroomMention `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL" json:"chatroomMention"`
 	Chatbot              []Chatbot          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"chatbot"`
-	Session              []Session          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"session"`
+	Session              []*Session         `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"session"`
 	Device               []Device           `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"device"`
 	Notification         []Notification     `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"notification"`
 	MessengerRoomUserOne []*MessengerRoom   `gorm:"foreignKey:UserOneID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
@@ -192,9 +192,13 @@ type Session struct {
 	AccessToken  string    `gorm:"column:accessToken;not null;index" json:"accessToken"`
 	RefreshToken string    `gorm:"column:refreshToken;not null;index" json:"refreshToken"`
 	GeneratedVia string    `gorm:"column:generatedVia;not null;index" json:"generatedVia"`
+	Device       string    `gorm:"column:Device;default:'Unknown Device';index" json:"device"`
+	LocationID   string    `gorm:"column:locationID;default:null" json:"locationID"`
 	IsRevoked    bool      `gorm:"column:isRevoked;default:false" json:"isRevoked"`
 	CreatedAt    time.Time `gorm:"column:createdAt;index" json:"createdAt"`
 	UpdatedAt    time.Time `gorm:"column:updatedAt;index" json:"updatedAt"`
+	User         *User     `gorm:"foreignKey:UserID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"user"`
+	Location     *Location `gorm:"foreignKey:LocationID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"location"`
 }
 
 type Device struct {
@@ -377,6 +381,7 @@ type Location struct {
 	User             *User               `gorm:"foreignKey:UserID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 	AdvertView       []*AdvertView       `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 	AdvertImpression []*AdvertImpression `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	Session          []*Session          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" `
 }
 
 // Other Types

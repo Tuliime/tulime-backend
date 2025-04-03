@@ -1,6 +1,9 @@
 package auth
 
 import (
+	"log"
+
+	"github.com/Tuliime/tulime-backend/internal/handlers/location"
 	"github.com/Tuliime/tulime-backend/internal/models"
 	"github.com/Tuliime/tulime-backend/internal/packages"
 	"github.com/gofiber/fiber/v2"
@@ -15,6 +18,12 @@ var SignInWithRefreshToken = func(c *fiber.Ctx) error {
 	user := models.User{}
 	session := models.Session{}
 	sigInInput := SignInWithRefreshTokenInput{}
+
+	device := c.Get("X-Device")
+	clientIP, ok := c.Locals("clientIP").(string)
+	if !ok {
+		return fiber.NewError(fiber.StatusInternalServerError, "Invalid client type!")
+	}
 
 	if err := c.BodyParser(&sigInInput); err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
@@ -52,10 +61,17 @@ var SignInWithRefreshToken = func(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
+	location, err := location.GetUserLocationByIP(user.ID, clientIP)
+	if err != nil {
+		log.Printf("Error getting location ID:  %+v", err)
+	}
+
 	session.UserID = user.ID
 	session.AccessToken = accessToken
 	session.RefreshToken = sigInInput.RefreshToken
 	session.GeneratedVia = "sign in with refresh token"
+	session.Device = device
+	session.LocationID = location.ID
 
 	if _, err := session.Create(session); err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
