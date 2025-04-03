@@ -3,6 +3,7 @@ package auth
 import (
 	"log"
 
+	"github.com/Tuliime/tulime-backend/internal/handlers/location"
 	"github.com/Tuliime/tulime-backend/internal/models"
 	"github.com/Tuliime/tulime-backend/internal/packages"
 	"github.com/gofiber/fiber/v2"
@@ -10,6 +11,12 @@ import (
 
 var SignUp = func(c *fiber.Ctx) error {
 	user := models.User{}
+	device := c.Get("X-Device")
+	clientIP, ok := c.Locals("clientIP").(string)
+	if !ok {
+		return fiber.NewError(fiber.StatusInternalServerError, "Invalid client type!")
+	}
+
 	if err := c.BodyParser(&user); err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
@@ -49,8 +56,14 @@ var SignUp = func(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
-	session := models.Session{UserID: newUser.ID, AccessToken: accessToken, RefreshToken: refreshToken,
-		GeneratedVia: "sign up"}
+	location, err := location.GetUserLocationByIP(newUser.ID, clientIP)
+	if err != nil {
+		log.Printf("Error getting location ID:  %+v", err)
+	}
+
+	session := models.Session{UserID: newUser.ID, AccessToken: accessToken,
+		RefreshToken: refreshToken, GeneratedVia: "sign up", Device: device,
+		LocationID: location.ID}
 	if _, err := session.Create(session); err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
