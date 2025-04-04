@@ -22,8 +22,9 @@ var UpdateTypingStatus = func(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
 
-	if typingStatusInput.UserID == "" || typingStatusInput.RecipientID == "" {
-		return fiber.NewError(fiber.StatusBadRequest, "Missing userID/recipientID!")
+	if typingStatusInput.UserID == "" || typingStatusInput.RecipientID == "" ||
+		typingStatusInput.Type == "" {
+		return fiber.NewError(fiber.StatusBadRequest, "Missing userID/recipientID/type!")
 	}
 
 	user, err := user.FindOne(typingStatusInput.UserID)
