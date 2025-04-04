@@ -50,4 +50,7 @@ type File struct {
 type TypingStatus struct {
 	UserID          string    `json:"userID"`
 	StartedTypingAt time.Time `json:"startedTypingAt"`
+	RecipientID     string    `json:"recipientID"`
+	Type            string    `json:"type"`
+	User            User      `json:"user"`
 }

@@ -95,11 +95,19 @@ func GetEventStream(w http.ResponseWriter, r *http.Request) {
 		case typingStatusEvent := <-typingStatusChan:
 			typingStatus, ok := typingStatusEvent.Data.(TypingStatus)
 			if !ok {
-				log.Printf("Invalid message type received: %T", typingStatusEvent.Data)
+				log.Printf("Invalid typing-status received: %T", typingStatusEvent.Data)
 				return
 			}
-			if err := cm.SendEvent("typing-status", typingStatus, userID); err != nil {
-				log.Printf("Error sending keep-alive event: %v\n", err)
+			if typingStatus.Type == "messenger" {
+				if err := cm.SendEvent("typing-status-messenger", typingStatus,
+					typingStatus.RecipientID); err != nil {
+					log.Printf("Error sending typing-status event: %v\n", err)
+					return
+				}
+				return
+			}
+			if err := cm.SendEvent("typing-status-chatroom", typingStatus, userID); err != nil {
+				log.Printf("Error sending typing-status event: %v\n", err)
 				return
 			}
 		case notificationEvent := <-notificationChan:
