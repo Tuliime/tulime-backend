@@ -132,20 +132,17 @@ var PostChat = func(c *fiber.Ctx) error {
 	}
 
 	// Save all mentions of the chat message
-	if mention != "" {
+	if len(mentions) > 0 {
 		for _, mention := range mentions {
-			if mention == "" {
-				continue
-			}
 			chatroomMentions = append(chatroomMentions,
 				models.ChatroomMention{ChatroomID: newChatroom.ID, UserID: mention})
 		}
-		newChatroomMentions, err := chatroomMention.CreateMany(chatroomMentions)
+		chatroomMentions, err = chatroomMention.CreateMany(chatroomMentions)
 		if err != nil {
 			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 		}
-		newChatroom.Mention = newChatroomMentions
 	}
+	newChatroom.Mention = chatroomMentions
 
 	// Get replied message if it exists
 	if newChatroom.Reply != "" {
