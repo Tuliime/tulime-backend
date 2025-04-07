@@ -127,6 +127,7 @@ func GetEventStream(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 		case <-disconnect:
+			log.Printf("All Clients :%+v", cm.GetAllClients())
 			cm.RemoveClient(userID)
 			keepAliveTicker.Stop()
 			cancel()
