@@ -40,6 +40,17 @@ func (cm *ClientManager) GetClient(userId string) (http.ResponseWriter, bool) {
 	return client, ok
 }
 
+func (cm *ClientManager) GetAllClients() map[string]http.ResponseWriter {
+	cm.RLock()
+	defer cm.RUnlock()
+
+	clientsCopy := make(map[string]http.ResponseWriter)
+	for userID, writer := range cm.clients {
+		clientsCopy[userID] = writer
+	}
+	return clientsCopy
+}
+
 func (cm *ClientManager) SendEvent(eventType string, data any, userID string) error {
 	w, ok := cm.GetClient(userID)
 	if !ok {
