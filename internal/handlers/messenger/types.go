@@ -35,8 +35,8 @@ type Message struct {
 	ArrivedAt       time.Time             `json:"arrivedAt"`
 	CreatedAt       time.Time             `json:"createdAt"`
 	UpdatedAt       time.Time             `json:"updatedAt"`
-	Sender          any                   `json:"Sender"`
-	Recipient       any                   `json:"Recipient"`
+	Sender          any                   `json:"sender"`
+	Recipient       any                   `json:"recipient"`
 }
 
 type File struct {
