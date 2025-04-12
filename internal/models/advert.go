@@ -24,7 +24,7 @@ func (ad *Advert) Create(advert Advert) (Advert, error) {
 
 func (ad *Advert) FindOne(id string) (Advert, error) {
 	var advert Advert
-	db.First(&advert, "id = ?", id)
+	db.Preload("Store").Where("id = ?", id).First(&advert)
 
 	return advert, nil
 }

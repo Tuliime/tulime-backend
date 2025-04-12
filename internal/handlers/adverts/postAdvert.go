@@ -23,7 +23,7 @@ var PostAdvert = func(c *fiber.Ctx) error {
 
 	// Get store id, if it doesn't exist, create one
 	if advert.StoreID == "" {
-		savedStore, err := store.FindByUSer(advert.UserID, 1, "")
+		savedStore, err := store.FindByUser(advert.UserID, 1, "")
 		if err != nil {
 			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 		}
