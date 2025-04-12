@@ -6,6 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+// TODO: To add image dimensions and compression
 var UpdateAdvertImage = func(c *fiber.Ctx) error {
 	advertImage := models.AdvertImage{}
 	advertImageID := c.Params("advertImageID")
