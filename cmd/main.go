@@ -191,6 +191,7 @@ func main() {
 	advertGroup.Get("/:id/views/count", middlewares.Auth, adverts.GetViewCountByAdvert)
 	advertGroup.Post("/impressions", middlewares.Auth, adverts.PostAdvertImpression)
 	advertGroup.Get("/:id/impressions/count", middlewares.Auth, adverts.GetImpressionCountByAdvert)
+	advertGroup.Get("/:id/analytics", middlewares.Auth, adverts.GetAdvertAnalytics)
 
 	// ChatBoot
 	chatBotGroup := app.Group("/api/v0.01/chatbot", func(c *fiber.Ctx) error {
