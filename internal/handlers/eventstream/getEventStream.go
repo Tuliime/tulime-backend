@@ -88,6 +88,8 @@ func GetEventStream(w http.ResponseWriter, r *http.Request) {
 				log.Printf("Invalid message type received: %T", onlineStatusEvent.Data)
 				return
 			}
+			log.Printf("sending online-status event : %+v", onlineStatus)
+
 			if err := cm.SendEvent("online-status", onlineStatus, userID); err != nil {
 				log.Printf("Error sending online-status event: %v\n", err)
 				return

@@ -37,6 +37,7 @@ var UpdateOnlineStatus = func(c *fiber.Ctx) error {
 		}
 	}
 
+	log.Printf("published event onlineStatus : %+v", onlineStatus)
 	events.EB.Publish("onlineStatus", onlineStatus)
 
 	response := fiber.Map{
