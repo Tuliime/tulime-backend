@@ -36,7 +36,7 @@ func (s *Store) FindByName(name string) (Store, error) {
 	return store, nil
 }
 
-func (s *Store) FindByUSer(userID string, limit float64, cursor string) ([]Store, error) {
+func (s *Store) FindByUser(userID string, limit float64, cursor string) ([]Store, error) {
 	var stores []Store
 	query := db.Order("\"createdAt\" DESC").Limit(int(limit))
 
@@ -54,18 +54,18 @@ func (s *Store) FindByUSer(userID string, limit float64, cursor string) ([]Store
 	return stores, nil
 }
 
-func (cr *Store) FindAll(limit float64, cursor string, includeCursor bool, direction string) ([]Store, error) {
+func (s *Store) FindAll(limit float64, cursor string, includeCursor bool, direction string) ([]Store, error) {
 	var stores []Store
 
 	if direction == "FORWARD" {
-		storesInAscOrder, err := cr.FindAllInASCOrder(limit, cursor, includeCursor)
+		storesInAscOrder, err := s.FindAllInAscOrder(limit, cursor, includeCursor)
 		if err != nil {
 			return stores, err
 		}
 		stores = storesInAscOrder
 
 	} else if direction == "BACKWARD" {
-		chatRoomsInDescOrder, err := cr.FindAllInDESCOrder(limit, cursor, includeCursor)
+		chatRoomsInDescOrder, err := s.FindAllInDescOrder(limit, cursor, includeCursor)
 		if err != nil {
 			return stores, err
 		}
@@ -77,7 +77,7 @@ func (cr *Store) FindAll(limit float64, cursor string, includeCursor bool, direc
 	return stores, nil
 }
 
-func (s *Store) FindAllInDESCOrder(limit float64, cursor string, includeCursor bool) ([]Store, error) {
+func (s *Store) FindAllInDescOrder(limit float64, cursor string, includeCursor bool) ([]Store, error) {
 	var stores []Store
 	query := db.Order("\"createdAt\" DESC").Limit(int(limit))
 
@@ -100,7 +100,7 @@ func (s *Store) FindAllInDESCOrder(limit float64, cursor string, includeCursor b
 	return stores, nil
 }
 
-func (s *Store) FindAllInASCOrder(limit float64, cursor string, includeCursor bool) ([]Store, error) {
+func (s *Store) FindAllInAscOrder(limit float64, cursor string, includeCursor bool) ([]Store, error) {
 	var stores []Store
 
 	query := db.Order("\"createdAt\" ASC").Limit(int(limit))

@@ -17,7 +17,7 @@ var GetStoresByUser = func(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
 
-	stores, err := store.FindByUSer(userID, limit+1, cursorParam)
+	stores, err := store.FindByUser(userID, limit+1, cursorParam)
 	if err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
