@@ -38,18 +38,25 @@ var UpdateStoreBgImage = func(c *fiber.Ctx) error {
 	}
 	defer file.Close()
 
+	imageProcessor := packages.ImageProcessor{}
+	compressedFileBuf, err := imageProcessor.CompressMultipartFile(file, 75)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, "Failed to compress image")
+	}
+
 	filePath = packages.GenFilePath(fileHeader.Filename)
 	firebaseStorage := packages.FirebaseStorage{FilePath: filePath}
 
 	if savedStore.BackgroundImageUrl != "" {
 		// Update existing image
-		imageUrl, err = firebaseStorage.Update(file, fileHeader, savedStore.BackgroundImagePath)
+		imageUrl, err = firebaseStorage.UpdateFromBuffer(compressedFileBuf,
+			savedStore.BackgroundImagePath)
 		if err != nil {
 			return fiber.NewError(fiber.StatusBadRequest, err.Error())
 		}
 	} else {
 		// Add new image
-		imageUrl, err = firebaseStorage.Add(file, fileHeader)
+		imageUrl, err = firebaseStorage.AddFromBuffer(compressedFileBuf)
 		if err != nil {
 			return fiber.NewError(fiber.StatusBadRequest, err.Error())
 		}

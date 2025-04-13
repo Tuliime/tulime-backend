@@ -38,25 +38,31 @@ var UpdateStoreLogo = func(c *fiber.Ctx) error {
 	}
 	defer file.Close()
 
+	imageProcessor := packages.ImageProcessor{}
+	compressedFileBuf, err := imageProcessor.CompressMultipartFile(file, 75)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, "Failed to compress image")
+	}
+
 	filePath = packages.GenFilePath(fileHeader.Filename)
 	firebaseStorage := packages.FirebaseStorage{FilePath: filePath}
 
 	if savedStore.LogoUrl != "" {
 		// update existing image
-		imageUrl, err = firebaseStorage.Update(file, fileHeader, savedStore.LogoPath)
+		imageUrl, err = firebaseStorage.UpdateFromBuffer(compressedFileBuf, savedStore.LogoPath)
 		if err != nil {
 			return fiber.NewError(fiber.StatusBadRequest, err.Error())
 		}
 	} else {
 		// add new image
-		imageUrl, err = firebaseStorage.Add(file, fileHeader)
+		imageUrl, err = firebaseStorage.AddFromBuffer(compressedFileBuf)
 		if err != nil {
 			return fiber.NewError(fiber.StatusBadRequest, err.Error())
 		}
 	}
 
 	savedStore.LogoUrl = imageUrl
-	savedStore.LogoUrl = filePath
+	savedStore.LogoPath = filePath
 
 	updatedStore, err := savedStore.Update()
 	if err != nil {
