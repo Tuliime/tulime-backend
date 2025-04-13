@@ -54,6 +54,24 @@ func (ad *Advert) FindByUser(userID string, limit float64, cursor string) ([]Adv
 	return adverts, nil
 }
 
+func (ad *Advert) FindByStore(storeID string, limit float64, cursor string) ([]Advert, error) {
+	var adverts []Advert
+	query := db.Order("\"createdAt\" DESC").Limit(int(limit))
+
+	if cursor != "" {
+		var lastAdvert Advert
+		if err := db.Select("\"createdAt\"").Where("id = ?", cursor).First(&lastAdvert).Error; err != nil {
+			return nil, err
+		}
+		query = query.Where("\"createdAt\" < ?", lastAdvert.CreatedAt)
+	}
+	if err := query.Where("\"storeID\" = ?", storeID).Find(&adverts).Error; err != nil {
+		return nil, err
+	}
+
+	return adverts, nil
+}
+
 func (ad *Advert) FindAll(limit float64, cursor string, includeCursor bool, direction string) ([]Advert, error) {
 	var adverts []Advert
 

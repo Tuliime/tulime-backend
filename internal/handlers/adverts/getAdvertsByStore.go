@@ -6,20 +6,21 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-var GetAdvertsByUser = func(c *fiber.Ctx) error {
+var GetAdvertsByStore = func(c *fiber.Ctx) error {
 	advert := models.Advert{}
+	storeID := c.Params("storeID")
+
 	limitParam := c.Query("limit")
-	cursorParam := c.Query("cursor")
-	userID := c.Params("userID")
+	cursor := c.Query("cursor")
 
 	limit, err := packages.ValidateQueryLimit(limitParam)
 	if err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
 
-	adverts, err := advert.FindByUser(userID, limit+1, cursorParam)
+	adverts, err := advert.FindByStore(storeID, limit+1, cursor)
 	if err != nil {
-		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
 	var prevCursor string

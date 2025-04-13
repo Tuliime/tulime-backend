@@ -243,7 +243,7 @@ type Store struct {
 	CreatedAt           time.Time        `gorm:"column:createdAt;index" json:"createdAt"`
 	UpdatedAt           time.Time        `gorm:"column:updatedAt;index" json:"updatedAt"`
 	User                *User            `gorm:"foreignKey:UserID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"user"`
-	Advert              []*Advert        `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"advert"`
+	Advert              []*Advert        `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"adverts"`
 	StoreFeedback       []*StoreFeedback `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"feedback"`
 }
 
