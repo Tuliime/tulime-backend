@@ -24,21 +24,21 @@ func (ad *Advert) Create(advert Advert) (Advert, error) {
 
 func (ad *Advert) FindOne(id string) (Advert, error) {
 	var advert Advert
-	db.Preload("Store").Where("id = ?", id).First(&advert)
+	db.Preload("Store").Preload("AdvertImage").Where("id = ?", id).First(&advert)
 
 	return advert, nil
 }
 
 func (ad *Advert) FindByName(name string) (Advert, error) {
 	var advert Advert
-	db.First(&advert, "name = ?", name)
+	db.Preload("AdvertImage").First(&advert, "name = ?", name)
 
 	return advert, nil
 }
 
 func (ad *Advert) FindByUser(userID string, limit float64, cursor string) ([]Advert, error) {
 	var adverts []Advert
-	query := db.Order("\"createdAt\" DESC").Limit(int(limit))
+	query := db.Preload("AdvertImage").Order("\"createdAt\" DESC").Limit(int(limit))
 
 	if cursor != "" {
 		var lastAdvert Advert
@@ -56,7 +56,7 @@ func (ad *Advert) FindByUser(userID string, limit float64, cursor string) ([]Adv
 
 func (ad *Advert) FindByStore(storeID string, limit float64, cursor string) ([]Advert, error) {
 	var adverts []Advert
-	query := db.Order("\"createdAt\" DESC").Limit(int(limit))
+	query := db.Preload("AdvertImage").Order("\"createdAt\" DESC").Limit(int(limit))
 
 	if cursor != "" {
 		var lastAdvert Advert
@@ -97,7 +97,7 @@ func (ad *Advert) FindAll(limit float64, cursor string, includeCursor bool, dire
 
 func (ad *Advert) FindAllInDescOrder(limit float64, cursor string, includeCursor bool) ([]Advert, error) {
 	var adverts []Advert
-	query := db.Order("\"createdAt\" DESC").Limit(int(limit))
+	query := db.Preload("AdvertImage").Order("\"createdAt\" DESC").Limit(int(limit))
 
 	if cursor != "" {
 		var lastAdvert Advert
@@ -121,7 +121,7 @@ func (ad *Advert) FindAllInDescOrder(limit float64, cursor string, includeCursor
 func (ad *Advert) FindAllInAscOrder(limit float64, cursor string, includeCursor bool) ([]Advert, error) {
 	var adverts []Advert
 
-	query := db.Order("\"createdAt\" ASC").Limit(int(limit))
+	query := db.Preload("AdvertImage").Order("\"createdAt\" ASC").Limit(int(limit))
 
 	if cursor != "" {
 		var lastAdvert Advert
