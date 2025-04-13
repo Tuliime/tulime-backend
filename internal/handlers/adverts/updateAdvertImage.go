@@ -39,10 +39,16 @@ var UpdateAdvertImage = func(c *fiber.Ctx) error {
 	}
 	defer file.Close()
 
+	imageProcessor := packages.ImageProcessor{}
+	compressedFileBuf, err := imageProcessor.CompressMultipartFile(file, 75)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, "Failed to compress image")
+	}
+
 	filePath = packages.GenFilePath(fileHeader.Filename)
 	firebaseStorage := packages.FirebaseStorage{FilePath: filePath}
 
-	imageUrl, err = firebaseStorage.Update(file, fileHeader, savedAdvertImage.Path)
+	imageUrl, err = firebaseStorage.UpdateFromBuffer(compressedFileBuf, savedAdvertImage.Path)
 	if err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}

@@ -45,7 +45,7 @@ var PostAdvert = func(c *fiber.Ctx) error {
 
 	newAdvert, err := advert.Create(advert)
 	if err != nil {
-		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
 	response := fiber.Map{

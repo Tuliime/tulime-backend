@@ -50,7 +50,7 @@ var PostMessage = func(c *fiber.Ctx) error {
 	}
 	fmt.Printf("tags: %v\n", tags)
 
-	fileReader, err := c.FormFile("file")
+	fileHeader, err := c.FormFile("file")
 	if err != nil {
 		if err.Error() == constants.NO_FILE_UPLOADED_ERROR {
 			fmt.Println("No file uploaded")
@@ -73,10 +73,10 @@ var PostMessage = func(c *fiber.Ctx) error {
 	if fileUploaded {
 		// Validate file size (10 MB limit)
 		const maxFileSize = 10 << 20 // 10 MB in bytes
-		if fileReader.Size > maxFileSize {
+		if fileHeader.Size > maxFileSize {
 			return fiber.NewError(fiber.StatusBadRequest, "File size exceeds the 10 MB limit")
 		}
-		file, err := fileReader.Open()
+		file, err := fileHeader.Open()
 		if err != nil {
 			return fiber.NewError(fiber.StatusBadRequest, err.Error())
 		}
@@ -104,7 +104,7 @@ var PostMessage = func(c *fiber.Ctx) error {
 			return fiber.NewError(fiber.StatusInternalServerError, "Failed to compress image")
 		}
 
-		filePath = packages.GenFilePath(fileReader.Filename)
+		filePath = packages.GenFilePath(fileHeader.Filename)
 		firebaseStorage := packages.FirebaseStorage{FilePath: filePath}
 
 		imageUrl, err = firebaseStorage.AddFromBuffer(compressedFileBuf)
