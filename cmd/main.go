@@ -167,6 +167,7 @@ func main() {
 	storeGroup.Patch("/:id", middlewares.Auth, store.UpdateStore)
 	storeGroup.Patch("/:id/bg-image", middlewares.Auth, store.UpdateStoreBgImage)
 	storeGroup.Patch("/:id/logo", middlewares.Auth, store.UpdateStoreLogo)
+	storeGroup.Get("/:id", middlewares.Auth, store.GetStore)
 	storeGroup.Get("/", middlewares.Auth, store.GetAllStores)
 	storeGroup.Get("/user/:userID", middlewares.Auth, store.GetStoresByUser)
 	storeGroup.Post("/:id/feedback", middlewares.Auth, storefeedback.PostStoreFeedback)
@@ -192,6 +193,7 @@ func main() {
 	advertGroup.Post("/impressions", middlewares.Auth, adverts.PostAdvertImpression)
 	advertGroup.Get("/:id/impressions/count", middlewares.Auth, adverts.GetImpressionCountByAdvert)
 	advertGroup.Get("/:id/analytics", middlewares.Auth, adverts.GetAdvertAnalytics)
+	advertGroup.Get("/store/:storeID", middlewares.Auth, adverts.GetAdvertsByStore)
 
 	// ChatBoot
 	chatBotGroup := app.Group("/api/v0.01/chatbot", func(c *fiber.Ctx) error {
