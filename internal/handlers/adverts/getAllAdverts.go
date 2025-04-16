@@ -85,13 +85,9 @@ var GetAllAdverts = func(c *fiber.Ctx) error {
 		"direction":     direction,
 	}
 
-	storeMap := fiber.Map{
-		"stores": adverts,
-	}
-
 	response := fiber.Map{
 		"status":     "success",
-		"data":       storeMap,
+		"data":       adverts,
 		"pagination": pagination,
 	}
 
