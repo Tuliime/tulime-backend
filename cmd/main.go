@@ -188,6 +188,8 @@ func main() {
 	advertGroup.Get("/user/:userID", middlewares.Auth, adverts.GetAdvertsByUser)
 	advertGroup.Post("/:id/image", middlewares.Auth, adverts.PostAdvertImage)
 	advertGroup.Patch("/:id/image/:advertImageID", middlewares.Auth, adverts.UpdateAdvertImage)
+	advertGroup.Post("/:id/price", middlewares.Auth, adverts.PostAdvertPrice)
+	advertGroup.Post("/:id/inventory", middlewares.Auth, adverts.PostAdvertInventory)
 	advertGroup.Post("/views", middlewares.Auth, adverts.PostAdvertView)
 	advertGroup.Get("/:id/views/count", middlewares.Auth, adverts.GetViewCountByAdvert)
 	advertGroup.Post("/impressions", middlewares.Auth, adverts.PostAdvertImpression)

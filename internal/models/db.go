@@ -57,9 +57,9 @@ func Db() *gorm.DB {
 			&News{}, &FarmInputs{}, &OTP{}, &FarmManager{}, &VetDoctor{},
 			&Chatroom{}, &ChatroomFile{}, &ChatroomMention{}, &Chatbot{},
 			&Session{}, &OnlineStatus{}, &Device{}, &Notification{}, &Store{},
-			&Advert{}, &AdvertImage{}, &AdvertView{}, &AdvertImpression{},
-			&StoreFeedback{}, &StoreFeedbackFile{}, &MessengerRoom{}, &Messenger{},
-			&MessengerFile{}, &MessengerTag{}, &MessengerTag{}, &Location{})
+			&Advert{}, &AdvertImage{}, &AdvertPrice{}, &AdvertInventory{}, &AdvertView{},
+			&AdvertImpression{}, &StoreFeedback{}, &StoreFeedbackFile{}, &MessengerRoom{},
+			&Messenger{}, &MessengerFile{}, &MessengerTag{}, &MessengerTag{}, &Location{})
 		if err != nil {
 			log.Fatal("Failed to make auto migration", err)
 		}
