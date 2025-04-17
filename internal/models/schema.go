@@ -255,6 +255,8 @@ type Advert struct {
 	ProductDescription string              `gorm:"column:productDescription;not null;index" json:"productDescription"`
 	IsPublished        bool                `gorm:"column:isPublished;default:false;index" json:"isPublished"`
 	AdvertImage        []*AdvertImage      `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"images"`
+	AdvertPrice        *AdvertPrice        `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"price"`
+	AdvertInventory    *AdvertInventory    `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"inventory"`
 	MessengerTag       []*MessengerTag     `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"tags"`
 	AdvertView         []*AdvertView       `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"views"`
 	AdvertImpression   []*AdvertImpression `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"impressions"`
@@ -270,6 +272,27 @@ type AdvertImage struct {
 	URL       string    `gorm:"column:url;not null" json:"url"`
 	Path      string    `gorm:"column:path;not null" json:"path"`
 	IsPrimary bool      `gorm:"column:isPrimary;default:false" json:"isPrimary"`
+	CreatedAt time.Time `gorm:"column:createdAt;index" json:"createdAt"`
+	UpdatedAt time.Time `gorm:"column:updatedAt;index" json:"updatedAt"`
+	Advert    *Advert   `gorm:"foreignKey:AdvertID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+}
+
+type AdvertPrice struct {
+	ID        string    `gorm:"column:id;type:uuid;primaryKey" json:"id"`
+	AdvertID  string    `gorm:"column:advertID;not null;index" json:"advertID"`
+	Amount    float64   `gorm:"column:amount;not null" json:"amount"`
+	Currency  string    `gorm:"column:currency;not null" json:"currency"` // Stringified json
+	Unit      string    `gorm:"column:unit;not null" json:"unit"`
+	CreatedAt time.Time `gorm:"column:createdAt;index" json:"createdAt"`
+	UpdatedAt time.Time `gorm:"column:updatedAt;index" json:"updatedAt"`
+	Advert    *Advert   `gorm:"foreignKey:AdvertID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+}
+
+type AdvertInventory struct {
+	ID        string    `gorm:"column:id;type:uuid;primaryKey" json:"id"`
+	AdvertID  string    `gorm:"column:advertID;not null;index" json:"advertID"`
+	Quantity  float64   `gorm:"column:quantity;not null" json:"quantity"`
+	Unit      string    `gorm:"column:unit;not null" json:"unit"`
 	CreatedAt time.Time `gorm:"column:createdAt;index" json:"createdAt"`
 	UpdatedAt time.Time `gorm:"column:updatedAt;index" json:"updatedAt"`
 	Advert    *Advert   `gorm:"foreignKey:AdvertID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
