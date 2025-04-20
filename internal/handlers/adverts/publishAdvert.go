@@ -9,7 +9,7 @@ var PublishAdvert = func(c *fiber.Ctx) error {
 	advert := models.Advert{}
 	advertID := c.Params("id")
 
-	savedAdvert, err := advert.FindOne(advertID)
+	savedAdvert, err := advert.Find(advertID)
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
@@ -28,10 +28,15 @@ var PublishAdvert = func(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
+	updatedAdvert, err := advert.FindOne(publishedAdvert.ID)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+
 	response := fiber.Map{
 		"status":  "success",
 		"message": "Advert published successfully!",
-		"data":    publishedAdvert,
+		"data":    updatedAdvert,
 	}
 
 	return c.Status(fiber.StatusOK).JSON(response)

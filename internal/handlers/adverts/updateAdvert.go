@@ -17,7 +17,7 @@ var UpdateAdvert = func(c *fiber.Ctx) error {
 			"Missing ProductName/ProductDescription!")
 	}
 
-	savedAdvert, err := advert.FindOne(advertID)
+	savedAdvert, err := advert.Find(advertID)
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
@@ -30,6 +30,11 @@ var UpdateAdvert = func(c *fiber.Ctx) error {
 	savedAdvert.ProductDescription = advert.ProductDescription
 
 	updatedAdvert, err := savedAdvert.Update()
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+
+	updatedAdvert, err = advert.FindOne(updatedAdvert.ID)
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
