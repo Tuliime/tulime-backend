@@ -22,6 +22,16 @@ func (ad *Advert) Create(advert Advert) (Advert, error) {
 	return advert, nil
 }
 
+// Find retrieves one record matching provided id
+// and doesn't include joins
+func (ad *Advert) Find(id string) (Advert, error) {
+	var advert Advert
+	db.Where("id = ?", id).First(&advert)
+	return advert, nil
+}
+
+// Find retrieves one record matching provided id
+// and includes joins via preload
 func (ad *Advert) FindOne(id string) (Advert, error) {
 	var advert Advert
 	query := db.Preload("Store").Preload("AdvertImage").Preload("AdvertPrice").Preload("AdvertInventory")

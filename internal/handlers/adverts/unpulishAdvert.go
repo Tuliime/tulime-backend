@@ -9,7 +9,7 @@ var UnpublishAdvert = func(c *fiber.Ctx) error {
 	advert := models.Advert{}
 	advertID := c.Params("id")
 
-	savedAdvert, err := advert.FindOne(advertID)
+	savedAdvert, err := advert.Find(advertID)
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
@@ -23,7 +23,12 @@ var UnpublishAdvert = func(c *fiber.Ctx) error {
 	}
 
 	savedAdvert.IsPublished = false
-	publishedAdvert, err := savedAdvert.Update()
+	unpublishedAdvert, err := savedAdvert.Update()
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+
+	updatedAdvert, err := advert.FindOne(unpublishedAdvert.ID)
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
@@ -31,7 +36,7 @@ var UnpublishAdvert = func(c *fiber.Ctx) error {
 	response := fiber.Map{
 		"status":  "success",
 		"message": "Advert unpublished successfully!",
-		"data":    publishedAdvert,
+		"data":    updatedAdvert,
 	}
 
 	return c.Status(fiber.StatusOK).JSON(response)
