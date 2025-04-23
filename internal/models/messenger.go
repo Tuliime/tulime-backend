@@ -142,10 +142,6 @@ func (msgr *Messenger) FindRoomsByUser(userID string, limit float64,
 		return nil, err
 	}
 
-	// Reverse the slice to return in descending order
-	for i, j := 0, len(messengerRooms)-1; i < j; i, j = i+1, j-1 {
-		messengerRooms[i], messengerRooms[j] = messengerRooms[j], messengerRooms[i]
-	}
 	return messengerRooms, nil
 }
 
