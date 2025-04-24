@@ -40,7 +40,7 @@ var UpdateMessagesAsRead = func(c *fiber.Ctx) error {
 	fmt.Printf("messengerIDList: %v\n", messengerIDList)
 
 	for _, messengerID := range messengerIDList {
-		savedMessage, err := messenger.FindOne(messengerID)
+		savedMessage, err := messenger.Find(messengerID)
 		if err != nil {
 			return fiber.NewError(fiber.StatusBadRequest, err.Error())
 		}
