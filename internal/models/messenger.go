@@ -31,7 +31,9 @@ func (cr *Messenger) FindOne(id string) (Messenger, error) {
 
 func (msgr *Messenger) FindReply(reply string) (Messenger, error) {
 	var message Messenger
-	err := db.Preload("File").Preload("Tag").Where("id = ?", reply).First(&message).Error
+	query := db.Preload("File").Preload("Tag").Preload("Sender").Preload("Recipient")
+
+	err := query.Where("id = ?", reply).First(&message).Error
 	if err != nil {
 		return message, err
 	}
@@ -66,7 +68,9 @@ func (msgr *Messenger) FindInDescOrderByRoom(roomID string, limit float64,
 	cursor string, includeCursor bool) ([]Messenger, error) {
 	var messages []Messenger
 
-	query := db.Preload("File").Preload("Tag").Order("\"arrivedAt\" DESC").Limit(int(limit))
+	query := db.Order("\"arrivedAt\" DESC").Limit(int(limit))
+
+	query = query.Preload("File").Preload("Tag").Preload("Sender").Preload("Recipient")
 
 	if cursor != "" {
 		var lastMessage Messenger
@@ -96,7 +100,9 @@ func (msgr *Messenger) FindInAscOrderByRoom(roomID string, limit float64,
 	cursor string, includeCursor bool) ([]Messenger, error) {
 	var messages []Messenger
 
-	query := db.Preload("File").Preload("Tag").Order("\"arrivedAt\" ASC").Limit(int(limit))
+	query := db.Order("\"arrivedAt\" ASC").Limit(int(limit))
+
+	query = query.Preload("File").Preload("Tag").Preload("Sender").Preload("Recipient")
 
 	if cursor != "" {
 		var lastMessage Messenger

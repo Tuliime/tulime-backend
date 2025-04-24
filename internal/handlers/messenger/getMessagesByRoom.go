@@ -100,6 +100,30 @@ var GetMessagesByRoom = func(c *fiber.Ctx) error {
 				ArrivedAt:       reply.ArrivedAt,
 				CreatedAt:       reply.CreatedAt,
 				UpdatedAt:       reply.UpdatedAt,
+				Sender: User{
+					ID:             reply.Sender.ID,
+					Name:           reply.Sender.Name,
+					TelNumber:      reply.Sender.TelNumber,
+					Role:           reply.Sender.Role,
+					ImageUrl:       reply.Sender.ImageUrl,
+					ImagePath:      reply.Sender.ImagePath,
+					ProfileBgColor: reply.Sender.ProfileBgColor,
+					ChatroomColor:  reply.Sender.ChatroomColor,
+					CreatedAt:      reply.Sender.CreatedAt,
+					UpdatedAt:      reply.Sender.UpdatedAt,
+				},
+				Recipient: User{
+					ID:             reply.Recipient.ID,
+					Name:           reply.Recipient.Name,
+					TelNumber:      reply.Recipient.TelNumber,
+					Role:           reply.Recipient.Role,
+					ImageUrl:       reply.Recipient.ImageUrl,
+					ImagePath:      reply.Recipient.ImagePath,
+					ProfileBgColor: reply.Recipient.ProfileBgColor,
+					ChatroomColor:  reply.Recipient.ChatroomColor,
+					CreatedAt:      reply.Recipient.CreatedAt,
+					UpdatedAt:      reply.Recipient.UpdatedAt,
+				},
 			}
 		}
 
@@ -134,6 +158,30 @@ var GetMessagesByRoom = func(c *fiber.Ctx) error {
 			ArrivedAt:       messengerMsg.ArrivedAt,
 			CreatedAt:       messengerMsg.CreatedAt,
 			UpdatedAt:       messengerMsg.UpdatedAt,
+			Sender: User{
+				ID:             messengerMsg.Sender.ID,
+				Name:           messengerMsg.Sender.Name,
+				TelNumber:      messengerMsg.Sender.TelNumber,
+				Role:           messengerMsg.Sender.Role,
+				ImageUrl:       messengerMsg.Sender.ImageUrl,
+				ImagePath:      messengerMsg.Sender.ImagePath,
+				ProfileBgColor: messengerMsg.Sender.ProfileBgColor,
+				ChatroomColor:  messengerMsg.Sender.ChatroomColor,
+				CreatedAt:      messengerMsg.Sender.CreatedAt,
+				UpdatedAt:      messengerMsg.Sender.UpdatedAt,
+			},
+			Recipient: User{
+				ID:             messengerMsg.Recipient.ID,
+				Name:           messengerMsg.Recipient.Name,
+				TelNumber:      messengerMsg.Recipient.TelNumber,
+				Role:           messengerMsg.Recipient.Role,
+				ImageUrl:       messengerMsg.Recipient.ImageUrl,
+				ImagePath:      messengerMsg.Recipient.ImagePath,
+				ProfileBgColor: messengerMsg.Recipient.ProfileBgColor,
+				ChatroomColor:  messengerMsg.Recipient.ChatroomColor,
+				CreatedAt:      messengerMsg.Recipient.CreatedAt,
+				UpdatedAt:      messengerMsg.Recipient.UpdatedAt,
+			},
 		})
 	}
 

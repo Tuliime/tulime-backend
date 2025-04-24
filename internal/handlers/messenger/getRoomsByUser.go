@@ -7,7 +7,7 @@ import (
 )
 
 // Gets last message for each room by userID
-// And so it is essentially to the user rooms
+// And so it is essentially for getting the user rooms
 var GetRoomsByUser = func(c *fiber.Ctx) error {
 	messenger := models.Messenger{}
 	limitParam := c.Query("limit")
