@@ -203,7 +203,36 @@ var PostMessage = func(c *fiber.Ctx) error {
 			ArrivedAt:       reply.ArrivedAt,
 			CreatedAt:       reply.CreatedAt,
 			UpdatedAt:       reply.UpdatedAt,
+			Sender: User{
+				ID:             reply.Sender.ID,
+				Name:           reply.Sender.Name,
+				TelNumber:      reply.Sender.TelNumber,
+				Role:           reply.Sender.Role,
+				ImageUrl:       reply.Sender.ImageUrl,
+				ImagePath:      reply.Sender.ImagePath,
+				ProfileBgColor: reply.Sender.ProfileBgColor,
+				ChatroomColor:  reply.Sender.ChatroomColor,
+				CreatedAt:      reply.Sender.CreatedAt,
+				UpdatedAt:      reply.Sender.UpdatedAt,
+			},
+			Recipient: User{
+				ID:             reply.Recipient.ID,
+				Name:           reply.Recipient.Name,
+				TelNumber:      reply.Recipient.TelNumber,
+				Role:           reply.Recipient.Role,
+				ImageUrl:       reply.Recipient.ImageUrl,
+				ImagePath:      reply.Recipient.ImagePath,
+				ProfileBgColor: reply.Recipient.ProfileBgColor,
+				ChatroomColor:  reply.Recipient.ChatroomColor,
+				CreatedAt:      reply.Recipient.CreatedAt,
+				UpdatedAt:      reply.Recipient.UpdatedAt,
+			},
 		}
+	}
+
+	newMessage, err = messenger.FindOne(newMessage.ID)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
 	// structure the message
@@ -234,6 +263,30 @@ var PostMessage = func(c *fiber.Ctx) error {
 		ArrivedAt:       newMessage.ArrivedAt,
 		CreatedAt:       newMessage.CreatedAt,
 		UpdatedAt:       newMessage.UpdatedAt,
+		Sender: User{
+			ID:             newMessage.Sender.ID,
+			Name:           newMessage.Sender.Name,
+			TelNumber:      newMessage.Sender.TelNumber,
+			Role:           newMessage.Sender.Role,
+			ImageUrl:       newMessage.Sender.ImageUrl,
+			ImagePath:      newMessage.Sender.ImagePath,
+			ProfileBgColor: newMessage.Sender.ProfileBgColor,
+			ChatroomColor:  newMessage.Sender.ChatroomColor,
+			CreatedAt:      newMessage.Sender.CreatedAt,
+			UpdatedAt:      newMessage.Sender.UpdatedAt,
+		},
+		Recipient: User{
+			ID:             newMessage.Recipient.ID,
+			Name:           newMessage.Recipient.Name,
+			TelNumber:      newMessage.Recipient.TelNumber,
+			Role:           newMessage.Recipient.Role,
+			ImageUrl:       newMessage.Recipient.ImageUrl,
+			ImagePath:      newMessage.Recipient.ImagePath,
+			ProfileBgColor: newMessage.Recipient.ProfileBgColor,
+			ChatroomColor:  newMessage.Recipient.ChatroomColor,
+			CreatedAt:      newMessage.Recipient.CreatedAt,
+			UpdatedAt:      newMessage.Recipient.UpdatedAt,
+		},
 	}
 
 	events.EB.Publish("messenger", message)
@@ -242,8 +295,7 @@ var PostMessage = func(c *fiber.Ctx) error {
 	response := fiber.Map{
 		"status":  "success",
 		"message": "message posted successfully!",
-		// "data":    newMessage,
-		"data": message,
+		"data":    message,
 	}
 
 	return c.Status(fiber.StatusCreated).JSON(response)

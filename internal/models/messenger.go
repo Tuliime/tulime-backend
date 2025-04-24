@@ -22,10 +22,21 @@ func (msgr *Messenger) Create(message Messenger) (Messenger, error) {
 	return message, nil
 }
 
-func (cr *Messenger) FindOne(id string) (Messenger, error) {
+func (cr *Messenger) Find(id string) (Messenger, error) {
 	var message Messenger
 	db.First(&message, "id = ?", id)
 
+	return message, nil
+}
+
+func (cr *Messenger) FindOne(id string) (Messenger, error) {
+	var message Messenger
+	query := db.Preload("File").Preload("Tag").Preload("Sender").Preload("Recipient")
+
+	err := query.Where("id = ?", id).First(&message).Error
+	if err != nil {
+		return message, err
+	}
 	return message, nil
 }
 
