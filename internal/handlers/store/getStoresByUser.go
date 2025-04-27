@@ -1,49 +1,48 @@
 package store
 
 import (
+	"strconv"
+
 	"github.com/Tuliime/tulime-backend/internal/models"
-	"github.com/Tuliime/tulime-backend/internal/packages"
 	"github.com/gofiber/fiber/v2"
 )
 
 var GetStoresByUser = func(c *fiber.Ctx) error {
 	store := models.Store{}
-	limitParam := c.Query("limit")
 	cursorParam := c.Query("cursor")
 	userID := c.Params("userID")
+	includeAdvertStr := c.Query("includeAdverts", "false")
 
-	limit, err := packages.ValidateQueryLimit(limitParam)
-	if err != nil {
-		return fiber.NewError(fiber.StatusBadRequest, err.Error())
-	}
-
-	stores, err := store.FindByUser(userID, limit+1, cursorParam)
+	stores, err := store.FindByUser(userID, 1, cursorParam)
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
-	var prevCursor string
-	var hasPrevItems bool
-
-	if len(stores) > 0 && len(stores) > int(limit) {
-		stores = stores[:len(stores)-1] // Remove last element
-		prevCursor = stores[0].ID
-		hasPrevItems = true
-	} else {
-		prevCursor = ""
-		hasPrevItems = false
+	if len(stores) > 0 {
+		store = stores[0]
 	}
 
-	pagination := fiber.Map{
-		"limit":        limit,
-		"prevCursor":   prevCursor,
-		"hasPrevItems": hasPrevItems,
+	includeAdverts, err := strconv.ParseBool(includeAdvertStr)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+
+	advert := models.Advert{}
+	var adverts []models.Advert
+
+	if includeAdverts && len(stores) > 0 {
+		adverts, err = advert.FindByStore(stores[0].ID, 20, "")
+		if err != nil {
+			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		}
+		for i := range adverts {
+			store.Advert = append(store.Advert, &adverts[i])
+		}
 	}
 
 	response := fiber.Map{
-		"status":     "success",
-		"data":       stores,
-		"pagination": pagination,
+		"status": "success",
+		"data":   store,
 	}
 
 	return c.Status(fiber.StatusOK).JSON(response)
