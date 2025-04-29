@@ -134,7 +134,6 @@ func (ad *Advert) FindAllInDescOrder(limit float64, cursor string, includeCursor
 func (ad *Advert) FindAllInAscOrder(limit float64, cursor string, includeCursor bool) ([]Advert, error) {
 	var adverts []Advert
 
-	// query := db.Preload("AdvertImage").Order("\"createdAt\" ASC").Limit(int(limit))
 	query := db.Order("\"createdAt\" ASC").Limit(int(limit))
 	query = query.Preload("AdvertImage").Preload("AdvertPrice").Preload("AdvertInventory")
 
@@ -154,6 +153,21 @@ func (ad *Advert) FindAllInAscOrder(limit float64, cursor string, includeCursor 
 		return nil, err
 	}
 
+	return adverts, nil
+}
+
+func (ad *Advert) Search(searchQuery string) ([]Advert, error) {
+	var adverts []Advert
+
+	query := db.Order("\"createdAt\" DESC").Limit(20)
+	query = query.Preload("AdvertImage").Preload("AdvertPrice").Preload("AdvertInventory")
+
+	query = query.Where("\"isPublished\" = ? AND (\"productName\" ILIKE ? OR \"productDescription\" ILIKE ?)",
+		true, "%"+searchQuery+"%", "%"+searchQuery+"%")
+
+	if err := query.Find(&adverts).Error; err != nil {
+		return adverts, err
+	}
 	return adverts, nil
 }
 
