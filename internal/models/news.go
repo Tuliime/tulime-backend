@@ -55,6 +55,21 @@ func (n *News) FindAll(limit float64, category string, cursor string) ([]News, e
 	return news, nil
 }
 
+func (n *News) Search(searchQuery string) ([]News, error) {
+	var news []News
+
+	query := db.Order("\"createdAt\" DESC").Limit(20)
+
+	query = query.Where("title ILIKE ? OR description ILIKE ?",
+		"%"+searchQuery+"%", "%"+searchQuery+"%")
+
+	if err := query.Find(&news).Error; err != nil {
+		return news, err
+	}
+
+	return news, nil
+}
+
 // Update updates one News in the database, using the information
 // stored in the receiver u
 func (n *News) Update() (News, error) {

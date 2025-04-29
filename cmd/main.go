@@ -20,6 +20,7 @@ import (
 	"github.com/Tuliime/tulime-backend/internal/handlers/monitor"
 	"github.com/Tuliime/tulime-backend/internal/handlers/news"
 	"github.com/Tuliime/tulime-backend/internal/handlers/notification"
+	"github.com/Tuliime/tulime-backend/internal/handlers/search"
 	"github.com/Tuliime/tulime-backend/internal/handlers/status"
 	"github.com/Tuliime/tulime-backend/internal/handlers/store"
 	"github.com/Tuliime/tulime-backend/internal/handlers/storefeedback"
@@ -47,6 +48,7 @@ func main() {
 	app.Use(logger.New())
 
 	app.Use(middlewares.RateLimit)
+	app.Use(middlewares.NonAuthCheck)
 
 	// Load dev .env file
 	env := os.Getenv("GO_ENV")
@@ -229,6 +231,12 @@ func main() {
 	// EventStream using net/http
 	getEventStream := middlewares.NetHttpWrapper(http.HandlerFunc(eventstream.GetEventStream))
 	mux.Handle("/api/v0.01/event-stream", getEventStream)
+
+	// Search
+	searchGroup := app.Group("/api/v0.01/search", func(c *fiber.Ctx) error {
+		return c.Next()
+	})
+	searchGroup.Get("/", search.Search)
 
 	// Metrics
 	app.Get("/metrics", monitor.GetMetrics)

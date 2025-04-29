@@ -43,6 +43,7 @@ type User struct {
 	AdvertView           []*AdvertView      `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 	Location             []*Location        `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 	StoreFeedback        []*StoreFeedback   `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	SearchQuery          []*SearchQuery     `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 	CreatedAt            time.Time          `gorm:"column:createdAt" json:"createdAt"`
 	UpdatedAt            time.Time          `gorm:"column:updatedAt" json:"updatedAt"`
 }
@@ -77,7 +78,7 @@ type AgroproductPrice struct {
 type News struct {
 	ID          string    `gorm:"column:id;type:uuid;primaryKey" json:"id"`
 	Title       string    `gorm:"column:title;unique;not null;index" json:"title"`
-	Description string    `gorm:"column:description;not null" json:"description"`
+	Description string    `gorm:"column:description;not null;index" json:"description"`
 	Category    string    `gorm:"column:category;not null;index" json:"category"`
 	Source      string    `gorm:"column:source;not null;index" json:"source"`
 	ImageUrl    string    `gorm:"column:imageUrl;not null" json:"imageUrl"`
@@ -404,7 +405,20 @@ type Location struct {
 	User             *User               `gorm:"foreignKey:UserID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 	AdvertView       []*AdvertView       `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 	AdvertImpression []*AdvertImpression `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
-	Session          []*Session          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" `
+	Session          []*Session          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	SearchQuery      []*SearchQuery      `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+}
+
+type SearchQuery struct {
+	ID         string    `gorm:"column:id;type:uuid;primaryKey" json:"id"`
+	UserID     string    `gorm:"column:userID;not null;index" json:"userID"`
+	LocationID string    `gorm:"column:location;not null" json:"locationID"`
+	Device     string    `gorm:"column:device;default:'UNKNOWN'" json:"device"`
+	Query      string    `gorm:"column:query;not null" json:"query"`
+	CreatedAt  time.Time `gorm:"column:createdAt;index" json:"createdAt"`
+	UpdatedAt  time.Time `gorm:"column:updatedAt;index" json:"updatedAt"`
+	User       *User     `gorm:"foreignKey:UserID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	Location   *Location `gorm:"foreignKey:LocationID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 }
 
 // Other Types

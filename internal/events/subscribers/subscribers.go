@@ -8,6 +8,7 @@ func InitEventSubscribers() {
 	go ChatNotificationEventListener()
 	go MessengerNotificationEventListener()
 	go NotificationEventListener()
+	go SearchQueryEventListener()
 }
 
 // func init() {
