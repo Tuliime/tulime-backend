@@ -39,20 +39,35 @@ func processMessengerNotifications(messengerMsg models.Messenger) {
 			isTag = messengerMsg.Tag[0].ID != ""
 		}
 
-		if isReply {
-			notificationBody = fmt.Sprintf("%s replied to your message.", user.Name)
-		} else if isTag {
-			notificationBody = fmt.Sprintf("%s tagged a product in a new message.", user.Name)
+		var messageWithPhoto bool = messengerMsg.Text != "" && messengerMsg.File.ID != ""
+		var photoWithoutMessage bool = messengerMsg.File.ID != "" && messengerMsg.Text == ""
+
+		if messageWithPhoto {
+			notificationBody = fmt.Sprintf("📷 Photo - %s", messengerMsg.Text)
+		} else if photoWithoutMessage {
+			notificationBody = "📷 Photo"
 		} else {
-			notificationBody = fmt.Sprintf("%s sent you a new message.", user.Name)
+			notificationBody = messengerMsg.Text
+		}
+
+		if isReply {
+			notificationBody = fmt.Sprintf("↩️ Replied:  %s", notificationBody)
+		} else if isTag {
+			notificationBody = fmt.Sprintf("🏷️ Tagged:  %s", notificationBody)
+		} else {
+			notificationBody = fmt.Sprintf("🆕 New:  %s", notificationBody)
 		}
 
 		jsonNotificationData, err := json.Marshal(struct {
 			MessengerID string `json:"messengerID"`
 			FileURL     string `json:"fileURL"`
+			Type        string `json:"type"`
+			ClientPath  string `json:"clientPath"`
 		}{
 			MessengerID: messengerMsg.ID,
 			FileURL:     messenger.File.URL,
+			Type:        "messenger",
+			ClientPath:  fmt.Sprintf("/ecommerce/messenger/%s", messengerMsg.ID),
 		})
 
 		if err != nil {

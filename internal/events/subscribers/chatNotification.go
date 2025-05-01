@@ -27,7 +27,6 @@ func processChatNotifications(chatroomMessage models.Chatroom) {
 		if err != nil {
 			log.Printf("Error fetching replied message %v: ", err)
 		}
-
 	}
 
 	user, err = user.FindOne(chatroomMessage.UserID)
@@ -57,20 +56,35 @@ func processChatNotifications(chatroomMessage models.Chatroom) {
 			}
 		}
 
-		if isReply {
-			notificationBody = fmt.Sprintf("%s replied to your message.", user.Name)
-		} else if isMention {
-			notificationBody = fmt.Sprintf("%s mentioned you in a message.", user.Name)
+		var messageWithPhoto bool = chatroomMessage.Text != "" && chatroomMessage.File.ID != ""
+		var photoWithoutMessage bool = chatroomMessage.File.ID != "" && chatroomMessage.Text == ""
+
+		if messageWithPhoto {
+			notificationBody = fmt.Sprintf("📷 Photo - %s", chatroomMessage.Text)
+		} else if photoWithoutMessage {
+			notificationBody = "📷 Photo"
 		} else {
-			notificationBody = fmt.Sprintf("%s posted a new message.", user.Name)
+			notificationBody = chatroomMessage.Text
+		}
+
+		if isReply {
+			notificationBody = fmt.Sprintf("%s ~ ↩️ Replied:  %s", user.Name, notificationBody)
+		} else if isMention {
+			notificationBody = fmt.Sprintf("%s ~ 🏷️ Mentioned you:  %s", user.Name, notificationBody)
+		} else {
+			notificationBody = fmt.Sprintf("%s ~  %s", user.Name, notificationBody)
 		}
 
 		jsonNotificationData, err := json.Marshal(struct {
 			ChatroomID string `json:"chatroomID"`
 			FileURL    string `json:"fileURL"`
+			Type       string `json:"type"`
+			ClientPath string `json:"clientPath"`
 		}{
 			ChatroomID: chatroomMessage.ID,
 			FileURL:    chatroom.File.URL,
+			Type:       "chatroom",
+			ClientPath: "/chatroom",
 		})
 
 		if err != nil {
@@ -81,8 +95,8 @@ func processChatNotifications(chatroomMessage models.Chatroom) {
 		notificationData := string(jsonNotificationData)
 
 		notification := models.Notification{UserID: device.UserID,
-			Title: "Tulime ChatFarm", Body: notificationBody, Data: notificationData,
-			Type: "chat"}
+			Title: "Tulime Community Chatfam", Body: notificationBody, Data: notificationData,
+			Type: "chatroom"}
 
 		sendNotification := models.SendNotification{Notification: notification,
 			DeviceToken: device.Token}

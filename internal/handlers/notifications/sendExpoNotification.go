@@ -12,10 +12,12 @@ import (
 )
 
 type ExpoNotification struct {
-	To       string `json:"to"`
-	Title    string `json:"title"`
-	Body     string `json:"body"`
-	Priority string `json:"priority"`
+	To       string `json:"to,omitempty"`
+	Title    string `json:"title,omitempty"`
+	Body     string `json:"body,omitempty"`
+	Priority string `json:"priority,omitempty"`
+	// Data     map[string]interface{} `json:"data,omitempty"`
+	Data string `json:"data,omitempty"`
 }
 
 func SendExpoNotification(sendNotification models.SendNotification) error {
@@ -25,6 +27,7 @@ func SendExpoNotification(sendNotification models.SendNotification) error {
 		Title:    sendNotification.Notification.Title,
 		Body:     sendNotification.Notification.Body,
 		Priority: "high",
+		Data:     sendNotification.Notification.Data,
 	}
 
 	jsonData, err := json.Marshal(expoNotification)
