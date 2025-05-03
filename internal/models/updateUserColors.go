@@ -14,19 +14,29 @@ func UpdateUserColors() {
 	}
 
 	for _, user := range users {
-		profileColor, err := packages.GetRandomColor()
-		if err != nil {
-			log.Printf("Error getting random color for user %s: %v", user.ID, err)
+		if user.ProfileBgColor != "" && user.ChatroomColor != "" {
+			log.Printf("User :%s has both ProfileBgColor :%s and ChatroomColor :%s",
+				user.Name, user.ProfileBgColor, user.ChatroomColor)
 			continue
 		}
-		user.ProfileBgColor = profileColor
 
-		chatroomColor, err := packages.GetRandomColor()
-		if err != nil {
-			log.Printf("Error getting random color for user %s: %v", user.ID, err)
-			continue
+		if user.ProfileBgColor == "" {
+			profileColor, err := packages.GetRandomColor()
+			if err != nil {
+				log.Printf("Error getting random profileColor for user %s: %v", user.ID, err)
+				continue
+			}
+			user.ProfileBgColor = profileColor
 		}
-		user.ChatroomColor = chatroomColor
+
+		if user.ChatroomColor == "" {
+			chatroomColor, err := packages.GetRandomColor()
+			if err != nil {
+				log.Printf("Error getting random chatroomColor for user %s: %v", user.ID, err)
+				continue
+			}
+			user.ChatroomColor = chatroomColor
+		}
 
 		if err := db.Save(&user).Error; err != nil {
 			log.Printf("Error updating user %s: %v", user.ID, err)
@@ -36,6 +46,6 @@ func UpdateUserColors() {
 	log.Println("Updated all user colors")
 }
 
-// func init() {
-// 	UpdateUserColors()
-// }
+func init() {
+	UpdateUserColors()
+}

@@ -25,13 +25,22 @@ var SignUp = func(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusBadRequest, "Missing username/telephone number/password!")
 	}
 
-	savedUser, err := user.FindByTelNumber(user.TelNumber)
+	telNumberUser, err := user.FindByTelNumber(user.TelNumber)
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
-	if savedUser.ID != "" {
+	if telNumberUser.ID != "" {
 		return fiber.NewError(fiber.StatusBadRequest, "Telephone number already registered!")
+	}
+
+	emailUser, err := user.FindByEmail(user.Email)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+
+	if emailUser.ID != "" {
+		return fiber.NewError(fiber.StatusBadRequest, "Email is already registered!")
 	}
 
 	err = user.SetRole("user")

@@ -14,13 +14,27 @@ var ForgotPassword = func(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
-	user, err := user.FindByTelNumber(user.TelNumber)
-	if err != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	hasEmail := user.Email != ""
+	hasTelNumber := user.TelNumber != 0
+
+	if hasTelNumber {
+		user, err := user.FindByTelNumber(user.TelNumber)
+		if err != nil {
+			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		}
+		if user.ID == "" {
+			return fiber.NewError(fiber.StatusBadRequest, "We couldn't find user with provided telephone number!")
+		}
 	}
 
-	if user.ID == "" {
-		return fiber.NewError(fiber.StatusBadRequest, "We couldn't find user with provided telephone number!")
+	if hasEmail {
+		user, err := user.FindByEmail(user.Email)
+		if err != nil {
+			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		}
+		if user.ID == "" {
+			return fiber.NewError(fiber.StatusBadRequest, "We couldn't find user with provided email!")
+		}
 	}
 
 	otp := models.OTP{UserID: user.ID}
@@ -30,7 +44,14 @@ var ForgotPassword = func(c *fiber.Ctx) error {
 	}
 
 	fmt.Println("OTP:", optCode)
+	// if hasTelNumber {
+	// 	//TODO:To Send email  message here
+	// }
 	//TODO:To Send an sms message here
+
+	// if hasEmail {
+	// 	//TODO:To Send email  message here
+	// }
 
 	response := map[string]interface{}{
 		"status":  "success",

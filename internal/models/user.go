@@ -15,13 +15,18 @@ func (u *User) BeforeCreate(tx *gorm.DB) error {
 		return err
 	}
 
-	color, err := packages.GetRandomColor()
+	profileBgColor, err := packages.GetRandomColor()
+	if err != nil {
+		return err
+	}
+	chatroomColor, err := packages.GetRandomColor()
 	if err != nil {
 		return err
 	}
 
 	u.Password = hashedPassword
-	u.ProfileBgColor = color
+	u.ProfileBgColor = profileBgColor
+	u.ProfileBgColor = chatroomColor
 
 	uuid := uuid.New().String()
 	tx.Statement.SetColumn("ID", uuid)
@@ -61,6 +66,13 @@ func (u *User) FindOne(id string) (User, error) {
 func (u *User) FindByTelNumber(telNumber int) (User, error) {
 	var user User
 	db.First(&user, "\"telNumber\" = ?", telNumber)
+
+	return user, nil
+}
+
+func (u *User) FindByEmail(email string) (User, error) {
+	var user User
+	db.First(&user, "email = ?", email)
 
 	return user, nil
 }
