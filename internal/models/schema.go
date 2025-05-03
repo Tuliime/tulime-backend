@@ -1,12 +1,10 @@
 package models
 
 import (
-	// "context"
 	"context"
 	"time"
 
 	"gorm.io/gorm"
-	// "gorm.io/gorm"
 )
 
 var db = Db()
@@ -20,6 +18,10 @@ type User struct {
 	TelNumber            int                `gorm:"column:telNumber;unique;not null;index" json:"telNumber"`
 	Password             string             `gorm:"column:password;not null" json:"password"`
 	Role                 string             `gorm:"column:role;default:'user';not null" json:"role"`
+	Email                string             `gorm:"column:email;index" json:"email"` //Enforce email uniqueness at the application level
+	Gender               string             `gorm:"column:gender;default:null" json:"gender"`
+	DateOfBirth          string             `gorm:"column:dateOfBirth;default:null" json:"dateOfBirth"`
+	Country              string             `gorm:"column:country;default:null" json:"country"`
 	ImageUrl             string             `gorm:"column:imageUrl;default:null" json:"imageUrl"`
 	ImagePath            string             `gorm:"column:imagePath;default:null" json:"imagePath"`
 	ProfileBgColor       string             `gorm:"column:profileBgColor;default:null" json:"profileBgColor"`

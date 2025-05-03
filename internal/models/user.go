@@ -70,6 +70,13 @@ func (u *User) FindByTelNumber(telNumber int) (User, error) {
 	return user, nil
 }
 
+func (u *User) FindByEmail(email string) (User, error) {
+	var user User
+	db.First(&user, "email = ?", email)
+
+	return user, nil
+}
+
 func (u *User) FindAll() ([]User, error) {
 	var users []User
 	db.Find(&users)
