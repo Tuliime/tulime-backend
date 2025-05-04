@@ -46,6 +46,6 @@ func UpdateUserColors() {
 	log.Println("Updated all user colors")
 }
 
-func init() {
-	UpdateUserColors()
-}
+// func init() {
+// 	UpdateUserColors()
+// }
