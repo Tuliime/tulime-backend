@@ -169,13 +169,13 @@ func main() {
 	storeGroup.Patch("/:id", middlewares.Auth, store.UpdateStore)
 	storeGroup.Patch("/:id/bg-image", middlewares.Auth, store.UpdateStoreBgImage)
 	storeGroup.Patch("/:id/logo", middlewares.Auth, store.UpdateStoreLogo)
-	storeGroup.Get("/:id", middlewares.Auth, store.GetStore)
-	storeGroup.Get("/", middlewares.Auth, store.GetAllStores)
-	storeGroup.Get("/user/:userID", middlewares.Auth, store.GetStoresByUser)
+	storeGroup.Get("/:id", store.GetStore)
+	storeGroup.Get("/", store.GetAllStores)
+	storeGroup.Get("/user/:userID", store.GetStoresByUser)
 	storeGroup.Post("/:id/feedback", middlewares.Auth, storefeedback.PostStoreFeedback)
 	storeGroup.Patch("/:id/feedback/:feedbackID", middlewares.Auth,
 		storefeedback.UpdateStoreFeedback)
-	storeGroup.Get("/:id/feedback", middlewares.Auth, storefeedback.GetFeedbackByStore)
+	storeGroup.Get("/:id/feedback", storefeedback.GetFeedbackByStore)
 
 	// E-commerce Adverts
 	advertGroup := app.Group("/api/v0.01/adverts", func(c *fiber.Ctx) error {
@@ -185,9 +185,9 @@ func main() {
 	advertGroup.Patch("/:id", middlewares.Auth, adverts.UpdateAdvert)
 	advertGroup.Patch("/:id/publish", middlewares.Auth, adverts.PublishAdvert)
 	advertGroup.Patch("/:id/unpublish", middlewares.Auth, adverts.UnpublishAdvert)
-	advertGroup.Get("/:id", middlewares.Auth, adverts.GetAdvert)
-	advertGroup.Get("/", middlewares.Auth, adverts.GetAllAdverts)
-	advertGroup.Get("/user/:userID", middlewares.Auth, adverts.GetAdvertsByUser)
+	advertGroup.Get("/:id", adverts.GetAdvert)
+	advertGroup.Get("/", adverts.GetAllAdverts)
+	advertGroup.Get("/user/:userID", adverts.GetAdvertsByUser)
 	advertGroup.Post("/:id/image", middlewares.Auth, adverts.PostAdvertImage)
 	advertGroup.Patch("/:id/image/:advertImageID", middlewares.Auth, adverts.UpdateAdvertImage)
 	advertGroup.Post("/:id/price", middlewares.Auth, adverts.PostAdvertPrice)
@@ -199,7 +199,7 @@ func main() {
 	advertGroup.Post("/impressions", middlewares.Auth, adverts.PostAdvertImpression)
 	advertGroup.Get("/:id/impressions/count", middlewares.Auth, adverts.GetImpressionCountByAdvert)
 	advertGroup.Get("/:id/analytics", middlewares.Auth, adverts.GetAdvertAnalytics)
-	advertGroup.Get("/store/:storeID", middlewares.Auth, adverts.GetAdvertsByStore)
+	advertGroup.Get("/store/:storeID", adverts.GetAdvertsByStore)
 
 	// ChatBoot
 	chatBotGroup := app.Group("/api/v0.01/chatbot", func(c *fiber.Ctx) error {
