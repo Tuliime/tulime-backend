@@ -76,6 +76,7 @@ var UpdateUser = func(c *fiber.Ctx) error {
 		"role":           updatedUser.Role,
 		"imageUrl":       updatedUser.ImageUrl,
 		"profileBgColor": updatedUser.ProfileBgColor,
+		"chatroomColor":  updatedUser.ChatroomColor,
 		"createdAt":      updatedUser.CreatedAt,
 		"updatedAt":      updatedUser.UpdatedAt,
 	}

@@ -18,23 +18,25 @@ var ForgotPassword = func(c *fiber.Ctx) error {
 	hasTelNumber := user.TelNumber != 0
 
 	if hasTelNumber {
-		user, err := user.FindByTelNumber(user.TelNumber)
+		userByNumber, err := user.FindByTelNumber(user.TelNumber)
 		if err != nil {
 			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 		}
-		if user.ID == "" {
+		if userByNumber.ID == "" {
 			return fiber.NewError(fiber.StatusBadRequest, "We couldn't find user with provided telephone number!")
 		}
+		user = userByNumber
 	}
 
 	if hasEmail {
-		user, err := user.FindByEmail(user.Email)
+		userByEmail, err := user.FindByEmail(user.Email)
 		if err != nil {
 			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 		}
-		if user.ID == "" {
+		if userByEmail.ID == "" {
 			return fiber.NewError(fiber.StatusBadRequest, "We couldn't find user with provided email!")
 		}
+		user = userByEmail
 	}
 
 	otp := models.OTP{UserID: user.ID}

@@ -26,7 +26,7 @@ func (u *User) BeforeCreate(tx *gorm.DB) error {
 
 	u.Password = hashedPassword
 	u.ProfileBgColor = profileBgColor
-	u.ProfileBgColor = chatroomColor
+	u.ChatroomColor = chatroomColor
 
 	uuid := uuid.New().String()
 	tx.Statement.SetColumn("ID", uuid)
