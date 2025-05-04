@@ -25,24 +25,35 @@ var SignIn = func(c *fiber.Ctx) error {
 	hasEmail := user.Email != ""
 	hasTelNumber := user.TelNumber != 0
 
+	if !hasEmail && !hasTelNumber {
+		return fiber.NewError(fiber.StatusBadRequest, "Email or telephone number is required")
+	}
+
+	if password == "" {
+		return fiber.NewError(fiber.StatusBadRequest, "Password is required")
+	}
+
 	if hasTelNumber {
-		user, err := user.FindByTelNumber(user.TelNumber)
+		userByNumber, err := user.FindByTelNumber(user.TelNumber)
 		if err != nil {
 			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 		}
-		if user.ID == "" {
+
+		if userByNumber.ID == "" {
 			return fiber.NewError(fiber.StatusBadRequest, "Invalid telephone number/password!")
 		}
+		user = userByNumber
 	}
 
 	if hasEmail {
-		user, err := user.FindByEmail(user.Email)
+		userByEmail, err := user.FindByEmail(user.Email)
 		if err != nil {
 			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 		}
-		if user.ID == "" {
+		if userByEmail.ID == "" {
 			return fiber.NewError(fiber.StatusBadRequest, "Invalid email/password!")
 		}
+		user = userByEmail
 	}
 
 	passwordMatches, err := user.PasswordMatches(password)
@@ -50,13 +61,10 @@ var SignIn = func(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
-	if hasTelNumber {
-		if !passwordMatches {
+	if !passwordMatches {
+		if hasTelNumber {
 			return fiber.NewError(fiber.StatusBadRequest, "Invalid telephone number/password!")
-		}
-	}
-	if hasEmail {
-		if !passwordMatches {
+		} else if hasEmail {
 			return fiber.NewError(fiber.StatusBadRequest, "Invalid email/password!")
 		}
 	}
